@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Users Management</title>
+
+  <!-- <base href="/LibraTrack/"> -->
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/admin-users.css" rel="stylesheet">
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+
+  <style>
+    .name-grid{display:grid;grid-template-columns:1fr 1fr 1fr minmax(130px,180px);gap:12px}
+    @media (max-width: 768px){ .name-grid{grid-template-columns:1fr 1fr} .name-grid .col-span-2{grid-column: span 2} }
+    .form-text-hint{font-size:.8rem;color:#6b7280}
+    .field-error{color:#dc3545;font-size:.85rem;margin-top:.35rem}
+    .pw-wrap{position:relative}
+    .pw-toggle{position:absolute; right:.5rem; top:50%; transform:translateY(-50%); border:0; background:transparent}
+    .badge.text-bg-success-soft{background:rgba(25,135,84,.12); color:#198754; font-weight:500}
+    .badge.text-bg-danger-soft{background:rgba(220,53,69,.12); color:#dc3545; font-weight:500}
+    .role-badge{font-weight:500}
+    .role-badge.admin{background:rgba(33,37,41,.08); color:#212529}
+    .role-badge.librarian{background:rgba(13,110,253,.12); color:#0d6efd}
+    .role-badge.student{background:rgba(111,66,193,.12); color:#6f42c1}
+    .avatar{width:34px;height:34px;border-radius:50%;object-fit:cover}
+    .action-icons .icon-btn{border:0;background:transparent;padding:.25rem .35rem}
+    .action-icons i{font-size:1rem}
+    .table-modern th,.table-modern td{vertical-align:middle}
+    .fit-select{width:160px}
+    .chip{display:inline-flex;align-items:center;padding:.25rem .5rem;border-radius:999px;font-size:.75rem;font-weight:600}
+    .chip-status.disabled{background:rgba(220,53,69,.12); color:#dc3545}
+    .userview-2col .vu-head{display:flex;gap:16px;align-items:center}
+    .userview-2col .vu-avatar img{width:64px;height:64px;border-radius:50%}
+    .userview-2col .vu-sheet{margin-top:16px;border-top:1px solid #eee}
+    .userview-2col .vu-row{display:grid;grid-template-columns:220px 1fr;padding:.6rem .25rem;border-bottom:1px dashed #eee}
+    .userview-2col .vu-headrow{font-weight:600;background:#fafafa}
+    .th-tight{width:1%;white-space:nowrap}
+  </style>
+</head>
+<body class="sb-body">
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <nav class="sb-topbar navbar navbar-expand bg-white sticky-top">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <div class="fw-bold h5 mb-0">Users Management</div>
+
+        <form class="d-none d-md-flex ms-auto me-2" role="search" style="max-width:420px; width:100%;">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
+            <input id="searchInput" class="form-control border-0 bg-light" type="search" placeholder="Search name, email, ID…">
+          </div>
+        </form>
+
+        <button class="btn btn-dark btn-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#userModal">
+          <i class="bi bi-person-plus"></i> Add User
+        </button>
+      </div>
+    </nav>
+
+    <main class="container-fluid py-4">
+      <section class="table-card card p-0">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="fw-semibold"><i class="bi bi-people-fill me-2"></i>Users</span>
+        </div>
+
+        <div class="px-3 pt-3 pb-2">
+          <div class="d-flex flex-wrap align-items-end gap-3 justify-content-between">
+            <div class="d-flex flex-wrap gap-2">
+              <div>
+                <label class="form-label mb-1">Role</label>
+                <select id="filterRole" class="form-select form-select-sm fit-select">
+                  <option value="">All</option>
+                  <option value="admin">Admin</option>
+                  <option value="librarian">Librarian</option>
+                  <option value="student">Student</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label mb-1">Status</label>
+                <select id="filterStatus" class="form-select form-select-sm fit-select">
+                  <option value="">All</option>
+                  <option value="active">Active</option>
+                  <option value="disabled">Disabled</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6 text-md-end mt-2 mt-md-0">
+              <div class="d-flex gap-2 justify-content-md-end flex-wrap">
+                <button id="btnExport" class="btn btn-soft-dark btn-sm">
+                  <i class="bi bi-download me-1"></i>Export CSV
+                </button>
+                <button id="btnBulkDisable" class="btn btn-soft-warning btn-sm">
+                  <i class="bi bi-slash-circle me-1"></i>Disable
+                </button>
+                <button id="btnBulkDelete" class="btn btn-soft-danger btn-sm">
+                  <i class="bi bi-trash-fill me-1"></i>Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-modern align-middle mb-0" id="usersTable">
+            <thead>
+              <tr>
+                <th class="th-tight"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th class="d-none d-lg-table-cell">ID / Student No.</th>
+                <th class="th-tight">Status</th>
+                <th class="th-tight text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersBody"></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+          <div class="text-muted small" id="pageInfo">Showing 1–10 of 0</div>
+          <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add/Edit User Modal -->
+  <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <form id="userForm" class="modal-content" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title" id="userModalTitle">Add User</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label mb-1">Name</label>
+              <div class="name-grid">
+                <div>
+                  <input id="fFirst" type="text" class="form-control" placeholder="First name" required>
+                  <div class="field-error d-none" id="errFirst"></div>
+                </div>
+                <div>
+                  <input id="fMiddle" type="text" class="form-control" placeholder="Middle name (optional)">
+                  <div class="form-text-hint">Optional</div>
+                </div>
+                <div>
+                  <input id="fLast" type="text" class="form-control" placeholder="Last name" required>
+                  <div class="field-error d-none" id="errLast"></div>
+                </div>
+                <div>
+                  <select id="fSuffix" class="form-select" aria-label="Suffix">
+                    <option value="">No suffix</option>
+                    <option>Jr.</option><option>Sr.</option>
+                    <option>I</option><option>II</option><option>III</option><option>IV</option>
+                    <option>V</option><option>VI</option><option>VII</option><option>VIII</option>
+                    <option>IX</option><option>X</option>
+                  </select>
+                  <div class="form-text-hint">Suffix</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">Email</label>
+              <input id="fEmail" type="email" class="form-control" required>
+              <div class="field-error d-none" id="errEmail"></div>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label">Role</label>
+              <select id="fRole" class="form-select" required>
+                <option value="" disabled selected>Select role</option>
+                <option value="admin" disabled>Admin (disabled)</option>
+                <option value="librarian">Librarian</option>
+                <option value="student" disabled>Student (disabled)</option>
+              </select>
+              <div class="field-error d-none" id="errRole"></div>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <label class="form-label">Status</label>
+              <select id="fStatus" class="form-select" required>
+                <option value="active">Active</option>
+                <option value="disabled">Disabled</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">Password</label>
+              <div class="pw-wrap">
+                <input id="fPassword" type="password" class="form-control" placeholder="≥8 chars, 1 uppercase, 1 special">
+                <button type="button" class="pw-toggle" id="pwToggle1" aria-label="Show password">
+                  <i class="bi bi-eye" id="pwIcon1"></i>
+                </button>
+              </div>
+              <div class="field-error d-none" id="errPassword"></div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">Confirm Password</label>
+              <div class="pw-wrap">
+                <input id="fConfirm" type="password" class="form-control" placeholder="Repeat password">
+                <button type="button" class="pw-toggle" id="pwToggle2" aria-label="Show password">
+                  <i class="bi bi-eye" id="pwIcon2"></i>
+                </button>
+              </div>
+              <div class="field-error d-none" id="errConfirm"></div>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label">ID / Student No.</label>
+              <input id="fStudentNo" type="text" class="form-control" placeholder="e.g., 2025-12345">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <input id="fNotes" type="text" class="form-control" placeholder="Optional notes…">
+            </div>
+
+            <input id="fId" type="hidden">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+          <button id="btnSaveUser" class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View User Modal -->
+  <div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content userview-2col">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title">User Details</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body pt-0">
+          <div class="vu-head">
+            <div class="vu-avatar">
+              <img id="vuAvatar" src="assets/img/default-avatar.png" alt="Avatar">
+            </div>
+            <div class="vu-id">
+              <div class="vu-name" id="vuName">—</div>
+              <div class="vu-email" id="vuEmail">—</div>
+              <div class="vu-chips">
+                <span id="vuRole" class="chip chip-role">—</span>
+                <span id="vuStatus" class="chip chip-status">—</span>
+              </div>
+            </div>
+            <div class="vu-actions">
+              <button type="button" class="btn btn-outline-primary btn-sm" id="vuEditBtn">
+                <i class="bi bi-pencil-square me-1"></i>Edit
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm" id="vuDeleteBtn">
+                <i class="bi bi-trash-fill me-1"></i>Delete
+              </button>
+            </div>
+          </div>
+
+          <div class="vu-sheet">
+            <div class="vu-row vu-headrow">
+              <div class="vu-col vu-field"><i class="bi bi-info-circle me-2"></i> Field</div>
+              <div class="vu-col vu-value"><i class="bi bi-clipboard-check me-2"></i> Details</div>
+            </div>
+
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-person-fill"></i> Full Name</div><div class="vu-col vu-value" id="fldFullName">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-card-text"></i> First Name</div><div class="vu-col vu-value" id="fldFirst">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-card-text"></i> Middle Name</div><div class="vu-col vu-value" id="fldMiddle">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-card-text"></i> Last Name</div><div class="vu-col vu-value" id="fldLast">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-card-text"></i> Suffix</div><div class="vu-col vu-value" id="fldSuffix">—</div></div>
+
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-envelope-fill"></i> Email</div><div class="vu-col vu-value" id="fldEmail">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-shield-lock-fill"></i> Role</div><div class="vu-col vu-value" id="fldRole">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-clock-fill"></i> Status</div><div class="vu-col vu-value" id="fldStatus">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-person-vcard-fill"></i> Student No.</div><div class="vu-col vu-value" id="fldStudentNo">—</div></div>
+
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-book"></i> Borrowed</div><div class="vu-col vu-value" id="fldBorrowed">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-exclamation-triangle"></i> Overdue</div><div class="vu-col vu-value" id="fldOverdue">—</div></div>
+
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-clock-history"></i> Last Active</div><div class="vu-col vu-value" id="fldLastActive">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-calendar-event"></i> Joined</div><div class="vu-col vu-value" id="fldJoined">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-card-text"></i> Notes</div><div class="vu-col vu-value" id="fldNotes">—</div></div>
+          </div>
+        </div>
+
+        <div class="modal-footer border-0 pt-0">
+          <button class="btn btn-light" data-bs-dismiss="modal">Back to list</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    // Sidebar hooks
+    if (typeof renderSidebar === 'function') renderSidebar('admin');
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+      if (typeof toggleSidebar === 'function') toggleSidebar();
+      else document.body.classList.toggle('sb-collapsed');
+    });
+
+    // Elements
+    const search      = document.getElementById('searchInput');
+    const filterRole  = document.getElementById('filterRole');
+    const filterStatus= document.getElementById('filterStatus');
+    const tbody       = document.getElementById('usersBody');
+    const pageInfo    = document.getElementById('pageInfo');
+    const pager       = document.getElementById('pager');
+    const checkAll    = document.getElementById('checkAll');
+
+    const userModal = new bootstrap.Modal('#userModal');
+    const viewModal = new bootstrap.Modal('#viewUserModal');
+
+    const form       = document.getElementById('userForm');
+    const userModalTitle = document.getElementById('userModalTitle');
+
+    const fId        = document.getElementById('fId');
+    const fFirst     = document.getElementById('fFirst');
+    const fMiddle    = document.getElementById('fMiddle');
+    const fLast      = document.getElementById('fLast');
+    const fSuffix    = document.getElementById('fSuffix');
+    const fEmail     = document.getElementById('fEmail');
+    const fRole      = document.getElementById('fRole');
+    const fStatus    = document.getElementById('fStatus');
+    const fStudentNo = document.getElementById('fStudentNo');
+    const fNotes     = document.getElementById('fNotes');
+    const fPassword  = document.getElementById('fPassword');
+    const fConfirm   = document.getElementById('fConfirm');
+
+    const errFirst   = document.getElementById('errFirst');
+    const errLast    = document.getElementById('errLast');
+    const errEmail   = document.getElementById('errEmail');
+    const errRole    = document.getElementById('errRole');
+    const errPassword= document.getElementById('errPassword');
+    const errConfirm = document.getElementById('errConfirm');
+
+    // Password toggles
+    function setupPwToggle(inputEl, btnId, iconId){
+      const btn  = document.getElementById(btnId);
+      const icon = document.getElementById(iconId);
+      if(!inputEl || !btn || !icon) return;
+      btn.addEventListener('click', () => {
+        const showing = inputEl.type === 'text';
+        inputEl.type = showing ? 'password' : 'text';
+        icon.classList.toggle('bi-eye',  showing);
+        icon.classList.toggle('bi-eye-slash', !showing);
+        btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+      });
+    }
+    setupPwToggle(fPassword, 'pwToggle1', 'pwIcon1');
+    setupPwToggle(fConfirm,  'pwToggle2', 'pwIcon2');
+
+    // Data + helpers
+    let users = [];
+    const pageSize = 10;
+    let currentPage = 1;
+
+    function fullName(u){
+      const parts = [u.firstName, u.middleName, u.lastName].map(v => (v||'').trim()).filter(Boolean);
+      const base = parts.join(' ');
+      return base + (u.suffix ? ', ' + u.suffix : '');
+    }
+    const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||'');
+    const strongEnough = pw => /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{}|\\:;'"<>,.?/~`]).{8,}$/.test(pw||'');
+    const escapeHtml = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+    function clearError(inputEl, errEl){ inputEl?.classList.remove('is-invalid'); if (errEl){ errEl.textContent=''; errEl.classList.add('d-none'); } }
+    function setError(inputEl, errEl, msg){ inputEl?.classList.add('is-invalid'); if (errEl){ errEl.textContent=msg; errEl.classList.remove('d-none'); } }
+
+    function applyFilters(){
+      const q = (search.value || "").toLowerCase().trim();
+      const role = filterRole.value;
+      const status = filterStatus.value;
+      return users.filter(u => {
+        const nameStr = fullName(u).toLowerCase();
+        const hit = (nameStr + " " + (u.email||'') + " " + (u.studentNo || "")).toLowerCase().includes(q);
+        const roleOk = role ? u.role === role : true;
+        const stOk   = status ? u.status === status : true;
+        return hit && roleOk && stOk;
+      });
+    }
+
+    function rowHtml(u){
+      const statusBadge = u.status === "active"
+        ? `<span class="badge text-bg-success-soft">Active</span>`
+        : `<span class="badge text-bg-danger-soft">Disabled</span>`;
+
+      const roleBadge = u.role === "admin"
+        ? `<span class="badge role-badge admin">Admin</span>`
+        : u.role === "librarian"
+          ? `<span class="badge role-badge librarian">Librarian</span>`
+          : `<span class="badge role-badge student">Student</span>`;
+
+      return `
+        <tr>
+          <td><input class="form-check-input row-check" type="checkbox" value="${u.id}"></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <img class="avatar" src="assets/img/default-avatar.png" alt="">
+              <div>
+                <div class="fw-medium">${escapeHtml(fullName(u))}</div>
+                <div class="small text-muted d-lg-none">${escapeHtml(u.studentNo || "—")}</div>
+              </div>
+            </div>
+          </td>
+          <td>${escapeHtml(u.email)}</td>
+          <td>${roleBadge}</td>
+          <td class="d-none d-lg-table-cell">${escapeHtml(u.studentNo || "—")}</td>
+          <td>${statusBadge}</td>
+          <td class="text-end">
+            <div class="action-icons">
+              <button class="icon-btn" title="View" onclick="viewUser(${u.id})" aria-label="View user">
+                <i class="bi bi-eye icon-eye"></i>
+              </button>
+              <button class="icon-btn" title="Edit" onclick="editUser(${u.id})" aria-label="Edit user">
+                <i class="bi bi-pencil-square icon-pencil"></i>
+              </button>
+              <button class="icon-btn" title="Delete" onclick="deleteUser(${u.id})" aria-label="Delete user">
+                <i class="bi bi-trash-fill icon-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function render(){
+      const list = applyFilters();
+      const total = list.length;
+      const pages = Math.max(1, Math.ceil(total / pageSize));
+      if (currentPage > pages) currentPage = pages;
+
+      const start = (currentPage - 1) * pageSize;
+      const end   = Math.min(start + pageSize, total);
+      const slice = list.slice(start, end);
+
+      tbody.innerHTML = slice.map(rowHtml).join('');
+      pageInfo.textContent = `Showing ${total ? start + 1 : 0}–${end} of ${total}`;
+
+      pager.innerHTML = "";
+      const addItem = (label, page, disabled=false, active=false) => {
+        const li = document.createElement("li");
+        li.className = `page-item ${disabled ? "disabled" : ""} ${active ? "active" : ""}`;
+        li.innerHTML = `<a class="page-link" href="#">${label}</a>`;
+        li.onclick = (e) => { e.preventDefault(); if (!disabled) { currentPage = page; render(); } };
+        pager.appendChild(li);
+      };
+      addItem("«", 1, currentPage===1);
+      addItem("‹", Math.max(1, currentPage-1), currentPage===1);
+      for (let p = 1; p <= pages; p++) addItem(p, p, false, p===currentPage);
+      addItem("›", Math.min(pages, currentPage+1), currentPage===pages);
+      addItem("»", pages, currentPage===pages);
+
+      checkAll.checked = false;
+    }
+
+    // Load users from DB
+    async function loadUsers(){
+      try {
+        const res = await fetch('backend/list-users.php');
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          alert((data && (data.message || data.error)) || 'Failed to load users.');
+          return;
+        }
+        users = (data.users || []).map(u => ({
+          id: Number(u.id),
+          firstName: u.first_name,
+          middleName: u.middle_name,
+          lastName: u.last_name,
+          suffix: u.suffix,
+          email: u.email,
+          role: u.role,
+          status: u.status,
+          studentNo: "" // not used for librarians; kept for layout compatibility
+        }));
+        render();
+      } catch (err) {
+        alert('Network error while loading users: ' + (err?.message || err));
+      }
+    }
+
+    // Open modal as "Add User"
+    document.querySelector('[data-bs-target="#userModal"]').addEventListener('click', () => {
+      userModalTitle.textContent = "Add User";
+      fId.value = '';
+      fFirst.value = fMiddle.value = fLast.value = fSuffix.value = '';
+      fEmail.value = '';
+      fRole.value = 'librarian';
+      fStatus.value = 'active';
+      fPassword.value = fConfirm.value = '';
+      fStudentNo.value = '';
+      fNotes.value = '';
+      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fRole,errRole],[fPassword,errPassword],[fConfirm,errConfirm]]
+        .forEach(([a,b])=>clearError(a,b));
+    });
+
+    // Export, bulk, etc.
+    document.getElementById('btnExport').onclick = () => {
+      const rows = applyFilters().map(u => [
+        u.id, fullName(u), u.firstName, u.middleName||"", u.lastName, u.suffix||"", u.email, u.role, u.studentNo||"", u.status
+      ]);
+      const header = "id,fullName,firstName,middleName,lastName,suffix,email,role,studentNo,status";
+      const csv = [header, ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+      const blob = new Blob([csv], {type:"text/csv;charset=utf-8;"});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = "users.csv";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    };
+    document.getElementById('btnBulkDisable').onclick = () => {
+      const ids = selectedIds();
+      if (!ids.length) return alert('Select users first.');
+      users = users.map(u => ids.includes(u.id) ? {...u, status:'disabled'} : u);
+      render();
+      // TODO: Add backend endpoint if you want to persist bulk disables.
+    };
+    document.getElementById('btnBulkDelete').onclick = () => {
+      const ids = selectedIds();
+      if (!ids.length) return alert('Select users first.');
+      alert('Delete action not implemented against DB in this demo.');
+    };
+
+    // Submit handler — create librarian
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // clear previous errors
+      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fRole,errRole],[fPassword,errPassword],[fConfirm,errConfirm]]
+        .forEach(([a,b])=>clearError(a,b));
+
+      let ok = true;
+      if(!(fFirst.value||'').trim()){ setError(fFirst,errFirst,'First name is required.'); ok=false; }
+      if(!(fLast.value||'').trim()){  setError(fLast,errLast,'Last name is required.');   ok=false; }
+      if(!validEmail(fEmail.value)){  setError(fEmail,errEmail,'Enter a valid email.');   ok=false; }
+      if(!fRole.value){               setError(fRole,errRole,'Role is required.');        ok=false; }
+      const isCreate = !(fId.value||'').trim();
+      if (isCreate && fRole.value !== 'librarian'){
+        setError(fRole,errRole,'Admin can only add Librarian accounts.'); ok=false;
+      }
+
+      const pw = fPassword.value || '';
+      const cf = fConfirm.value || '';
+      if (isCreate){
+        if(!pw){ setError(fPassword,errPassword,'Password is required.'); ok=false; }
+        if(!cf){ setError(fConfirm,errConfirm,'Please confirm the password.'); ok=false; }
+      }
+      if (pw){
+        if (!strongEnough(pw)){
+          setError(fPassword,errPassword,'Use ≥8 chars with 1 uppercase & 1 special character.');
+          ok=false;
+        }
+        if (pw !== cf){
+          setError(fConfirm,errConfirm,'Passwords do not match.');
+          ok=false;
+        }
+      }
+      if(!ok) return;
+
+      const model = {
+        first_name: (fFirst.value || "").trim(),
+        middle_name: (fMiddle.value || "").trim(),
+        last_name: (fLast.value || "").trim(),
+        suffix: (fSuffix.value || "").trim(),
+        email: (fEmail.value || "").trim(),
+        password: pw,
+        status: fStatus.value
+      };
+
+      try {
+        const res = await fetch('backend/create-librarian.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(model)
+        });
+
+        const raw = await res.text();
+        let data;
+        try { data = JSON.parse(raw); }
+        catch { throw new Error(`Bad response ${res.status}: ${raw.slice(0,400)}`); }
+
+        if (!res.ok || !data || !data.success) {
+          const msg = (data && (data.message || data.error)) || `Failed (${res.status}).`;
+          if (/email/i.test(msg)) setError(fEmail, errEmail, msg);
+          else setError(fPassword, errPassword, msg);
+          return;
+        }
+
+        // Add immediately to UI for a snappy feel
+        const newId = Number(data.id);
+        users.unshift({
+          id: newId,
+          firstName: model.first_name,
+          middleName: model.middle_name,
+          lastName: model.last_name,
+          suffix: model.suffix,
+          email: model.email,
+          role: 'librarian',
+          status: model.status,
+          studentNo: ''
+        });
+
+        userModal.hide();
+        form.reset();
+        [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fRole,errRole],[fPassword,errPassword],[fConfirm,errConfirm]]
+          .forEach(([a,b])=>clearError(a,b));
+        render();
+
+        // Also refresh from DB to stay canonical
+        loadUsers();
+
+      } catch (err) {
+        alert(err.message || 'Network/Server error. Please try again.');
+      }
+    });
+
+    // Search & filter
+    search.addEventListener('input', () => { currentPage = 1; render(); });
+    filterRole.addEventListener('change', () => { currentPage = 1; render(); });
+    filterStatus.addEventListener('change', () => { currentPage = 1; render(); });
+    checkAll.addEventListener('change', () => {
+      document.querySelectorAll('.row-check').forEach(cb => cb.checked = checkAll.checked);
+    });
+
+    // View/Edit/Delete
+    const viewFmt = d => d ? new Date(d).toLocaleString() : '—';
+    function setTxt(id, val){ const el=document.getElementById(id); if (el) el.textContent = val ?? '—'; }
+
+    window.viewUser = function(id){
+      const u = users.find(x=>x.id===id); if (!u) return;
+      document.getElementById('vuAvatar').src = 'assets/img/default-avatar.png';
+      document.getElementById('vuName').textContent  = fullName(u);
+      document.getElementById('vuEmail').textContent = u.email || '—';
+
+      const roleChip = document.getElementById('vuRole');
+      roleChip.textContent = (u.role || '—').replace(/^\w/, c=>c.toUpperCase());
+      roleChip.className = 'chip chip-role ' + (u.role || '');
+
+      const stChip = document.getElementById('vuStatus');
+      const active = (u.status || '').toLowerCase() === 'active';
+      stChip.textContent = active ? 'Active' : 'Disabled';
+      stChip.className = 'chip chip-status ' + (active ? '' : 'disabled');
+
+      setTxt('fldFullName', fullName(u));
+      setTxt('fldFirst', u.firstName || '—');
+      setTxt('fldMiddle', u.middleName || '—');
+      setTxt('fldLast', u.lastName || '—');
+      setTxt('fldSuffix', u.suffix || '—');
+      setTxt('fldEmail', u.email);
+      setTxt('fldRole', roleChip.textContent);
+      setTxt('fldStatus', stChip.textContent);
+      setTxt('fldStudentNo', u.studentNo || '—');
+      setTxt('fldBorrowed', String(u.borrowedCount ?? 0));
+      setTxt('fldOverdue', String(u.overdueCount ?? 0));
+      setTxt('fldLastActive', viewFmt(u.lastActive));
+      setTxt('fldJoined', viewFmt(u.joined));
+      setTxt('fldNotes', u.notes || '—');
+
+      document.getElementById('vuEditBtn').onclick   = () => { viewModal.hide(); editUser(u.id); };
+      document.getElementById('vuDeleteBtn').onclick = () => { viewModal.hide(); deleteUser(u.id); };
+
+      viewModal.show();
+    };
+
+    window.editUser = function(id){
+      const u = users.find(x=>x.id===id); if (!u) return;
+      userModalTitle.textContent = "Edit User";
+      fId.value = u.id;
+      fFirst.value = u.firstName || "";
+      fMiddle.value= u.middleName || "";
+      fLast.value  = u.lastName || "";
+      fSuffix.value= u.suffix || "";
+      fEmail.value = u.email || "";
+      fRole.value  = u.role || "";
+      fStatus.value= u.status || "active";
+      fStudentNo.value = u.studentNo || "";
+      fNotes.value  = u.notes || "";
+      fPassword.value = '';
+      fConfirm.value  = '';
+      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fRole,errRole],[fPassword,errPassword],[fConfirm,errConfirm]]
+        .forEach(([a,b])=>clearError(a,b));
+      userModal.show();
+    };
+
+    window.deleteUser = function(id){
+      alert('Delete action not implemented against DB in this demo.');
+    };
+
+    function selectedIds(){
+      const ids = [];
+      document.querySelectorAll('.row-check:checked').forEach(cb => ids.push(Number(cb.value)));
+      return ids;
+    }
+
+    // initial load
+    loadUsers();
+  </script>
+</body>
+</html>

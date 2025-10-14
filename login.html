@@ -231,6 +231,8 @@
         }
       });
     })();
+    sessionStorage.setItem('role', data.role); // 'admin' | 'librarian' | 'student'
+    window.location.href = data.redirect || 'dashboard.html';
 
     // Footer year
     document.getElementById('year').textContent = new Date().getFullYear();

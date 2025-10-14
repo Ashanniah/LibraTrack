@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Add Book</title>
+
+  <!-- Fonts / Icons / Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Shared + page styles -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/librarian-add-book.css" rel="stylesheet">
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+</head>
+<body class="sb-body">
+  <!-- Shared Sidebar -->
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-2">
+          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+            <i class="bi bi-list fs-4"></i>
+          </button>
+          <div class="page-title">Add Book</div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 tools-wrap">
+          <button class="btn btn-outline-secondary d-flex align-items-center gap-2" data-bs-toggle="offcanvas" data-bs-target="#importCanvas">
+            <i class="bi bi-file-earmark-arrow-up"></i> Import CSV
+          </button>
+          <a href="librarian-books.html" class="btn btn-light">Back to Books</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <main class="container-fluid py-4">
+      <form id="bookForm" class="card p-3 p-md-4" novalidate>
+        <div class="row g-4">
+          <!-- Left: cover -->
+          <div class="col-12 col-lg-4">
+            <h6 class="section-title">Cover</h6>
+            <div id="dropArea" class="cover-drop" role="button" tabindex="0" aria-label="Upload cover (click or drop)">
+              <input id="coverInput" type="file" accept="image/*" class="d-none">
+              <img id="coverPreview" alt="" class="d-none">
+              <div id="dropHint" class="text-center">
+                <i class="bi bi-image fs-1 d-block mb-2"></i>
+                <div class="fw-medium">Click to choose or drop an image</div>
+                <small class="text-muted d-block">Max 5 MB · JPG/PNG</small>
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-2">
+              <button type="button" id="btnChangeImage" class="btn btn-outline-primary flex-grow-1"><i class="bi bi-upload me-1"></i> Change</button>
+              <button type="button" id="btnRemoveImage" class="btn btn-outline-secondary flex-grow-1"><i class="bi bi-x-lg me-1"></i> Remove</button>
+            </div>
+            <div class="small text-muted mt-2">Tip: clear cover if the title has no image.</div>
+          </div>
+
+          <!-- Right: fields -->
+          <div class="col-12 col-lg-8">
+            <h6 class="section-title">Details</h6>
+            <div class="row g-3">
+              <div class="col-12">
+                <label class="form-label">Title <span class="text-danger">*</span></label>
+                <input id="title" name="title" type="text" class="form-control" required>
+                <div class="invalid-feedback">Title is required.</div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">ISBN <span class="text-danger">*</span></label>
+                <input id="isbn" name="isbn" type="text" class="form-control" required>
+                <div class="invalid-feedback">ISBN is required.</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Author <span class="text-danger">*</span></label>
+                <input id="author" name="author" type="text" class="form-control" required>
+                <div class="invalid-feedback">Author is required.</div>
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">Category <span class="text-danger">*</span></label>
+                <select id="category" name="category" class="form-select" required>
+                  <option value="" selected disabled>Select category</option>
+                  <option>Action and Adventure</option>
+                  <option>Biography</option>
+                  <option>Children's Books</option>
+                  <option>Computer Science</option>
+                  <option>Fantasy</option>
+                  <option>History</option>
+                  <option>Mystery</option>
+                  <option>Romance</option>
+                  <option>Science</option>
+                </select>
+                <div class="invalid-feedback">Category is required.</div>
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label">Quantity <span class="text-danger">*</span></label>
+                <input id="quantity" name="quantity" type="number" min="0" step="1" class="form-control" required>
+                <div class="invalid-feedback">Quantity is required.</div>
+              </div>
+              <div class="col-6 col-md-3">
+                <label class="form-label">Low-stock Threshold</label>
+                <input id="threshold" name="threshold" type="number" min="0" step="1" class="form-control" placeholder="e.g., 3">
+              </div>
+
+              <div class="col-12 col-md-6">
+                <label class="form-label">Publisher <span class="text-danger">*</span></label>
+                <input id="publisher" name="publisher" type="text" class="form-control" required>
+                <div class="invalid-feedback">Publisher is required.</div>
+              </div>
+              <div class="col-12 col-md-6">
+                <label class="form-label">Date Published</label>
+                <input id="publishedAt" name="publishedAt" type="date" class="form-control">
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Synopsis</label>
+                <textarea id="synopsis" name="synopsis" rows="4" class="form-control" placeholder="Short description…"></textarea>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Tags</label>
+                <input id="tags" name="tags" type="text" class="form-control" placeholder="Comma-separated (e.g., oop, programming, ref)">
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex flex-wrap gap-2">
+              <button id="btnSave" type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i> Save Book</button>
+              <button id="btnSaveNew" type="button" class="btn btn-outline-primary"><i class="bi bi-save2 me-1"></i> Save & Add Another</button>
+              <a href="librarian-books.html" class="btn btn-light">Cancel</a>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Success toast -->
+      <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080">
+        <div id="toastSaved" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body"><i class="bi bi-check2-circle me-2"></i>Book saved.</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- CSV Import Offcanvas -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="importCanvas">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Import Books (CSV)</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <p class="text-muted small mb-3">
+        Columns: <code>title,isbn,author,category,quantity,publisher,publishedAt,synopsis,tags</code>.  
+        Max 5 MB file size. (Drag file here or click “Choose”.)
+      </p>
+      <div class="csv-drop" id="csvDrop" role="button" tabindex="0">
+        <input type="file" id="csvInput" accept=".csv" class="d-none">
+        <i class="bi bi-filetype-csv fs-1 d-block mb-1"></i>
+        <div class="fw-medium">Drop CSV or click to choose</div>
+      </div>
+      <div id="csvStatus" class="small text-muted mt-3">No file selected.</div>
+      <div class="d-grid mt-3">
+        <button id="btnUploadCsv" class="btn btn-primary" type="button"><i class="bi bi-upload me-1"></i> Upload</button>
+      </div>
+      <hr class="my-4">
+      <a class="btn btn-outline-secondary btn-sm" href="assets/samples/books-template.csv" download>
+        <i class="bi bi-download me-1"></i>Download Template
+      </a>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    // Sidebar mount
+    renderSidebar('books');
+    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+
+    // Elements
+    const form = document.getElementById('bookForm');
+    const toastSaved = new bootstrap.Toast(document.getElementById('toastSaved'));
+    const btnSaveNew = document.getElementById('btnSaveNew');
+
+    // Cover widgets
+    const dropArea = document.getElementById('dropArea');
+    const coverInput = document.getElementById('coverInput');
+    const coverPreview = document.getElementById('coverPreview');
+    const dropHint = document.getElementById('dropHint');
+    document.getElementById('btnChangeImage').onclick = () => coverInput.click();
+    document.getElementById('btnRemoveImage').onclick = removePreview;
+    dropArea.onclick = () => coverInput.click();
+    dropArea.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); coverInput.click(); } };
+    coverInput.onchange = handleCover;
+
+    // CSV widgets
+    const csvDrop = document.getElementById('csvDrop');
+    const csvInput = document.getElementById('csvInput');
+    const csvStatus = document.getElementById('csvStatus');
+    const importCanvas = document.getElementById('importCanvas');
+    csvDrop.onclick = () => csvInput.click();
+    csvDrop.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); csvInput.click(); } };
+    csvInput.onchange = () => {
+      const file = csvInput.files?.[0];
+      csvStatus.textContent = file ? `Selected: ${file.name}` : 'No file selected.';
+    };
+    document.getElementById('btnUploadCsv').onclick = () => {
+      const file = csvInput.files?.[0];
+      if (!file) return alert('Choose a CSV file first.');
+      // TODO: integrate with PHP endpoint: POST books-import.php
+      alert('(Demo) CSV uploaded: ' + file.name);
+      bootstrap.Offcanvas.getInstance(importCanvas)?.hide();
+    };
+
+    // Handle cover
+    function handleCover() {
+      const file = coverInput.files && coverInput.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { alert('Max file size is 5 MB.'); coverInput.value=''; return; }
+      const reader = new FileReader();
+      reader.onload = () => showPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+    function showPreview(src) {
+      coverPreview.src = src;
+      coverPreview.classList.remove('d-none');
+      dropHint.classList.add('d-none');
+    }
+    function removePreview() {
+      coverPreview.src = '';
+      coverPreview.classList.add('d-none');
+      dropHint.classList.remove('d-none');
+      coverInput.value = '';
+    }
+
+    // Submit
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      form.classList.add('was-validated');
+      if (!form.checkValidity()) return;
+
+      // Gather payload
+      const payload = {
+        title: document.getElementById('title').value.trim(),
+        isbn: document.getElementById('isbn').value.trim(),
+        author: document.getElementById('author').value.trim(),
+        category: document.getElementById('category').value,
+        quantity: Number(document.getElementById('quantity').value || 0),
+        threshold: Number(document.getElementById('threshold').value || 0),
+        publisher: document.getElementById('publisher').value.trim(),
+        publishedAt: document.getElementById('publishedAt').value || null,
+        synopsis: document.getElementById('synopsis').value.trim(),
+        tags: document.getElementById('tags').value.trim(),
+        // For now we pass a data URL; when wiring to PHP use FormData + $_FILES
+        coverDataUrl: coverPreview.src && !coverPreview.classList.contains('d-none') ? coverPreview.src : ''
+      };
+
+      // TODO: Replace with real endpoint (PHP)
+      // const res = await fetch('books-create.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+      // if (!res.ok) return alert('Save failed.');
+      // const data = await res.json();
+
+      toastSaved.show();
+
+      if (lastClickedWasSaveNew) {
+        form.reset(); form.classList.remove('was-validated'); removePreview();
+        lastClickedWasSaveNew = false;
+      } else {
+        // Back to list
+        setTimeout(()=> location.href = 'librarian-books.html', 600);
+      }
+    });
+
+    let lastClickedWasSaveNew = false;
+    btnSaveNew.addEventListener('click', () => { lastClickedWasSaveNew = true; form.requestSubmit(); });
+  </script>
+</body>
+</html>

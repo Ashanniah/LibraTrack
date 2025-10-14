@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Members</title>
+
+  <!-- Fonts / Icons / Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Shared + page styles -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/librarian-registered-members.css" rel="stylesheet">
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+</head>
+<body class="sb-body">
+  <!-- Shared Sidebar -->
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-2">
+          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+            <i class="bi bi-list fs-4"></i>
+          </button>
+          <div class="page-title">Members</div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 tools-wrap">
+          <div class="search-wrap flex-grow-1">
+            <i class="bi bi-search"></i>
+            <input id="memSearch" type="search" placeholder="Search name, email, student no…">
+          </div>
+          <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#memberModal">
+            <i class="bi bi-person-plus"></i> Register Member
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main class="container-fluid py-4">
+      <!-- Quick stats -->
+      <section class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-primary-subtle text-primary"><i class="bi bi-people"></i></div>
+            <div class="meta"><div class="label">Total Members</div><div id="statTotal" class="value">0</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-success-subtle text-success"><i class="bi bi-check2-circle"></i></div>
+            <div class="meta"><div class="label">Active</div><div id="statActive" class="value">0</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-secondary-subtle text-secondary"><i class="bi bi-slash-circle"></i></div>
+            <div class="meta"><div class="label">Inactive</div><div id="statInactive" class="value">0</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-warning-subtle text-warning"><i class="bi bi-hourglass-split"></i></div>
+            <div class="meta"><div class="label">Loans (Active)</div><div id="statLoans" class="value">0</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filters -->
+      <section class="card p-3 mb-3">
+        <div class="row g-2 align-items-end">
+          <div class="col-6 col-md-3">
+            <label class="form-label">Status</label>
+            <select id="filterStatus" class="form-select">
+              <option value="">All</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Course</label>
+            <select id="filterCourse" class="form-select">
+              <option value="">All</option>
+              <option value="BSIT">BSIT</option>
+              <option value="BSCS">BSCS</option>
+              <option value="BSEd">BSEd</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Section</label>
+            <select id="filterSection" class="form-select">
+              <option value="">All</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-3 text-md-end">
+            <div class="btn-group">
+              <button id="btnExport" class="btn btn-outline-secondary"><i class="bi bi-download me-2"></i>Export CSV</button>
+              <button id="btnDeactivate" class="btn btn-outline-warning">Deactivate</button>
+              <button id="btnDelete" class="btn btn-outline-danger">Delete</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Members table -->
+      <section class="card p-0">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0" id="membersTable">
+            <thead>
+              <tr>
+                <th style="width:38px"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Student No.</th>
+                <th class="d-none d-lg-table-cell">Course / Section</th>
+                <th>Loans</th>
+                <th>Status</th>
+                <th class="text-end" style="width:160px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="memBody"><!-- JS --></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+          <div class="text-muted small" id="pageInfo">Showing 1–10 of 0</div>
+          <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+        </div>
+
+        <div id="emptyState" class="empty d-none">
+          <i class="bi bi-people fs-2 d-block mb-2"></i>
+          No registered members yet. Use <b>Register Member</b> to add one.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add/Edit Member Modal -->
+  <div class="modal fade" id="memberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <form id="memberForm" class="modal-content" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title" id="memberModalTitle">Register Member</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Full Name</label>
+              <input id="fName" type="text" class="form-control" required>
+              <div class="invalid-feedback">Full name is required.</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Email</label>
+              <input id="fEmail" type="email" class="form-control" required>
+              <div class="invalid-feedback">Valid email is required.</div>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label">Student No.</label>
+              <input id="fStudNo" type="text" class="form-control" placeholder="e.g., 2025-12345" required>
+            </div>
+            <div class="col-6 col-md-4">
+              <label class="form-label">Course</label>
+              <select id="fCourse" class="form-select" required>
+                <option value="" disabled selected>Select</option>
+                <option>BSIT</option>
+                <option>BSCS</option>
+                <option>BSEd</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-4">
+              <label class="form-label">Section</label>
+              <select id="fSection" class="form-select" required>
+                <option value="" disabled selected>Select</option>
+                <option>A</option>
+                <option>B</option>
+                <option>C</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label">Status</label>
+              <select id="fStatus" class="form-select" required>
+                <option value="active" selected>Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-8">
+              <label class="form-label">Notes</label>
+              <input id="fNotes" type="text" class="form-control" placeholder="Optional…">
+            </div>
+            <input id="fId" type="hidden">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+          <button id="btnSaveMember" class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Member (Field / Details Sheet) -->
+  <div class="modal fade" id="viewMemberModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content mview">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title">Member Details</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div class="mv-head">
+            <div class="mv-avatar">
+              <img id="vmAvatar" src="assets/img/default-avatar.png" alt="">
+            </div>
+            <div class="mv-main">
+              <div class="mv-title" id="vmName">—</div>
+              <div class="mv-sub small text-muted">
+                <span id="vmEmail">—</span> • <span id="vmStudNo">—</span>
+              </div>
+              <div class="mv-chips">
+                <span id="vmStatus" class="chip chip-status">Active</span>
+                <span id="vmCourse" class="chip chip-neutral">BSIT-A</span>
+                <span class="chip chip-neutral"><i class="bi bi-book me-1"></i><span id="vmLoans">0</span> active loans</span>
+              </div>
+            </div>
+            <div class="mv-actions">
+              <button class="btn btn-outline-primary btn-sm" id="vmEmailBtn"><i class="bi bi-envelope me-1"></i>Email</button>
+              <button class="btn btn-outline-warning btn-sm" id="vmToggleBtn"><i class="bi bi-slash-circle me-1"></i>Deactivate</button>
+            </div>
+          </div>
+
+          <div class="mv-sheet">
+            <div class="mv-row mv-headrow">
+              <div class="mv-col mv-field"><i class="bi bi-info-circle me-2"></i> Field</div>
+              <div class="mv-col mv-value"><i class="bi bi-clipboard-check me-2"></i> Details</div>
+            </div>
+            <div class="mv-row"><div class="mv-col mv-field"><i class="bi bi-calendar-event"></i> Registered</div><div class="mv-col mv-value" id="vfRegistered">—</div></div>
+            <div class="mv-row"><div class="mv-col mv-field"><i class="bi bi-clock-history"></i> Last Activity</div><div class="mv-col mv-value" id="vfActivity">—</div></div>
+            <div class="mv-row"><div class="mv-col mv-field"><i class="bi bi-card-text"></i> Notes</div><div class="mv-col mv-value" id="vfNotes">—</div></div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    // Mount sidebar & highlight
+    renderSidebar('members');
+    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+
+    // ===== Demo data (replace with PHP later) =====
+    // member model: {id, name, email, studNo, course, section, status, loans, registeredAt, lastActivity, notes}
+    let AUTOINC = 8;
+    let members = [
+      {id:1, name:"Juan Dela Cruz", email:"2025-12345@student.edu", studNo:"2025-12345", course:"BSIT", section:"A", status:"active", loans:2, registeredAt:"2025-06-21", lastActivity:"2025-09-11 09:05", notes:""},
+      {id:2, name:"Ana Santos", email:"2025-10322@student.edu", studNo:"2025-10322", course:"BSIT", section:"B", status:"active", loans:1, registeredAt:"2025-06-22", lastActivity:"2025-09-12 14:21", notes:"Prefers email"},
+      {id:3, name:"Mark Reyes", email:"2024-88231@student.edu", studNo:"2024-88231", course:"BSCS", section:"A", status:"inactive", loans:0, registeredAt:"2024-07-10", lastActivity:"2025-08-30 10:00", notes:"On leave"},
+      {id:4, name:"Lea Cruz", email:"2025-99877@student.edu", studNo:"2025-99877", course:"BSEd", section:"C", status:"active", loans:0, registeredAt:"2025-07-02", lastActivity:"2025-09-10 08:15", notes:""},
+      {id:5, name:"Paolo Lim", email:"2025-11223@student.edu", studNo:"2025-11223", course:"BSCS", section:"B", status:"active", loans:3, registeredAt:"2025-07-05", lastActivity:"2025-09-13 11:04", notes:""}
+    ];
+
+    // ===== Elements =====
+    const search = document.getElementById('memSearch');
+    const fStatus = document.getElementById('filterStatus');
+    const fCourse = document.getElementById('filterCourse');
+    const fSection = document.getElementById('filterSection');
+    const memBody = document.getElementById('memBody');
+    const pageInfo = document.getElementById('pageInfo');
+    const pager = document.getElementById('pager');
+    const empty = document.getElementById('emptyState');
+    const checkAll = document.getElementById('checkAll');
+
+    // Stats
+    const statTotal = document.getElementById('statTotal');
+    const statActive = document.getElementById('statActive');
+    const statInactive = document.getElementById('statInactive');
+    const statLoans = document.getElementById('statLoans');
+
+    // Modals
+    const memberModal = new bootstrap.Modal('#memberModal');
+    const viewModal = new bootstrap.Modal('#viewMemberModal');
+    const memberForm = document.getElementById('memberForm');
+    const memberModalTitle = document.getElementById('memberModalTitle');
+
+    // Form refs
+    const fId = document.getElementById('fId');
+    const fNameI = document.getElementById('fName');
+    const fEmailI = document.getElementById('fEmail');
+    const fStudNoI = document.getElementById('fStudNo');
+    const fCourseI = document.getElementById('fCourse');
+    const fSectionI = document.getElementById('fSection');
+    const fStatusI = document.getElementById('fStatus');
+    const fNotesI = document.getElementById('fNotes');
+
+    // View refs
+    const vmName = document.getElementById('vmName');
+    const vmEmail = document.getElementById('vmEmail');
+    const vmStudNo = document.getElementById('vmStudNo');
+    const vmStatus = document.getElementById('vmStatus');
+    const vmCourse = document.getElementById('vmCourse');
+    const vmLoans = document.getElementById('vmLoans');
+    const vfRegistered = document.getElementById('vfRegistered');
+    const vfActivity = document.getElementById('vfActivity');
+    const vfNotes = document.getElementById('vfNotes');
+    const vmEmailBtn = document.getElementById('vmEmailBtn');
+    const vmToggleBtn = document.getElementById('vmToggleBtn');
+
+    // ===== Helpers =====
+    const pageSize = 10;
+    let currentPage = 1;
+    const escapeHtml = s => String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+
+    function applyFilters(){
+      const q = (search.value || "").toLowerCase().trim();
+      const st = fStatus.value;
+      const crs = fCourse.value;
+      const sec = fSection.value;
+
+      return members.filter(m=>{
+        const hit = (m.name + " " + m.email + " " + m.studNo).toLowerCase().includes(q);
+        const stOk = st ? m.status === st : true;
+        const crOk = crs ? m.course === crs : true;
+        const seOk = sec ? m.section === sec : true;
+        return hit && stOk && crOk && seOk;
+      });
+    }
+
+    function updateStats(list){
+      statTotal.textContent = list.length;
+      statActive.textContent = list.filter(m=>m.status==='active').length;
+      statInactive.textContent = list.filter(m=>m.status==='inactive').length;
+      statLoans.textContent = list.reduce((s,m)=>s+m.loans,0);
+    }
+
+    function render(){
+      const list = applyFilters();
+      updateStats(list);
+
+      const total = list.length;
+      const pages = Math.max(1, Math.ceil(total/pageSize));
+      if(currentPage>pages) currentPage = pages;
+      const start = (currentPage-1)*pageSize;
+      const end = Math.min(start+pageSize,total);
+      const slice = list.slice(start,end);
+
+      empty.classList.toggle('d-none', !!slice.length);
+      memBody.innerHTML = slice.map(rowHtml).join('');
+      pageInfo.textContent = `Showing ${total? start+1:0}–${end} of ${total}`;
+
+      pager.innerHTML = '';
+      const addItem=(label,page,disabled=false,active=false)=>{
+        const li=document.createElement('li');
+        li.className=`page-item ${disabled?'disabled':''} ${active?'active':''}`;
+        li.innerHTML=`<a class="page-link" href="#">${label}</a>`;
+        li.onclick=(e)=>{e.preventDefault(); if(!disabled){ currentPage=page; render(); }};
+        pager.appendChild(li);
+      };
+      addItem('«',1,currentPage===1); addItem('‹',Math.max(1,currentPage-1),currentPage===1);
+      for(let p=1;p<=pages;p++) addItem(p,p,false,p===currentPage);
+      addItem('›',Math.min(pages,currentPage+1),currentPage===pages); addItem('»',pages,currentPage===pages);
+
+      checkAll.checked = false;
+    }
+
+    function rowHtml(m){
+      const badge = m.status==='active'
+        ? `<span class="badge text-bg-success-soft">Active</span>`
+        : `<span class="badge text-bg-danger-soft">Inactive</span>`;
+      return `
+      <tr>
+        <td><input class="form-check-input row-check" type="checkbox" value="${m.id}"></td>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <img class="avatar" src="assets/img/default-avatar.png" alt="">
+            <div class="fw-medium">${escapeHtml(m.name)}</div>
+          </div>
+        </td>
+        <td>${escapeHtml(m.email)}</td>
+        <td>${escapeHtml(m.studNo)}</td>
+        <td class="d-none d-lg-table-cell">${escapeHtml(m.course)} — ${escapeHtml(m.section)}</td>
+        <td><span class="badge text-bg-primary-soft">${m.loans}</span></td>
+        <td>${badge}</td>
+        <td class="text-end">
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-secondary" title="View" onclick="viewMember(${m.id})"><i class="bi bi-eye"></i></button>
+            <button class="btn btn-outline-primary" title="Edit" onclick="editMember(${m.id})"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-outline-danger" title="Delete" onclick="deleteMember(${m.id})"><i class="bi bi-trash3"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }
+
+    // Events
+    search.addEventListener('input', ()=>{ currentPage=1; render(); });
+    fStatus.addEventListener('change', ()=>{ currentPage=1; render(); });
+    fCourse.addEventListener('change', ()=>{ currentPage=1; render(); });
+    fSection.addEventListener('change', ()=>{ currentPage=1; render(); });
+    checkAll.addEventListener('change', ()=>{ document.querySelectorAll('.row-check').forEach(cb=>cb.checked=checkAll.checked); });
+
+    document.getElementById('btnExport').onclick = ()=>{
+      const rows = applyFilters().map(m => [m.id,m.name,m.email,m.studNo,m.course,m.section,m.status,m.loans,m.registeredAt,m.lastActivity,m.notes||""]);
+      const csv = ["id,name,email,studentNo,course,section,status,loans,registeredAt,lastActivity,notes", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download="members.csv"; a.click(); URL.revokeObjectURL(a.href);
+    };
+
+    const selectedIds=()=>{ const ids=[]; document.querySelectorAll('.row-check:checked').forEach(cb=>ids.push(Number(cb.value))); return ids; };
+
+    document.getElementById('btnDeactivate').onclick = ()=>{ const ids=selectedIds(); if(!ids.length) return alert('Select members first.'); members = members.map(m=>ids.includes(m.id)? {...m,status:'inactive'}:m); render(); };
+    document.getElementById('btnDelete').onclick = ()=>{ const ids=selectedIds(); if(!ids.length) return alert('Select members first.'); if(!confirm('Delete selected members?')) return; members = members.filter(m=>!ids.includes(m.id)); render(); };
+
+    // Add/Edit
+    memberForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      memberForm.classList.add('was-validated');
+      if(!memberForm.checkValidity()) return;
+
+      const model = {
+        id: fId.value ? Number(fId.value) : AUTOINC++,
+        name: fNameI.value.trim(),
+        email: fEmailI.value.trim(),
+        studNo: fStudNoI.value.trim(),
+        course: fCourseI.value,
+        section: fSectionI.value,
+        status: fStatusI.value,
+        loans: members.find(x=>x.id===Number(fId.value))?.loans || 0,
+        registeredAt: members.find(x=>x.id===Number(fId.value))?.registeredAt || new Date().toISOString().slice(0,10),
+        lastActivity: new Date().toISOString().slice(0,16).replace('T',' '),
+        notes: fNotesI.value.trim()
+      };
+
+      const exists = members.find(m=>m.id===model.id);
+      if(exists) members = members.map(m=>m.id===model.id ? model : m);
+      else members.unshift(model);
+
+      memberModal.hide(); memberForm.reset(); memberForm.classList.remove('was-validated'); currentPage=1; render();
+    });
+
+    window.editMember = function(id){
+      const m = members.find(x=>x.id===id);
+      memberModalTitle.textContent = "Edit Member";
+      fId.value = m.id;
+      fNameI.value = m.name;
+      fEmailI.value = m.email;
+      fStudNoI.value = m.studNo;
+      fCourseI.value = m.course;
+      fSectionI.value = m.section;
+      fStatusI.value = m.status;
+      fNotesI.value = m.notes || "";
+      memberModal.show();
+    };
+
+    window.deleteMember = function(id){
+      if(!confirm('Delete this member?')) return;
+      members = members.filter(m=>m.id!==id);
+      render();
+    };
+
+    // View modal
+    window.viewMember = function(id){
+      const m = members.find(x=>x.id===id); if(!m) return;
+      vmName.textContent = m.name;
+      vmEmail.textContent = m.email;
+      vmStudNo.textContent = m.studNo;
+      vmLoans.textContent = m.loans;
+      vmCourse.textContent = `${m.course}-${m.section}`;
+      vmStatus.textContent = m.status==='active' ? 'Active' : 'Inactive';
+      vmStatus.className = 'chip chip-status ' + (m.status==='active' ? 'success' : 'danger');
+
+      vfRegistered.textContent = m.registeredAt || '—';
+      vfActivity.textContent = m.lastActivity || '—';
+      vfNotes.textContent = m.notes || '—';
+
+      vmEmailBtn.onclick = ()=> alert(`(Demo) Would send email to ${m.email}`);
+      vmToggleBtn.textContent = m.status==='active' ? 'Deactivate' : 'Activate';
+      vmToggleBtn.onclick = ()=>{ m.status = (m.status==='active'?'inactive':'active'); render(); viewModal.hide(); };
+
+      viewModal.show();
+    };
+
+    // Init
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Emails</title>
+
+  <!-- Fonts / Icons / Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Shared + page styles -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/librarian-emails.css" rel="stylesheet">
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+</head>
+<body class="sb-body">
+  <!-- Sidebar -->
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-2">
+          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+            <i class="bi bi-list fs-4"></i>
+          </button>
+          <div class="page-title">Emails</div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 tools-wrap">
+          <div class="search-wrap flex-grow-1">
+            <i class="bi bi-search"></i>
+            <input id="searchBox" type="search" placeholder="Search subject, recipient, type…">
+          </div>
+          <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="offcanvas" data-bs-target="#composePanel">
+            <i class="bi bi-pencil-square"></i> Compose
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main class="container-fluid py-4">
+      <!-- Stats -->
+      <section class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-primary-subtle text-primary"><i class="bi bi-envelope"></i></div>
+            <div class="meta"><div class="label">Total (view)</div><div id="stTotal" class="value">0</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-success-subtle text-success"><i class="bi bi-check2-circle"></i></div>
+            <div class="meta"><div class="label">Sent</div><div id="stSent" class="value">0</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-warning-subtle text-warning"><i class="bi bi-hourglass-split"></i></div>
+            <div class="meta"><div class="label">Queued</div><div id="stQueued" class="value">0</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-danger-subtle text-danger"><i class="bi bi-exclamation-octagon"></i></div>
+            <div class="meta"><div class="label">Failed</div><div id="stFailed" class="value">0</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filters -->
+      <section class="card p-3 mb-3">
+        <div class="row g-2 align-items-end">
+          <div class="col-6 col-md-3">
+            <label class="form-label">Type</label>
+            <select id="fType" class="form-select">
+              <option value="">All</option>
+              <option value="overdue">Overdue Notice</option>
+              <option value="lowstock">Low-Stock Alert</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Status</label>
+            <select id="fStatus" class="form-select">
+              <option value="">All</option>
+              <option value="sent">Sent</option>
+              <option value="queued">Queued</option>
+              <option value="failed">Failed</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Date</label>
+            <input id="fDate" type="date" class="form-control">
+          </div>
+          <div class="col-12 col-md-3 text-md-end">
+            <div class="btn-group">
+              <button id="btnExport" class="btn btn-outline-secondary"><i class="bi bi-download me-2"></i>Export CSV</button>
+              <button id="btnBulkSend" class="btn btn-outline-primary"><i class="bi bi-send me-1"></i>Send</button>
+              <button id="btnBulkDelete" class="btn btn-outline-danger">Delete</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Table -->
+      <section class="card p-0">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr>
+                <th style="width:38px"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                <th>Subject</th>
+                <th>Type</th>
+                <th>Recipient</th>
+                <th class="d-none d-lg-table-cell">Related Item</th>
+                <th>Created</th>
+                <th>Status</th>
+                <th class="text-end" style="width:160px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tblBody"><!-- JS --></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+          <div class="text-muted small" id="pageInfo">Showing 1–10 of 0</div>
+          <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+        </div>
+
+        <div id="emptyState" class="empty d-none">
+          <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+          No emails in this view. Try changing filters or click <b>Compose</b>.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Compose Offcanvas -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="composePanel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title">Compose Email</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <form id="composeForm" novalidate>
+        <div class="mb-3">
+          <label class="form-label">Type</label>
+          <select id="cType" class="form-select" required>
+            <option value="" disabled selected>Select</option>
+            <option value="overdue">Overdue Notice</option>
+            <option value="lowstock">Low-Stock Alert</option>
+            <option value="custom">Custom</option>
+          </select>
+          <div class="invalid-feedback">Please choose a type.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">To</label>
+          <input id="cTo" type="email" class="form-control" placeholder="name@school.edu" required>
+          <div class="invalid-feedback">Valid recipient required.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Subject</label>
+          <input id="cSubject" type="text" class="form-control" required>
+          <div class="invalid-feedback">Subject is required.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Message</label>
+          <textarea id="cBody" rows="8" class="form-control" required></textarea>
+          <div class="invalid-feedback">Message is required.</div>
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary flex-grow-1" type="submit"><i class="bi bi-send me-1"></i>Send</button>
+          <button class="btn btn-outline-primary" id="btnDraft" type="button"><i class="bi bi-save2 me-1"></i>Save Draft</button>
+        </div>
+
+        <hr class="my-4">
+        <div class="small text-muted">
+          Uses PHPMailer (server-side) per FRD to deliver overdue & low-stock notifications. :contentReference[oaicite:1]{index=1}
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Email Modal -->
+  <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content eview">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title">Email Details</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div class="ev-head">
+            <div class="ev-icon"><i class="bi bi-envelope-paper"></i></div>
+            <div class="ev-main">
+              <div class="ev-title" id="vSubject">—</div>
+              <div class="text-muted small" id="vMeta">—</div>
+              <div class="ev-chips">
+                <span id="vType" class="chip chip-neutral">Type</span>
+                <span id="vStatus" class="chip chip-status">Queued</span>
+                <span id="vRelated" class="chip chip-neutral">—</span>
+              </div>
+            </div>
+            <div class="ev-actions">
+              <button class="btn btn-outline-primary btn-sm" id="vResend"><i class="bi bi-send me-1"></i>Resend</button>
+              <button class="btn btn-outline-danger btn-sm" id="vDelete"><i class="bi bi-trash3 me-1"></i>Delete</button>
+            </div>
+          </div>
+
+          <div class="ev-sheet">
+            <div class="ev-row ev-headrow">
+              <div class="ev-col ev-field"><i class="bi bi-info-circle me-2"></i> Field</div>
+              <div class="ev-col ev-value"><i class="bi bi-clipboard-check me-2"></i> Details</div>
+            </div>
+            <div class="ev-row"><div class="ev-col ev-field"><i class="bi bi-person"></i> To</div><div class="ev-col ev-value" id="vTo">—</div></div>
+            <div class="ev-row"><div class="ev-col ev-field"><i class="bi bi-calendar-event"></i> Created</div><div class="ev-col ev-value" id="vCreated">—</div></div>
+            <div class="ev-row"><div class="ev-col ev-field"><i class="bi bi-clock-history"></i> Sent At</div><div class="ev-col ev-value" id="vSentAt">—</div></div>
+            <div class="ev-row"><div class="ev-col ev-field"><i class="bi bi-card-text"></i> Message</div><div class="ev-col ev-value" id="vBody">—</div></div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    // Sidebar
+    renderSidebar('emails');
+    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+
+    // ----- Demo datastore (replace with PHP later) -----
+    // model: {id,type:'overdue'|'lowstock'|'custom', subject, to, body, related, createdAt, status:'queued'|'sent'|'failed', sentAt?}
+    let AUTOINC = 6;
+    let emails = [
+      {id:1,type:'overdue', subject:'Overdue: Clean Code', to:'2025-12345@student.edu', body:'Please return Clean Code. It is now overdue.', related:'Loan #10023', createdAt:'2025-09-12 09:10', status:'queued'},
+      {id:2,type:'lowstock', subject:'Low-Stock: The Pragmatic Programmer', to:'admin@libratrack.edu', body:'Copies < 3. Consider restock.', related:'Book #22', createdAt:'2025-09-12 10:00', status:'sent', sentAt:'2025-09-12 10:01'},
+      {id:3,type:'overdue', subject:'Reminder: Harry Potter 1', to:'2024-88231@student.edu', body:'Kind reminder to return your book.', related:'Loan #10012', createdAt:'2025-09-10 08:30', status:'sent', sentAt:'2025-09-10 08:31'},
+      {id:4,type:'custom', subject:'Library Orientation', to:'bsit-a@school.edu', body:'Orientation on Sept 20.', related:'—', createdAt:'2025-09-08 14:00', status:'failed'},
+      {id:5,type:'overdue', subject:'Overdue: Computer Networks', to:'2025-99877@student.edu', body:'Please return Computer Networks.', related:'Loan #10045', createdAt:'2025-09-13 11:20', status:'queued'}
+    ];
+
+    // ----- Elements -----
+    const searchBox = document.getElementById('searchBox');
+    const fType = document.getElementById('fType');
+    const fStatus = document.getElementById('fStatus');
+    const fDate = document.getElementById('fDate');
+    const tblBody = document.getElementById('tblBody');
+    const empty = document.getElementById('emptyState');
+    const pageInfo = document.getElementById('pageInfo');
+    const pager = document.getElementById('pager');
+    const checkAll = document.getElementById('checkAll');
+
+    // Stats
+    const stTotal = document.getElementById('stTotal');
+    const stSent = document.getElementById('stSent');
+    const stQueued = document.getElementById('stQueued');
+    const stFailed = document.getElementById('stFailed');
+
+    // View modal
+    const viewModal = new bootstrap.Modal('#viewModal');
+    const vSubject = document.getElementById('vSubject');
+    const vMeta = document.getElementById('vMeta');
+    const vType = document.getElementById('vType');
+    const vStatus = document.getElementById('vStatus');
+    const vRelated = document.getElementById('vRelated');
+    const vTo = document.getElementById('vTo');
+    const vCreated = document.getElementById('vCreated');
+    const vSentAt = document.getElementById('vSentAt');
+    const vBody = document.getElementById('vBody');
+    const vResend = document.getElementById('vResend');
+    const vDelete = document.getElementById('vDelete');
+
+    // Compose
+    const composePanel = document.getElementById('composePanel');
+    const composeForm = document.getElementById('composeForm');
+    const cType = document.getElementById('cType');
+    const cTo = document.getElementById('cTo');
+    const cSubject = document.getElementById('cSubject');
+    const cBody = document.getElementById('cBody');
+    const btnDraft = document.getElementById('btnDraft');
+
+    // ----- Helpers -----
+    const pageSize = 10;
+    let currentPage = 1;
+    const esc = s => String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+
+    function applyFilters(){
+      const q = (searchBox.value||'').toLowerCase().trim();
+      const t = fType.value, s = fStatus.value, d = fDate.value;
+
+      return emails.filter(x=>{
+        const hit = (x.subject+' '+x.to+' '+x.type).toLowerCase().includes(q);
+        const typeOk = t ? x.type===t : true;
+        const stOk = s ? x.status===s : true;
+        const dtOk = d ? (x.createdAt||'').startsWith(d) : true;
+        return hit && typeOk && stOk && dtOk;
+      });
+    }
+
+    function updateStats(list){
+      stTotal.textContent = list.length;
+      stSent.textContent = list.filter(x=>x.status==='sent').length;
+      stQueued.textContent = list.filter(x=>x.status==='queued').length;
+      stFailed.textContent = list.filter(x=>x.status==='failed').length;
+    }
+
+    function render(){
+      const list = applyFilters();
+      updateStats(list);
+
+      const total = list.length;
+      const pages = Math.max(1, Math.ceil(total/pageSize));
+      if(currentPage>pages) currentPage=pages;
+      const start=(currentPage-1)*pageSize, end=Math.min(start+pageSize,total);
+      const slice = list.slice(start,end);
+
+      empty.classList.toggle('d-none', !!slice.length);
+      tblBody.innerHTML = slice.map(rowHtml).join('');
+      pageInfo.textContent = `Showing ${total?start+1:0}–${end} of ${total}`;
+
+      pager.innerHTML='';
+      const add=(label,page,dis=false,act=false)=>{
+        const li=document.createElement('li');
+        li.className=`page-item ${dis?'disabled':''} ${act?'active':''}`;
+        li.innerHTML=`<a class="page-link" href="#">${label}</a>`;
+        li.onclick=(e)=>{e.preventDefault(); if(!dis){ currentPage=page; render(); }};
+        pager.appendChild(li);
+      };
+      add('«',1,currentPage===1); add('‹',Math.max(1,currentPage-1),currentPage===1);
+      for(let p=1;p<=pages;p++) add(p,p,false,p===currentPage);
+      add('›',Math.min(pages,currentPage+1),currentPage===pages); add('»',pages,currentPage===pages);
+
+      checkAll.checked = false;
+    }
+
+    function rowHtml(x){
+      const typeChip = x.type==='overdue' ? '<span class="badge chip chip-ov">Overdue</span>'
+                      : x.type==='lowstock' ? '<span class="badge chip chip-ls">Low-Stock</span>'
+                      : '<span class="badge chip chip-neutral">Custom</span>';
+
+      const stChip = x.status==='sent' ? '<span class="badge text-bg-success-soft">Sent</span>'
+                   : x.status==='failed' ? '<span class="badge text-bg-danger-soft">Failed</span>'
+                   : '<span class="badge text-bg-warning-soft">Queued</span>';
+
+      return `
+      <tr>
+        <td><input class="form-check-input row-check" type="checkbox" value="${x.id}"></td>
+        <td><div class="fw-medium">${esc(x.subject)}</div></td>
+        <td>${typeChip}</td>
+        <td>${esc(x.to)}</td>
+        <td class="d-none d-lg-table-cell">${esc(x.related||'—')}</td>
+        <td>${esc(x.createdAt)}</td>
+        <td>${stChip}</td>
+        <td class="text-end">
+          <div class="btn-group btn-group-sm">
+            <button class="btn btn-outline-secondary" title="View" onclick="viewEmail(${x.id})"><i class="bi bi-eye"></i></button>
+            <button class="btn btn-outline-primary" title="Send/Resend" onclick="sendEmail(${x.id})"><i class="bi bi-send"></i></button>
+            <button class="btn btn-outline-danger" title="Delete" onclick="deleteEmail(${x.id})"><i class="bi bi-trash3"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }
+
+    // Events
+    [searchBox,fType,fStatus,fDate].forEach(el=>el.addEventListener('input',()=>{currentPage=1;render();}));
+    checkAll.addEventListener('change',()=>{ document.querySelectorAll('.row-check').forEach(cb=>cb.checked=checkAll.checked); });
+
+    document.getElementById('btnExport').onclick=()=>{
+      const rows = applyFilters().map(x=>[x.id,x.type,x.subject,x.to,x.body.replace(/\n/g,' '),x.related||'',x.createdAt,x.status,x.sentAt||'']);
+      const csv = ["id,type,subject,to,body,related,createdAt,status,sentAt", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download='emails.csv'; a.click(); URL.revokeObjectURL(a.href);
+    };
+
+    const selectedIds=()=>{ const ids=[]; document.querySelectorAll('.row-check:checked').forEach(cb=>ids.push(Number(cb.value))); return ids; };
+
+    document.getElementById('btnBulkSend').onclick=()=>{ const ids=selectedIds(); if(!ids.length) return alert('Select rows first.'); ids.forEach(sendEmail); render(); };
+    document.getElementById('btnBulkDelete').onclick=()=>{ const ids=selectedIds(); if(!ids.length) return alert('Select rows first.'); if(!confirm('Delete selected?')) return; emails=emails.filter(x=>!ids.includes(x.id)); render(); };
+
+    // Compose
+    composeForm.addEventListener('submit',(e)=>{
+      e.preventDefault();
+      composeForm.classList.add('was-validated');
+      if(!composeForm.checkValidity()) return;
+
+      const model = {
+        id: AUTOINC++,
+        type: cType.value, subject: cSubject.value.trim(), to: cTo.value.trim(), body: cBody.value.trim(),
+        related: (cType.value==='overdue'?'Loan —':cType.value==='lowstock'?'Book —':'—'),
+        createdAt: new Date().toISOString().slice(0,16).replace('T',' '),
+        status: 'queued'
+      };
+      emails.unshift(model);
+      bootstrap.Offcanvas.getInstance(composePanel)?.hide();
+      composeForm.reset(); composeForm.classList.remove('was-validated');
+      render();
+    });
+
+    btnDraft.onclick = ()=>{
+      if(!cSubject.value.trim()) cSubject.value='(Draft) Untitled';
+      const model = {
+        id: AUTOINC++,
+        type: cType.value||'custom', subject: cSubject.value.trim(), to: cTo.value.trim()||'draft@local',
+        body: cBody.value.trim(), related:'—', createdAt:new Date().toISOString().slice(0,16).replace('T',' '),
+        status:'queued'
+      };
+      emails.unshift(model);
+      bootstrap.Offcanvas.getInstance(composePanel)?.hide();
+      composeForm.reset(); composeForm.classList.remove('was-validated');
+      render();
+    };
+
+    // View
+    window.viewEmail = function(id){
+      const x = emails.find(e=>e.id===id); if(!x) return;
+      vSubject.textContent = x.subject;
+      vMeta.textContent = `${x.to} • ${x.createdAt}`;
+      vType.textContent = x.type==='overdue'?'Overdue Notice':x.type==='lowstock'?'Low-Stock Alert':'Custom';
+      vType.className = 'chip ' + (x.type==='overdue'?'chip-ov':x.type==='lowstock'?'chip-ls':'chip-neutral');
+      vStatus.textContent = x.status==='sent'?'Sent':x.status==='failed'?'Failed':'Queued';
+      vStatus.className = 'chip chip-status ' + (x.status==='sent'?'success':x.status==='failed'?'danger':'');
+      vRelated.textContent = x.related || '—';
+      vTo.textContent = x.to;
+      vCreated.textContent = x.createdAt || '—';
+      vSentAt.textContent = x.sentAt || '—';
+      vBody.textContent = x.body || '—';
+
+      vResend.onclick = ()=>{ sendEmail(x.id); render(); };
+      vDelete.onclick = ()=>{ deleteEmail(x.id); viewModal.hide(); };
+      viewModal.show();
+    };
+
+    // Send / Delete
+    window.sendEmail = function(id){
+      const x = emails.find(e=>e.id===id); if(!x) return;
+      // In production: POST to emails-send.php (PHPMailer) with id/payload
+      x.status='sent'; x.sentAt=new Date().toISOString().slice(0,16).replace('T',' ');
+      render();
+    };
+
+    window.deleteEmail = function(id){
+      if(!confirm('Delete this email?')) return;
+      emails = emails.filter(e=>e.id!==id);
+      render();
+    };
+
+    // Init
+    render();
+  </script>
+</body>
+</html>

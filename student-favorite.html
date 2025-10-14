@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack – Search Books</title>
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/student-pages.css" rel="stylesheet">
+</head>
+<body class="sb-body">
+  <div id="sidebar-root"></div>
+  <div class="sb-wrapper">
+    <div class="page-head">
+      <div class="container-fluid d-flex align-items-center justify-content-between py-3">
+        <div class="d-flex align-items-center gap-2">
+          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2"><i class="bi bi-list fs-4"></i></button>
+          <div class="page-title">Favorites</div>
+        </div>
+      </div>
+    </div>
+
+    <main class="container-fluid py-4">
+      <section class="card p-0">
+        <div class="table-responsive">
+          <table class="table table-modern align-middle mb-0">
+            <thead>
+              <tr><th>Title</th><th>Author</th><th>Category</th><th class="d-none d-lg-table-cell">ISBN</th><th class="text-end" style="width:140px">Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Clean Code</td><td>Robert C. Martin</td><td>CS</td><td class="d-none d-lg-table-cell">978-0132350884</td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary"><i class="bi bi-bookmark-plus"></i> Reserve</button>
+                    <button class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Design Patterns</td><td>GoF</td><td>CS</td><td class="d-none d-lg-table-cell">978-0201633610</td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary"><i class="bi bi-bookmark-plus"></i> Reserve</button>
+                    <button class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    /* paste the same renderStudentSidebar + toggleSidebar from student-search.html */
+    renderStudentSidebar('favorites');
+    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+  </script>
+</body>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack – Borrowing History</title>
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/student-pages.css" rel="stylesheet">
+</head>
+<body class="sb-body">
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <div class="page-head">
+      <div class="container-fluid d-flex align-items-center justify-content-between py-3">
+        <div class="d-flex align-items-center gap-2">
+          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+            <i class="bi bi-list fs-4"></i>
+          </button>
+          <div class="page-title">Borrowing History</div>
+        </div>
+      </div>
+    </div>
+
+    <main class="container-fluid py-4">
+      <section class="card p-0">
+        <div class="table-responsive">
+          <table class="table table-modern align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Book</th>
+                <th>Status</th>
+                <th>Borrowed</th>
+                <th>Due</th>
+                <th>Returned</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Sep 5</td>
+                <td>Atomic Habits</td>
+                <td><span class="pill pill-info"><span class="dot"></span>Borrowed</span></td>
+                <td>Sep 5</td>
+                <td>Sep 22</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td>Sep 2</td>
+                <td>Clean Code</td>
+                <td><span class="pill pill-success"><span class="dot"></span>Returned</span></td>
+                <td>Aug 30</td>
+                <td>Sep 6</td>
+                <td>Sep 3</td>
+              </tr>
+              <tr>
+                <td>Aug 30</td>
+                <td>Discrete Math</td>
+                <td><span class="pill pill-danger"><span class="dot"></span>Overdue</span></td>
+                <td>Aug 20</td>
+                <td>Sep 1</td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // ---- Sidebar rendering (no code generation / nested templates) ----
+    function renderStudentSidebar(active = 'history') {
+      const root = document.getElementById('sidebar-root');
+      if (!root) return;
+
+      root.innerHTML = `
+        <nav id="sidebar" class="sb-sidebar d-flex flex-column">
+          <a class="sb-brand" href="student-dashboard.html">
+            <img src="assets/img/LibraTrack-logo.png" class="sb-logo" alt="LibraTrack">
+            <span class="sb-text fw-semibold">LibraTrack</span>
+          </a>
+
+          <div class="sb-menu flex-grow-1">
+            <div class="sb-label">Main</div>
+
+            <a class="sb-link ${active === 'dashboard' ? 'active' : ''}" href="student-dashboard.html">
+              <i class="bi bi-speedometer2"></i><span class="sb-text">Dashboard</span>
+            </a>
+            <a class="sb-link ${active === 'search' ? 'active' : ''}" href="student-search.html">
+              <i class="bi bi-search"></i><span class="sb-text">Search Books</span>
+            </a>
+            <a class="sb-link ${active === 'history' ? 'active' : ''}" href="student-history.html">
+              <i class="bi bi-clock-history"></i><span class="sb-text">History</span>
+            </a>
+            <a class="sb-link ${active === 'favorites' ? 'active' : ''}" href="student-favorite.html">
+              <i class="bi bi-heart"></i><span class="sb-text">Favorites</span>
+            </a>
+            <a class="sb-link ${active === 'overdue' ? 'active' : ''}" href="student-overdue.html">
+              <i class="bi bi-exclamation-triangle"></i><span class="sb-text">Overdue</span>
+            </a>
+            <a class="sb-link ${active === 'notifications' ? 'active' : ''}" href="student-notifications.html">
+              <i class="bi bi-bell"></i><span class="sb-text">Notifications</span>
+            </a>
+
+            <div class="sb-label mt-3">Account</div>
+            <a class="sb-link" href="student-profile.html">
+              <i class="bi bi-person"></i><span class="sb-text">Profile</span>
+            </a>
+            <a class="sb-link" href="login.html">
+              <i class="bi bi-box-arrow-right"></i><span class="sb-text">Logout</span>
+            </a>
+          </div>
+
+          <div class="mt-auto small text-secondary px-3 pb-3 sb-text">
+            © <span id="year"></span> LibraTrack
+          </div>
+        </nav>
+      `;
+
+      const y = root.querySelector('#year');
+      if (y) y.textContent = new Date().getFullYear();
+    }
+
+    function toggleSidebar() {
+      const desktop = window.innerWidth >= 992;
+      if (desktop) {
+        document.body.classList.toggle('sb-expanded');
+        document.body.classList.remove('sb-toggled');
+      } else {
+        document.body.classList.toggle('sb-toggled');
+        document.body.classList.remove('sb-expanded');
+      }
+    }
+
+    // ---- Init ----
+    renderStudentSidebar('history');
+    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+
+    // keep state sensible on resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 992) {
+        document.body.classList.remove('sb-toggled');
+      }
+    });
+  </script>
+</body>
+</html>

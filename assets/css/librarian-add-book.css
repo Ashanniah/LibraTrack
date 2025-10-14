@@ -1,0 +1,46 @@
+:root{
+  --ft-bg:#f6f7fb;
+  --ft-card:#fff;
+  --ft-text:#111827;
+  --ft-muted:#6b7280;
+  --ft-border:#e5e7eb;
+  --ft-primary:#2563eb;
+}
+
+body.sb-body{
+  font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+  color:var(--ft-text);
+  background:var(--ft-bg);
+}
+
+.topbar{ background:var(--ft-card); border-bottom:1px solid var(--ft-border) }
+.page-title{font-weight:700;font-size:20px}
+.tools-wrap .btn{border-radius:12px}
+
+/* card/form */
+.card{ border:1px solid var(--ft-border); border-radius:16px; background:var(--ft-card); box-shadow:0 1px 2px rgba(0,0,0,.04) }
+.section-title{ font-weight:700; font-size:14px; text-transform:uppercase; letter-spacing:.06em; color:#6b7280; margin-bottom:8px }
+.form-label{font-weight:600}
+.form-control,.form-select,.btn{border-radius:12px}
+
+/* cover drop */
+.cover-drop{
+  width:100%; aspect-ratio:3/4; background:#f3f4f6; border:2px dashed var(--ft-border); border-radius:16px;
+  display:flex; align-items:center; justify-content:center; padding:12px; cursor:pointer; user-select:none;
+}
+.cover-drop:focus{ outline:3px solid #c7d2fe }
+.cover-drop img{ width:100%; height:100%; object-fit:cover; border-radius:12px }
+.cover-drop #dropHint{ color:#6b7280 }
+
+.csv-drop{
+  border:2px dashed var(--ft-border); border-radius:16px; padding:24px; text-align:center; color:#6b7280; cursor:pointer;
+}
+.csv-drop:focus{ outline:3px solid #c7d2fe }
+
+/* toast */
+.toast{ border-radius:12px }
+
+/* responsive tweaks */
+@media (max-width: 991px){
+  .cover-drop{ aspect-ratio: 16/9 }
+}

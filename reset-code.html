@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LibraTrack — Verify Code</title>
+
+  <!-- Favicons (same as the rest of the site) -->
+  <link rel="icon" href="assets/img/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&family=Poppins:wght@100..900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Site CSS -->
+  <link href="assets/css/main.css" rel="stylesheet">
+</head>
+
+<body class="index-page d-flex flex-column min-vh-100">
+  <!-- Header (same as other public pages) -->
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <img src="assets/img/LibraTrack-logo.png" alt="LibraTrack Logo" style="width:45px; height:100px;">
+        <h1 class="sitename" style="font-size:24px;">LibraTrack</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html#hero">Home</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="register.html">Register</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li class="dropdown">
+            <a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="#">Dropdown 1</a></li>
+              <li class="dropdown">
+                <a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="#">Deep Dropdown 1</a></li>
+                  <li><a href="#">Deep Dropdown 2</a></li>
+                  <li><a href="#">Deep Dropdown 3</a></li>
+                  <li><a href="#">Deep Dropdown 4</a></li>
+                  <li><a href="#">Deep Dropdown 5</a></li>
+                </ul>
+              </li>
+              <li><a href="#">Dropdown 2</a></li>
+              <li><a href="#">Dropdown 3</a></li>
+              <li><a href="#">Dropdown 4</a></li>
+            </ul>
+          </li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted d-none d-sm-block" href="index.html#menu">Browse Catalog</a>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main flex-grow-1">
+    <section class="page-bg min-vh-100 d-flex align-items-center justify-content-center">
+      <div class="card border-0 shadow-sm mx-auto" style="max-width: 460px; width: 100%;">
+        <div class="card-body p-5">
+          <div class="text-center mb-4">
+            <img src="assets/img/LibraTrack-logo.png" alt="LibraTrack Logo" width="84" height="84">
+          </div>
+
+          <h3 class="form-big-label text-center mb-2">Enter Reset Code</h3>
+          <p class="form-label-login-register text-center mb-4">
+            We sent a 6-digit code to your email. Enter it below and choose a new password.
+          </p>
+
+          <form id="resetForm" novalidate>
+            <!-- Email (prefilled & readonly if present in URL) -->
+            <div class="mb-3">
+              <label for="email" class="form-label-login-register">Email</label>
+              <input id="email" type="email" class="form-control" required>
+              <div class="invalid-feedback" id="emailError"></div>
+            </div>
+
+            <!-- Code -->
+            <div class="mb-3">
+              <label for="code" class="form-label-login-register">Reset Code</label>
+              <input id="code" type="text" inputmode="numeric" autocomplete="one-time-code" class="form-control" placeholder="e.g., 123456" required>
+              <div class="invalid-feedback" id="codeError"></div>
+              <div class="d-flex align-items-center justify-content-between mt-2">
+                <small class="text-muted">Didn’t receive it?</small>
+                <button id="btnResend" type="button" class="btn btn-link p-0">Resend code</button>
+              </div>
+              <small id="resendHint" class="text-secondary d-block" style="min-height:1.25rem"></small>
+            </div>
+
+            <!-- New password -->
+            <div class="mb-3">
+              <label for="password" class="form-label-login-register">New Password</label>
+              <div class="position-relative">
+                <input id="password" type="password" class="form-control" required autocomplete="new-password">
+                <button type="button" class="btn btn-link p-0 position-absolute top-50 end-0 translate-middle-y me-3" id="togglePwd" aria-label="Show password">
+                  <i id="eyePwd" class="bi bi-eye"></i>
+                </button>
+                <div class="invalid-feedback" id="passwordError"></div>
+              </div>
+              <small class="text-secondary d-block mt-1">At least 8 chars, 1 uppercase, 1 special.</small>
+            </div>
+
+            <!-- Confirm -->
+            <div class="mb-4">
+              <label for="confirm" class="form-label-login-register">Confirm Password</label>
+              <div class="position-relative">
+                <input id="confirm" type="password" class="form-control" required autocomplete="new-password">
+                <button type="button" class="btn btn-link p-0 position-absolute top-50 end-0 translate-middle-y me-3" id="toggleCnf" aria-label="Show password">
+                  <i id="eyeCnf" class="bi bi-eye"></i>
+                </button>
+                <div class="invalid-feedback" id="confirmError"></div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary w-100 rounded-pill py-2 form-button-label" type="submit">Update Password</button>
+          </form>
+
+          <div class="text-center mt-4">
+            <a href="forgot.html" class="form-label-create">Use a different email</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer id="footer" class="footer mt-auto">
+    <div class="container copyright text-center mt-4">
+      <p>© <span id="year"></span> <strong class="px-1 sitename">LibraTrack</strong> — All Rights Reserved</p>
+    </div>
+  </footer>
+
+  <!-- Success Modal -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content success-modal text-center p-4">
+        <div class="success-icon"><i class="bi bi-check-circle-fill"></i></div>
+        <h5 class="modal-title">Password Updated</h5>
+        <p id="successMsg">You can now log in with your new password.</p>
+        <div class="d-flex justify-content-center gap-2 mt-3">
+          <a class="btn btn-primary w-50" href="login.html">Go to Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vendor JS -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Site JS -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- Page JS -->
+  <script>
+    // --- helpers ---
+    const qs = (s) => document.querySelector(s);
+    const byId = (id) => document.getElementById(id);
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const hasUpper = /[A-Z]/;
+    const hasSpecial = /[^A-Za-z0-9]/;
+
+    function cleanCode(v) { return (v||'').replace(/\D/g,'').slice(0,6); }
+    function normalizePwd(s) {
+      return (s||'').normalize('NFKC').replace(/[\u200B-\u200D\u2060]/g,'').replace(/\u00A0/g,' ').trim();
+    }
+
+    // --- prefill from querystring ---
+    (function prefill() {
+      const params = new URLSearchParams(location.search);
+      const email = params.get('email') || '';
+      const code  = params.get('code') || '';
+      if (email) {
+        byId('email').value = email;
+        byId('email').readOnly = true;
+      }
+      if (code) byId('code').value = cleanCode(code);
+    })();
+
+    // --- show/hide toggles ---
+    byId('togglePwd').addEventListener('click', () => {
+      const inp = byId('password'); const eye = byId('eyePwd');
+      const show = inp.type === 'password'; inp.type = show ? 'text' : 'password';
+      eye.classList.toggle('bi-eye', !show); eye.classList.toggle('bi-eye-slash', show);
+    });
+    byId('toggleCnf').addEventListener('click', () => {
+      const inp = byId('confirm'); const eye = byId('eyeCnf');
+      const show = inp.type === 'password'; inp.type = show ? 'text' : 'password';
+      eye.classList.toggle('bi-eye', !show); eye.classList.toggle('bi-eye-slash', show);
+    });
+
+    // --- clear errors on input ---
+    ['email','code','password','confirm'].forEach(id=>{
+      byId(id).addEventListener('input', () => {
+        byId(id).classList.remove('is-invalid');
+        const err = byId(id + 'Error'); if (err) err.textContent = '';
+      });
+    });
+    byId('code').addEventListener('input', (e)=>{ e.target.value = cleanCode(e.target.value); });
+
+    // --- resend code with countdown ---
+    let cooldown = 0, timer = null;
+    const btnResend = byId('btnResend'), hint = byId('resendHint');
+
+    function updateResendUI(){
+      if (cooldown > 0) {
+        btnResend.disabled = true;
+        hint.textContent = `You can request a new code in ${cooldown}s.`;
+      } else {
+        btnResend.disabled = false;
+        hint.textContent = '';
+      }
+    }
+    function startCooldown(sec=60){
+      cooldown = sec; updateResendUI();
+      timer && clearInterval(timer);
+      timer = setInterval(()=>{
+        cooldown--; updateResendUI();
+        if (cooldown<=0) clearInterval(timer);
+      },1000);
+    }
+
+    btnResend.addEventListener('click', async ()=>{
+      const email = byId('email').value.trim();
+      if (!emailRe.test(email)) {
+        byId('email').classList.add('is-invalid');
+        byId('emailError').textContent = 'Enter a valid email first.';
+        return;
+      }
+      try {
+        // Backend should re-send a code email
+        const res = await fetch('backend/request-reset.php', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json().catch(()=>({}));
+        if (!data.success) throw new Error(data.message || 'Failed to resend code.');
+        hint.textContent = 'A new code was sent to your email.';
+        startCooldown(60);
+      } catch (e) {
+        hint.textContent = e.message;
+      }
+    });
+
+    // --- submit (verify code + reset password) ---
+    byId('resetForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+
+      const email = byId('email').value.trim();
+      const code  = cleanCode(byId('code').value);
+      const pwd   = normalizePwd(byId('password').value);
+      const cpw   = normalizePwd(byId('confirm').value);
+
+      let ok = true;
+
+      if (!email || !emailRe.test(email)) {
+        ok=false; byId('email').classList.add('is-invalid'); byId('emailError').textContent='Valid email required';
+      }
+      if (!code || code.length !== 6) {
+        ok=false; byId('code').classList.add('is-invalid'); byId('codeError').textContent='Enter the 6-digit code';
+      }
+      if (!pwd) {
+        ok=false; byId('password').classList.add('is-invalid'); byId('passwordError').textContent='Password is required';
+      } else if (pwd.length < 8 || !hasUpper.test(pwd) || !hasSpecial.test(pwd)) {
+        ok=false; byId('password').classList.add('is-invalid'); byId('passwordError').textContent='Min 8 chars, 1 uppercase, 1 special';
+      }
+      if (!cpw || cpw !== pwd) {
+        ok=false; byId('confirm').classList.add('is-invalid'); byId('confirmError').textContent='Passwords do not match';
+      }
+      if (!ok) return;
+
+      try {
+        // 1) Optional: verify code first (if your backend requires a separate step)
+        // const v = await fetch('backend/verify-reset.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email, code})});
+        // const vData = await v.json().catch(()=>({}));
+        // if (!vData.success) { throw new Error(vData.message || 'Invalid or expired code.'); }
+
+        // 2) Reset password
+        const res = await fetch('backend/reset-password.php', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email, code, new_password: pwd })
+        });
+        const data = await res.json().catch(()=>({}));
+        if (!data.success) throw new Error(data.message || 'Reset failed.');
+
+        new bootstrap.Modal(byId('successModal')).show();
+      } catch (err) {
+        // Show error on code by default
+        byId('code').classList.add('is-invalid');
+        byId('codeError').textContent = err.message || 'Invalid code.';
+      }
+    });
+
+    // Footer year
+    byId('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -19,7 +19,7 @@
   <!-- Sidebar mount point -->
   <div id="sidebar-root"></div>
 
-  <!-- Content wrapper shifted by sidebar.css -->
+  <!-- Content wrapper -->
   <div class="sb-wrapper">
     <!-- Topbar -->
     <nav class="sb-topbar navbar navbar-expand bg-white sticky-top">
@@ -27,6 +27,9 @@
         <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
           <i class="bi bi-list fs-4"></i>
         </button>
+
+        <!-- Page title -->
+        <div class="fw-bold h5 mb-0">Dashboard</div>
 
         <form class="d-none d-md-flex ms-auto me-3" role="search" style="max-width:420px; width:100%;">
           <div class="input-group input-group-sm">
@@ -55,7 +58,7 @@
       <!-- KPI Cards -->
       <div class="row g-3 mb-3">
         <div class="col-6 col-md-4 col-lg-3">
-          <div class="sb-card">
+          <div class="sb-card is-link" id="kpiBooks">
             <div class="sb-card-body">
               <div class="sb-card-title">Total Books</div>
               <div class="sb-card-value">3,284</div>
@@ -65,7 +68,7 @@
         </div>
 
         <div class="col-6 col-md-4 col-lg-3">
-          <div class="sb-card">
+          <div class="sb-card is-link" id="kpiMembers">
             <div class="sb-card-body">
               <div class="sb-card-title">Active Members</div>
               <div class="sb-card-value">812</div>
@@ -75,7 +78,7 @@
         </div>
 
         <div class="col-6 col-md-4 col-lg-3">
-          <div class="sb-card">
+          <div class="sb-card is-link" id="kpiBorrowed">
             <div class="sb-card-body">
               <div class="sb-card-title">Borrowed Today</div>
               <div class="sb-card-value">19</div>
@@ -85,7 +88,7 @@
         </div>
 
         <div class="col-6 col-md-4 col-lg-3">
-          <div class="sb-card">
+          <div class="sb-card is-link" id="kpiReturned">
             <div class="sb-card-body">
               <div class="sb-card-title">Returned Today</div>
               <div class="sb-card-value">8</div>
@@ -95,7 +98,7 @@
         </div>
 
         <div class="col-6 col-md-4 col-lg-3">
-          <div class="sb-card">
+          <div class="sb-card is-link" id="kpiOverdue">
             <div class="sb-card-body">
               <div class="sb-card-title">Overdue</div>
               <div class="sb-card-value">14</div>
@@ -113,42 +116,19 @@
           <div class="table-card card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
               <span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Recent Transactions</span>
-              <a href="#" class="link-light small text-decoration-underline">View all</a>
+              <a href="librarian-borrow-return.html" class="link-light small text-decoration-underline">View all</a>
             </div>
-
             <div class="table-responsive">
               <table class="table table-modern align-middle mb-0">
                 <thead>
                 <tr>
-                  <th class="th-tight">When</th>
-                  <th>Member</th>
-                  <th>Book</th>
-                  <th class="th-tight">Type</th>
-                  <th class="th-tight">Due</th>
+                  <th>When</th><th>Member</th><th>Book</th><th>Type</th><th>Due</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                  <td>09:10</td>
-                  <td>A. Cruz</td>
-                  <td>Atomic Habits</td>
-                  <td class="td-tight"><span class="pill pill-info"><span class="dot"></span>Borrow</span></td>
-                  <td class="td-tight">Sep 22</td>
-                </tr>
-                <tr>
-                  <td>08:55</td>
-                  <td>M. Reyes</td>
-                  <td>Clean Code</td>
-                  <td class="td-tight"><span class="pill pill-success"><span class="dot"></span>Return</span></td>
-                  <td class="td-tight">—</td>
-                </tr>
-                <tr>
-                  <td>08:42</td>
-                  <td>J. Santos</td>
-                  <td>Algorithms 4e</td>
-                  <td class="td-tight"><span class="pill pill-info"><span class="dot"></span>Borrow</span></td>
-                  <td class="td-tight">Sep 25</td>
-                </tr>
+                  <tr><td>09:10</td><td>A. Cruz</td><td>Atomic Habits</td><td><span class="pill pill-info"><span class="dot"></span>Borrow</span></td><td>Sep 22</td></tr>
+                  <tr><td>08:55</td><td>M. Reyes</td><td>Clean Code</td><td><span class="pill pill-success"><span class="dot"></span>Return</span></td><td>—</td></tr>
+                  <tr><td>08:42</td><td>J. Santos</td><td>Algorithms 4e</td><td><span class="pill pill-info"><span class="dot"></span>Borrow</span></td><td>Sep 25</td></tr>
                 </tbody>
               </table>
             </div>
@@ -160,14 +140,14 @@
           <div class="table-card card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
               <span class="fw-semibold"><i class="bi bi-exclamation-triangle me-2"></i>Overdue</span>
-              <a href="#" class="link-light small text-decoration-underline">View list</a>
+              <a href="librarian-overdue.html" class="link-light small text-decoration-underline">View list</a>
             </div>
             <div class="list-group list-group-flush">
-              <a class="list-group-item list-group-item-action d-flex justify-content-between" href="#">
+              <a class="list-group-item d-flex justify-content-between" href="#">
                 <span>Intro to Psychology — <span class="text-muted">K. Dela Cruz</span></span>
                 <span class="badge text-bg-danger rounded-pill">3 days</span>
               </a>
-              <a class="list-group-item list-group-item-action d-flex justify-content-between" href="#">
+              <a class="list-group-item d-flex justify-content-between" href="#">
                 <span>Database Systems — <span class="text-muted">L. Perez</span></span>
                 <span class="badge text-bg-danger rounded-pill">1 day</span>
               </a>
@@ -180,32 +160,14 @@
           <div class="table-card card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
               <span class="fw-semibold"><i class="bi bi-box-seam me-2"></i>Low Stock</span>
-              <a href="#" class="link-light small text-decoration-underline">Manage</a>
+              <a href="librarian-lowstock.html" class="link-light small text-decoration-underline">Manage</a>
             </div>
             <div class="table-responsive">
               <table class="table table-modern align-middle mb-0">
-                <thead>
-                <tr><th>Title</th><th class="th-tight">Qty</th><th class="th-tight"></th></tr>
-                </thead>
+                <thead><tr><th>Title</th><th>Qty</th><th></th></tr></thead>
                 <tbody>
-                <tr>
-                  <td>Operating Systems</td>
-                  <td class="td-tight">2</td>
-                  <td class="td-tight">
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                      <i class="bi bi-arrow-repeat me-1"></i>Reorder
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Discrete Math</td>
-                  <td class="td-tight">1</td>
-                  <td class="td-tight">
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                      <i class="bi bi-arrow-repeat me-1"></i>Reorder
-                    </button>
-                  </td>
-                </tr>
+                  <tr><td>Operating Systems</td><td>2</td><td><button class="btn btn-sm btn-outline-secondary">Reorder</button></td></tr>
+                  <tr><td>Discrete Math</td><td>1</td><td><button class="btn btn-sm btn-outline-secondary">Reorder</button></td></tr>
                 </tbody>
               </table>
             </div>
@@ -221,17 +183,12 @@
             </div>
             <div class="table-responsive">
               <table class="table table-modern align-middle mb-0">
-                <thead>
-                <tr><th>Title</th><th>Author</th><th>Category</th><th class="th-tight">Qty</th><th class="th-tight"></th></tr>
-                </thead>
-                <tbody>
-                <tr><td colspan="5" class="text-center empty">No results yet</td></tr>
-                </tbody>
+                <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Qty</th><th></th></tr></thead>
+                <tbody><tr><td colspan="5" class="text-center empty">No results yet</td></tr></tbody>
               </table>
             </div>
           </div>
         </div>
-
       </div>
     </main>
   </div>
@@ -240,14 +197,24 @@
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script>
-    // Mount with current section highlighted
     renderSidebar('dashboard');
-
-    // Toggle button behavior
     document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
 
-    // Year stamp
-    (function(){const y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear();})();
+    // Card routes
+    const routes = {
+      kpiBooks: 'librarian-books.html',
+      kpiMembers: 'librarian-members.html',
+      kpiBorrowed: 'librarian-borrow-return.html',
+      kpiReturned: 'librarian-borrow-return.html#returned',
+      kpiOverdue: 'librarian-overdue.html'
+    };
+    Object.entries(routes).forEach(([id, url]) => {
+      const el = document.getElementById(id);
+      if(el){
+        el.addEventListener('click',()=>location.href=url);
+        el.addEventListener('keydown',e=>{if(e.key==='Enter')location.href=url});
+      }
+    });
   </script>
 </body>
 </html>

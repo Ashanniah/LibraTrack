@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Low Stock</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/librarian-lowstock.css" rel="stylesheet">
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+</head>
+<body class="sb-body">
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <div class="topbar">
+      <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-2">
+          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+            <i class="bi bi-list fs-4"></i>
+          </button>
+          <div class="page-title">Low Stock</div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 tools-wrap">
+          <div class="search-wrap flex-grow-1">
+            <i class="bi bi-search"></i>
+            <input id="q" type="search" placeholder="Search title, author, ISBN…">
+          </div>
+          <button id="btnExport" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="bi bi-download"></i> Export CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main class="container-fluid py-4">
+      <!-- Stats -->
+      <section class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-warning-subtle text-warning"><i class="bi bi-box-seam"></i></div>
+            <div class="meta"><div class="label">Titles Low</div><div id="stTitles" class="value">0</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-danger-subtle text-danger"><i class="bi bi-exclamation-octagon"></i></div>
+            <div class="meta"><div class="label">Critical (0–1)</div><div id="stCritical" class="value">0</div></div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="card stat">
+            <div class="icon bg-primary-subtle text-primary"><i class="bi bi-clipboard2-check"></i></div>
+            <div class="meta"><div class="label">Needed Copies</div><div id="stNeeded" class="value">0</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filters -->
+      <section class="card p-3 mb-3">
+        <div class="row g-2 align-items-end">
+          <div class="col-6 col-md-3">
+            <label class="form-label">Category</label>
+            <select id="fCat" class="form-select">
+              <option value="">All</option>
+              <option>Computer Science</option>
+              <option>Fantasy</option>
+              <option>Science</option>
+              <option>History</option>
+              <option>Children's Books</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Severity</label>
+            <select id="fSeverity" class="form-select">
+              <option value="">All</option>
+              <option value="critical">Critical (≤1)</option>
+              <option value="low">Low (≤ threshold)</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6 text-md-end">
+            <div class="btn-group">
+              <button id="btnRestock" class="btn btn-outline-primary"><i class="bi bi-bag-plus me-1"></i>Restock</button>
+              <button id="btnEmail" class="btn btn-outline-warning"><i class="bi bi-envelope-exclamation me-1"></i>Email Alert</button>
+              <button id="btnDelete" class="btn btn-outline-danger"><i class="bi bi-trash3 me-1"></i>Delete</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Table -->
+      <section class="card p-0">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0" id="tbl">
+            <thead>
+              <tr>
+                <th style="width:38px"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                <th>Title / Author</th>
+                <th>ISBN</th>
+                <th>Category</th>
+                <th class="text-center">Qty</th>
+                <th class="text-center">Threshold</th>
+                <th class="text-end" style="width:180px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"><!-- JS --></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+          <div class="text-muted small" id="pageInfo">Showing 1–10 of 0</div>
+          <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+        </div>
+
+        <div id="emptyState" class="empty d-none">
+          <i class="bi bi-box2-heart fs-2 d-block mb-2"></i>
+          Nothing low right now. Great job keeping stock healthy!
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Edit Threshold Modal -->
+  <div class="modal fade" id="thModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form class="modal-content" id="thForm" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Low-stock Threshold</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2 text-muted small" id="thBook">—</div>
+          <label class="form-label">Threshold</label>
+          <input type="number" id="thValue" class="form-control" min="0" step="1" required>
+          <div class="invalid-feedback">Enter a valid number.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    renderSidebar('lowstock');
+    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+
+    // Demo data (replace with PHP fetch later)
+    let AUTOINC=10;
+    let books = [
+      {id:1, title:"Clean Code", author:"Robert C. Martin", isbn:"978-0132350884", category:"Computer Science", qty:1, threshold:3},
+      {id:2, title:"The Pragmatic Programmer", author:"Hunt & Thomas", isbn:"978-0135957059", category:"Computer Science", qty:0, threshold:2},
+      {id:3, title:"Harry Potter 1", author:"J.K. Rowling", isbn:"978-1408855652", category:"Fantasy", qty:2, threshold:3},
+      {id:4, title:"Brief History of Time", author:"Stephen Hawking", isbn:"978-0553380163", category:"Science", qty:1, threshold:1},
+      {id:5, title:"Juan Tamad", author:"Oriela B. Concepcion", isbn:"978-751305636", category:"Children's Books", qty:3, threshold:3}
+    ].filter(b=>b.qty<=b.threshold);
+
+    // Elements
+    const q=document.getElementById('q'), fCat=document.getElementById('fCat'), fSeverity=document.getElementById('fSeverity');
+    const tbody=document.getElementById('tbody'), empty=document.getElementById('emptyState');
+    const stTitles=document.getElementById('stTitles'), stCritical=document.getElementById('stCritical'), stNeeded=document.getElementById('stNeeded');
+    const pager=document.getElementById('pager'), pageInfo=document.getElementById('pageInfo'), checkAll=document.getElementById('checkAll');
+    const thModal = new bootstrap.Modal('#thModal'); const thForm=document.getElementById('thForm'); const thValue=document.getElementById('thValue'); const thBook=document.getElementById('thBook');
+    let thId=null;
+
+    // Helpers
+    const pageSize=10; let currentPage=1;
+    const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    function applyFilters(){
+      const text=(q.value||'').toLowerCase().trim();
+      const cat=fCat.value, sev=fSeverity.value;
+      return books.filter(b=>{
+        const hit=(b.title+' '+b.author+' '+b.isbn).toLowerCase().includes(text);
+        const catOk=cat? b.category===cat : true;
+        const sevOk=sev==='critical'? b.qty<=1 : sev==='low'? b.qty<=b.threshold : true;
+        return hit && catOk && sevOk;
+      });
+    }
+    function updateStats(list){
+      stTitles.textContent=list.length;
+      stCritical.textContent=list.filter(b=>b.qty<=1).length;
+      stNeeded.textContent=list.reduce((sum,b)=> sum + Math.max(0,(b.threshold||0)-b.qty),0);
+    }
+    function render(){
+      const list=applyFilters(); updateStats(list);
+      const total=list.length, pages=Math.max(1,Math.ceil(total/pageSize));
+      if(currentPage>pages) currentPage=pages;
+      const start=(currentPage-1)*pageSize, end=Math.min(start+pageSize,total), slice=list.slice(start,end);
+
+      empty.classList.toggle('d-none', !!slice.length);
+      tbody.innerHTML=slice.map(rowHtml).join('');
+      pageInfo.textContent=`Showing ${total?start+1:0}–${end} of ${total}`;
+      pager.innerHTML='';
+      const add=(label,page,dis=false,act=false)=>{ const li=document.createElement('li'); li.className=`page-item ${dis?'disabled':''} ${act?'active':''}`; li.innerHTML=`<a class="page-link" href="#">${label}</a>`; li.onclick=(e)=>{e.preventDefault(); if(!dis){currentPage=page; render();}}; pager.appendChild(li); };
+      add('«',1,currentPage===1); add('‹',Math.max(1,currentPage-1),currentPage===1);
+      for(let p=1;p<=pages;p++) add(p,p,false,p===currentPage);
+      add('›',Math.min(pages,currentPage+1),currentPage===pages); add('»',pages,currentPage===pages);
+      checkAll.checked=false;
+    }
+    function rowHtml(b){
+      return `
+        <tr>
+          <td><input class="form-check-input row-check" type="checkbox" value="${b.id}"></td>
+          <td>
+            <div class="fw-medium">${esc(b.title)}</div>
+            <div class="small text-muted">${esc(b.author)}</div>
+          </td>
+          <td>${esc(b.isbn)}</td>
+          <td>${esc(b.category)}</td>
+          <td class="text-center">${b.qty}</td>
+          <td class="text-center">${b.threshold}</td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-warning" title="Email Alert" onclick="emailAlert(${b.id})"><i class="bi bi-envelope-exclamation"></i></button>
+              <button class="btn btn-outline-primary" title="Restock +1" onclick="restock(${b.id})"><i class="bi bi-bag-plus"></i></button>
+              <button class="btn btn-outline-secondary" title="Edit Threshold" onclick="editThreshold(${b.id})"><i class="bi bi-sliders"></i></button>
+            </div>
+          </td>
+        </tr>`;
+    }
+
+    // Events
+    [q,fCat,fSeverity].forEach(el=>el.addEventListener('input',()=>{currentPage=1;render();}));
+    document.getElementById('btnExport').onclick=()=>{
+      const rows=applyFilters().map(b=>[b.id,b.title,b.author,b.isbn,b.category,b.qty,b.threshold]);
+      const csv=["id,title,author,isbn,category,qty,threshold", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download="lowstock.csv"; a.click(); URL.revokeObjectURL(a.href);
+    };
+    const selectedIds=()=>{ const ids=[]; document.querySelectorAll('.row-check:checked').forEach(cb=>ids.push(Number(cb.value))); return ids; };
+    checkAll.addEventListener('change',()=>{ document.querySelectorAll('.row-check').forEach(cb=>cb.checked=checkAll.checked); });
+    document.getElementById('btnRestock').onclick=()=>{ const ids=selectedIds(); if(!ids.length) return alert('Select rows first.'); ids.forEach(restock); };
+    document.getElementById('btnEmail').onclick=()=>{ const ids=selectedIds(); if(!ids.length) return alert('Select rows first.'); alert('(Demo) Email sent for '+ids.length+' title(s).'); };
+    document.getElementById('btnDelete').onclick=()=>{ const ids=selectedIds(); if(!ids.length) return alert('Select rows first.'); if(!confirm('Delete selected titles?')) return; books=books.filter(b=>!ids.includes(b.id)); render(); };
+
+    // Actions
+    window.emailAlert=function(id){ const b=books.find(x=>x.id===id); alert('(Demo) Email alert for "'+b.title+'".'); };
+    window.restock=function(id){ const b=books.find(x=>x.id===id); b.qty++; if(b.qty>b.threshold) books=books.filter(x=>x.id!==id); render(); };
+    window.editThreshold=function(id){ const b=books.find(x=>x.id===id); thId=id; thBook.textContent=`${b.title} (${b.isbn})`; thValue.value=b.threshold; thForm.classList.remove('was-validated'); thModal.show(); };
+
+    thForm.addEventListener('submit',(e)=>{ e.preventDefault(); thForm.classList.add('was-validated'); if(!thForm.checkValidity()) return; const b=books.find(x=>x.id===thId); b.threshold=Number(thValue.value||0); if(b.qty>b.threshold) books=books.filter(x=>x.id!==thId); thModal.hide(); render(); });
+
+    // Init
+    render();
+  </script>
+</body>
+</html>

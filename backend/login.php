@@ -1,71 +1,82 @@
 <?php
 // backend/login.php
-header('Content-Type: application/json');
-ini_set('display_errors','0'); ini_set('log_errors','1');
+declare(strict_types=1);
 
-// ---- DB config (match with register.php) ----
+header('Content-Type: application/json');
+ini_set('display_errors','0');
+ini_set('log_errors','1');
+
+// --- DB config (edit if yours is different) ---
 $host = 'localhost';
 $user = 'root';
 $pass = '';
 $db   = 'libratrack';
 
-// ---- Helpers ----
-function bad($msg, $field = null, $code = 400) {
+// helpers
+function bad(string $msg, ?string $field=null, int $code=400): never {
   http_response_code($code);
   echo json_encode(['success'=>false,'message'=>$msg,'field'=>$field]);
   exit;
 }
 
-// ---- Read JSON ----
-$raw = file_get_contents('php://input');
-$req = json_decode($raw, true) ?: [];
-$email = trim($req['email'] ?? '');
-$password = $req['password'] ?? '';
+// method guard
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') bad('Method not allowed', null, 405);
 
-if ($email === '') bad('Email address is required', 'email');
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) bad('Invalid email address', 'email');
-if ($password === '') bad('Password is required', 'password');
+// read JSON (or form fallback)
+$raw = file_get_contents('php://input') ?: '';
+$req = json_decode($raw, true);
+if (!is_array($req) || !$req) $req = $_POST;
 
-// ---- DB connect ----
+$email    = trim((string)($req['email'] ?? ''));
+$password = (string)($req['password'] ?? '');
+
+if ($email === '') bad('Email address is required', 'email', 422);
+if (!filter_var($email, FILTER_VALIDATE_EMAIL)) bad('Invalid email address', 'email', 422);
+if ($password === '') bad('Password is required', 'password', 422);
+
+// connect
 $mysqli = @new mysqli($host, $user, $pass, $db);
 if ($mysqli->connect_errno) bad('Database connection failed', null, 500);
 
-// ---- Lookup user ----
-$sql = "SELECT id, first_name, last_name, email, password FROM users WHERE email=? LIMIT 1";
+// lookup ANY user by email (admin/librarian/student)
+$sql = "SELECT id, first_name, last_name, email, password, role, status 
+        FROM users WHERE email=? LIMIT 1";
 $stmt = $mysqli->prepare($sql);
-$stmt->bind_param("s", $email);
+if (!$stmt) bad('Server error (prep)', null, 500);
+$stmt->bind_param('s', $email);
 $stmt->execute();
 $res = $stmt->get_result();
-$userRow = $res->fetch_assoc();
+$row = $res?->fetch_assoc();
 $stmt->close();
 
-if (!$userRow) bad('Account not found', 'email', 401);
+if (!$row) bad('Account not found', 'email', 401);
+if (strtolower((string)$row['status']) !== 'active') bad('Your account is disabled. Please contact admin.', 'status', 403);
+if (!password_verify($password, (string)$row['password'])) bad('Incorrect password', 'password', 401);
 
-// ---- Verify password ----
-if (!password_verify($password, $userRow['password'])) {
-  bad('Incorrect password', 'password', 401);
-}
-
-// ---- Start secure session & store minimal identity ----
+// start secure session
 session_set_cookie_params([
   'lifetime' => 0,
   'path'     => '/',
-  'secure'   => isset($_SERVER['HTTPS']),
+  'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
   'httponly' => true,
   'samesite' => 'Lax'
 ]);
 session_start();
+
 $_SESSION['user'] = [
-  'id'         => (int)$userRow['id'],
-  'first_name' => $userRow['first_name'],
-  'last_name'  => $userRow['last_name'],
-  'email'      => $userRow['email'],
+  'id'         => (int)$row['id'],
+  'first_name' => (string)$row['first_name'],
+  'last_name'  => (string)$row['last_name'],
+  'email'      => (string)$row['email'],
+  'role'       => strtolower((string)$row['role']),
+  'status'     => (string)$row['status'],
+  'logged_in'  => time(),
 ];
 
-// ---- Respond OK ----
 echo json_encode([
-  'success' => true,
-  'message' => 'Login successful',
-  // optional: where you want to go after login
-  'redirect' => '../librarian-dashboard.html'
+  'success'  => true,
+  'message'  => 'Login successful',
+  // single, unified dashboard for every role
+  'redirect' => '/libratrack/dashboard.html',
+  'role'     => strtolower((string)$row['role'])
 ]);

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack – Dashboard</title>
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet"/>
+  <link href="assets/css/sidebar.css" rel="stylesheet"/>
+  <style>
+    .role-hidden{display:none!important}
+    .pill{display:inline-flex;align-items:center;gap:.4rem;padding:.15rem .5rem;border-radius:999px;font-size:.75rem}
+    .pill-info{background:#e7f1ff;color:#0d6efd}.pill-success{background:#e9f7ef;color:#198754}
+    .pill-danger{background:#fde8ea;color:#dc3545}.pill-returned{background:#eef5ff;color:#0d6efd}
+    .sb-card{cursor:pointer}
+  </style>
+</head>
+<body class="sb-body">
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <!-- Topbar -->
+    <nav class="sb-topbar navbar navbar-expand bg-white sticky-top">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+
+        <div class="fw-bold h5 mb-0">Dashboard</div>
+
+        <div class="ms-auto me-3 small text-muted">
+          <span id="welcomeName">—</span> · <span id="welcomeRole">—</span>
+        </div>
+
+        <div class="dropdown">
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle me-2"></i><span id="topRole">User</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a id="logoutBtn" class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <main class="sb-content container-fluid py-4">
+
+      <!-- COMMON KPI (visible to all) -->
+      <section class="row g-3 mb-3">
+        <div class="col-6 col-md-4 col-lg-3"><div class="sb-card card p-3"><div class="text-muted">Total Books</div><div class="fs-4 fw-semibold">3,284</div></div></div>
+        <div class="col-6 col-md-4 col-lg-3"><div class="sb-card card p-3"><div class="text-muted">Borrowed Today</div><div class="fs-4 fw-semibold">19</div></div></div>
+        <div class="col-6 col-md-4 col-lg-3"><div class="sb-card card p-3"><div class="text-muted">Returned Today</div><div class="fs-4 fw-semibold">8</div></div></div>
+        <div class="col-6 col-md-4 col-lg-3"><div class="sb-card card p-3"><div class="text-muted">Overdue</div><div class="fs-4 fw-semibold">14</div></div></div>
+      </section>
+
+      <!-- ADMIN ONLY -->
+      <section id="adminSection" class="role-hidden">
+        <h5 class="mb-3"><i class="bi bi-shield-lock me-2"></i>Admin Area</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-xl-6">
+            <div class="table-card card h-100">
+              <div class="card-header d-flex justify-content-between">
+                <span class="fw-semibold"><i class="bi bi-people-fill me-2"></i>System Users</span>
+                <a class="small text-decoration-underline" href="admin-users.html">Manage users</a>
+              </div>
+              <div class="p-3">
+                <div class="row g-3">
+                  <div class="col-6 col-md-3"><div class="card p-3"><span>Admins</span><strong>3</strong></div></div>
+                  <div class="col-6 col-md-3"><div class="card p-3"><span>Librarians</span><strong>7</strong></div></div>
+                  <div class="col-6 col-md-3"><div class="card p-3"><span>Students</span><strong>2,034</strong></div></div>
+                  <div class="col-6 col-md-3"><div class="card p-3"><span>Guests</span><strong>128</strong></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-xl-6">
+            <div class="table-card card h-100">
+              <div class="card-header"><span class="fw-semibold"><i class="bi bi-megaphone me-2"></i>Announcements</span></div>
+              <div class="p-3">
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">System maintenance — Sept 15, 10:00–12:00</li>
+                  <li class="list-group-item">New arrivals: 120 CS titles</li>
+                  <li class="list-group-item">Library hours update: Mon–Sat, 8:00–18:00</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIBRARIAN ONLY -->
+      <section id="librarianSection" class="role-hidden">
+        <h5 class="mb-3"><i class="bi bi-journal-text me-2"></i>Librarian Area</h5>
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-xxl-7">
+            <div class="table-card card h-100">
+              <div class="card-header d-flex justify-content-between"><span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Recent Transactions</span><a class="small text-decoration-underline" href="librarian-borrow-return.html">View all</a></div>
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0">
+                  <thead><tr><th>When</th><th>Member</th><th>Book</th><th>Type</th><th>Due</th></tr></thead>
+                  <tbody>
+                    <tr><td>09:10</td><td>A. Cruz</td><td>Atomic Habits</td><td><span class="pill pill-info"><span class="dot"></span>Borrow</span></td><td>Sep 22</td></tr>
+                    <tr><td>08:55</td><td>M. Reyes</td><td>Clean Code</td><td><span class="pill pill-success"><span class="dot"></span>Return</span></td><td>—</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-xxl-5">
+            <div class="table-card card h-100">
+              <div class="card-header d-flex justify-content-between"><span class="fw-semibold"><i class="bi bi-exclamation-triangle me-2"></i>Overdue</span><a class="small text-decoration-underline" href="librarian-overdue.html">View list</a></div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between"><span>Intro to Psychology — <span class="text-muted">K. Dela Cruz</span></span><span class="badge text-bg-danger rounded-pill">3 days</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span>Database Systems — <span class="text-muted">L. Perez</span></span><span class="badge text-bg-danger rounded-pill">1 day</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STUDENT ONLY -->
+      <section id="studentSection" class="role-hidden">
+        <h5 class="mb-3"><i class="bi bi-mortarboard me-2"></i>Student Area</h5>
+        <div class="row g-3">
+          <div class="col-12 col-xxl-7">
+            <div class="table-card card h-100">
+              <div class="card-header"><span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Borrowing History</span></div>
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0">
+                  <thead><tr><th>Date</th><th>Book</th><th>Status</th><th>Due</th></tr></thead>
+                  <tbody>
+                    <tr><td>Sep 5</td><td>Atomic Habits</td><td><span class="pill pill-info">Borrowed</span></td><td>Sep 22</td></tr>
+                    <tr><td>Sep 2</td><td>Clean Code</td><td><span class="pill pill-returned">Returned</span></td><td>—</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-xxl-5">
+            <div class="table-card card h-100">
+              <div class="card-header d-flex justify-content-between"><span class="fw-semibold"><i class="bi bi-heart me-2"></i>Favorites</span><a class="small text-decoration-underline" href="#">Manage</a></div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between"><span>Clean Code</span><button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Remove</button></li>
+                <li class="list-group-item d-flex justify-content-between"><span>Design Patterns</span><button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Remove</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    // Sidebar toggler
+    if (typeof renderSidebar === 'function') renderSidebar('dashboard');
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+      if (typeof toggleSidebar === 'function') toggleSidebar();
+      else document.body.classList.toggle('sb-collapsed');
+    });
+
+    // Load session and toggle role UI
+    (async function init() {
+      try {
+        const res = await fetch('backend/me.php', {credentials:'same-origin'});
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          location.href = 'login.html';
+          return;
+        }
+
+        const u = data.user || {};
+        const fullName = [u.first_name, u.last_name].filter(Boolean).join(' ');
+        const role = (u.role || '').toLowerCase();
+
+        document.getElementById('welcomeName').textContent = fullName || 'User';
+        document.getElementById('welcomeRole').textContent = role || '—';
+        document.getElementById('topRole').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+
+        // show only the matching role sections
+        if (role === 'admin') document.getElementById('adminSection')?.classList.remove('role-hidden');
+        if (role === 'librarian') document.getElementById('librarianSection')?.classList.remove('role-hidden');
+        if (role === 'student') document.getElementById('studentSection')?.classList.remove('role-hidden');
+      } catch {
+        location.href = 'login.html';
+      }
+    })();
+
+    // Logout
+    document.getElementById('logoutBtn')?.addEventListener('click', async (e)=>{
+      e.preventDefault();
+      try{
+        const res = await fetch('backend/logout.php', {credentials:'same-origin'});
+        const data = await res.json().catch(()=>({}));
+        location.href = (data && data.redirect) || 'login.html';
+      }catch{
+        location.href = 'login.html';
+      }
+    });
+  </script>
+</body>
+</html>

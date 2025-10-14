@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - History</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/librarian-history.css" rel="stylesheet">
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+</head>
+<body class="sb-body">
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <div class="topbar">
+      <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-2">
+          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+            <i class="bi bi-list fs-4"></i>
+          </button>
+          <div class="page-title">History</div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 tools-wrap">
+          <div class="search-wrap flex-grow-1">
+            <i class="bi bi-search"></i>
+            <input id="q" type="search" placeholder="Search member, title, ISBN…">
+          </div>
+          <button id="btnExport" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+            <i class="bi bi-download"></i> Export CSV
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main class="container-fluid py-4">
+      <!-- Filters -->
+      <section class="card p-3 mb-3">
+        <div class="row g-2">
+          <div class="col-6 col-md-3">
+            <label class="form-label">Status</label>
+            <select id="fStatus" class="form-select">
+              <option value="">All</option>
+              <option value="borrowed">Borrowed</option>
+              <option value="returned">Returned</option>
+              <option value="overdue">Overdue</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Member</label>
+            <input id="fMember" type="text" class="form-control" placeholder="Name / Student no.">
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">From</label>
+            <input id="fFrom" type="date" class="form-control">
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">To</label>
+            <input id="fTo" type="date" class="form-control">
+          </div>
+        </div>
+      </section>
+
+      <!-- Table -->
+      <section class="card p-0">
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Member</th>
+                <th>Book</th>
+                <th class="d-none d-lg-table-cell">Loan #</th>
+                <th>Borrowed</th>
+                <th class="d-none d-lg-table-cell">Due</th>
+                <th>Returned</th>
+                <th>Status</th>
+                <th class="text-end" style="width:120px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"><!-- JS --></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+          <div class="text-muted small" id="pageInfo">Showing 1–10 of 0</div>
+          <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+        </div>
+
+        <div id="emptyState" class="empty d-none">
+          <i class="bi bi-clock-history fs-2 d-block mb-2"></i>
+          No records match your filters.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- View Detail Modal -->
+  <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content hview">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title">Transaction Details</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div class="hv-head">
+            <div class="hv-icon"><i class="bi bi-journal-arrow-down"></i></div>
+            <div class="hv-main">
+              <div class="hv-title" id="vTitle">—</div>
+              <div class="text-muted small" id="vMeta">—</div>
+              <div class="hv-chips">
+                <span id="vStatus" class="chip chip-neutral">Status</span>
+                <span id="vLoan" class="chip chip-neutral">Loan #</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hv-sheet">
+            <div class="hv-row hv-headrow">
+              <div class="hv-col hv-field"><i class="bi bi-info-circle me-2"></i> Field</div>
+              <div class="hv-col hv-value"><i class="bi bi-clipboard-check me-2"></i> Details</div>
+            </div>
+            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-person"></i> Member</div><div class="hv-col hv-value" id="vMember">—</div></div>
+            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-calendar-plus"></i> Borrowed</div><div class="hv-col hv-value" id="vBorrowed">—</div></div>
+            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-calendar-check"></i> Due</div><div class="hv-col hv-value" id="vDue">—</div></div>
+            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-calendar2-check"></i> Returned</div><div class="hv-col hv-value" id="vReturned">—</div></div>
+            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-stopwatch"></i> Days Late</div><div class="hv-col hv-value" id="vLate">—</div></div>
+            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-card-text"></i> Notes</div><div class="hv-col hv-value" id="vNotes">—</div></div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    renderSidebar('history');
+    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+
+    // Demo data (replace with PHP later)
+    // model: {id, loanNo, member, studNo, book, isbn, borrowedAt, dueAt, returnedAt?, status, daysLate, notes}
+    let history = [
+      {id:1, loanNo:'10023', member:'Juan Dela Cruz', studNo:'2025-12345', book:'Clean Code', isbn:'978-0132350884', borrowedAt:'2025-09-01 09:00', dueAt:'2025-09-08', returnedAt:'2025-09-08 08:30', status:'returned', daysLate:0, notes:''},
+      {id:2, loanNo:'10045', member:'Lea Cruz', studNo:'2025-99877', book:'Computer Networks', isbn:'978-0132126959', borrowedAt:'2025-09-03 10:00', dueAt:'2025-09-10', returnedAt:null, status:'borrowed', daysLate:0, notes:'—'},
+      {id:3, loanNo:'10012', member:'Mark Reyes', studNo:'2024-88231', book:'Harry Potter 1', isbn:'978-1408855652', borrowedAt:'2025-08-25 14:00', dueAt:'2025-09-01', returnedAt:null, status:'overdue', daysLate:12, notes:'2 reminders sent'}
+    ];
+
+    // Elements
+    const q=document.getElementById('q'), fStatus=document.getElementById('fStatus'), fMember=document.getElementById('fMember'), fFrom=document.getElementById('fFrom'), fTo=document.getElementById('fTo');
+    const tbody=document.getElementById('tbody'), empty=document.getElementById('emptyState'), pager=document.getElementById('pager'), pageInfo=document.getElementById('pageInfo');
+    const viewModal=new bootstrap.Modal('#viewModal');
+
+    // Helpers
+    const pageSize=10; let currentPage=1;
+    const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    function applyFilters(){
+      const text=(q.value||'').toLowerCase().trim(), st=fStatus.value, mem=(fMember.value||'').toLowerCase().trim();
+      const d1=fFrom.value? new Date(fFrom.value) : null, d2=fTo.value? new Date(fTo.value+'T23:59') : null;
+      return history.filter(h=>{
+        const hit=(h.member+' '+h.book+' '+h.isbn+' '+h.loanNo).toLowerCase().includes(text);
+        const stOk=st? h.status===st : true;
+        const memOk=mem? (h.member.toLowerCase().includes(mem) || (h.studNo||'').toLowerCase().includes(mem)) : true;
+        const dt=new Date(h.borrowedAt); const dateOk = (d1? dt>=d1:true) && (d2? dt<=d2:true);
+        return hit && stOk && memOk && dateOk;
+      });
+    }
+    function render(){
+      const list=applyFilters();
+      const total=list.length, pages=Math.max(1,Math.ceil(total/pageSize));
+      if(currentPage>pages) currentPage=pages;
+      const start=(currentPage-1)*pageSize, end=Math.min(start+pageSize,total), slice=list.slice(start,end);
+
+      empty.classList.toggle('d-none', !!slice.length);
+      tbody.innerHTML=slice.map(rowHtml).join('');
+      pageInfo.textContent=`Showing ${total?start+1:0}–${end} of ${total}`;
+
+      pager.innerHTML='';
+      const add=(label,page,dis=false,act=false)=>{const li=document.createElement('li'); li.className=`page-item ${dis?'disabled':''} ${act?'active':''}`; li.innerHTML=`<a class="page-link" href="#">${label}</a>`; li.onclick=(e)=>{e.preventDefault(); if(!dis){currentPage=page; render();}}; pager.appendChild(li);};
+      add('«',1,currentPage===1); add('‹',Math.max(1,currentPage-1),currentPage===1);
+      for(let p=1;p<=pages;p++) add(p,p,false,p===currentPage);
+      add('›',Math.min(pages,currentPage+1),currentPage===pages); add('»',pages,currentPage===pages);
+    }
+    function rowHtml(h){
+      const stChip = h.status==='returned' ? '<span class="badge text-bg-success-soft">Returned</span>'
+                  : h.status==='overdue' ? '<span class="badge text-bg-danger-soft">Overdue</span>'
+                  : '<span class="badge text-bg-primary-soft">Borrowed</span>';
+      return `
+        <tr>
+          <td>
+            <div class="fw-medium">${esc(h.member)}</div>
+            <div class="small text-muted">${esc(h.studNo)}</div>
+          </td>
+          <td>
+            <div class="fw-medium">${esc(h.book)}</div>
+            <div class="small text-muted">${esc(h.isbn)}</div>
+          </td>
+          <td class="d-none d-lg-table-cell">${esc(h.loanNo)}</td>
+          <td>${esc(h.borrowedAt)}</td>
+          <td class="d-none d-lg-table-cell">${esc(h.dueAt)}</td>
+          <td>${h.returnedAt? esc(h.returnedAt): '—'}</td>
+          <td>${stChip}</td>
+          <td class="text-end">
+            <button class="btn btn-outline-secondary btn-sm" onclick="view(${h.id})"><i class="bi bi-eye"></i></button>
+          </td>
+        </tr>`;
+    }
+
+    // Export
+    document.getElementById('btnExport').onclick=()=>{
+      const rows=applyFilters().map(h=>[h.loanNo,h.member,h.studNo,h.book,h.isbn,h.borrowedAt,h.dueAt,h.returnedAt||'',h.status,h.daysLate||0,h.notes||'']);
+      const csv=["loanNo,member,studentNo,book,isbn,borrowedAt,dueAt,returnedAt,status,daysLate,notes", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download="history.csv"; a.click(); URL.revokeObjectURL(a.href);
+    };
+
+    // Filters live
+    [q,fStatus,fMember,fFrom,fTo].forEach(el=>el.addEventListener('input',()=>{currentPage=1;render();}));
+
+    // View modal
+    window.view=function(id){
+      const h=history.find(x=>x.id===id); if(!h) return;
+      document.getElementById('vTitle').textContent=h.book;
+      document.getElementById('vMeta').textContent=`${h.member} • Loan #${h.loanNo}`;
+      const vs=document.getElementById('vStatus'); vs.textContent=h.status==='overdue'?'Overdue':h.status==='returned'?'Returned':'Borrowed';
+      vs.className='chip ' + (h.status==='overdue'?'chip-danger':h.status==='returned'?'chip-success':'chip-neutral');
+      document.getElementById('vLoan').textContent='Loan #'+h.loanNo;
+      document.getElementById('vMember').textContent=`${h.member} (${h.studNo})`;
+      document.getElementById('vBorrowed').textContent=h.borrowedAt;
+      document.getElementById('vDue').textContent=h.dueAt;
+      document.getElementById('vReturned').textContent=h.returnedAt||'—';
+      document.getElementById('vLate').textContent=String(h.daysLate||0);
+      document.getElementById('vNotes').textContent=h.notes||'—';
+      viewModal.show();
+    };
+
+    // Init
+    render();
+  </script>
+</body>
+</html>
