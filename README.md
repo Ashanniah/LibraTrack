@@ -8,7 +8,8 @@ LibraTrack is a PHP-based platform designed to help schools manage library opera
 
 ## Group Members
 - Grachelle Mae A. Carmelotes  
-- Edmar Angelo S. Generoso  
+- Edmar Angelo S. Generoso
+- Vicente Miguel N. Alcala 
 
 ---
 
