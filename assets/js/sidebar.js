@@ -3,7 +3,8 @@
   const APP_BASE = '/libratrack/';
 
   const ROUTES = {
-    admin:     { dashboard:'dashboard.html', books:'books.html', users:'admin-users.html', overdue:'overdue.html', history:'history.html', emails:'emails.html' },
+    admin:     { dashboard:'dashboard.html', books:'books.html', users:'admin-users.html',  profile:   'admin-profile.html', // settings:  'admin-settings.html',   // TODO // reports:   'admin-reports.html',    // TODO // audit:     'admin-audit.html'       // TODO 
+    },
     librarian: { dashboard:'dashboard.html', books:'books.html', members:'members.html', borrow:'borrow-return.html', overdue:'overdue.html', lowstock:'lowstock.html', history:'history.html', emails:'emails.html', regMember:'registered-members.html' },
     student:   { dashboard:'dashboard.html', books:'books.html', search:'search.html', history:'history.html', favorites:'favorites.html', overdue:'overdue.html', notifications:'notifications.html', profile:'profile.html', logout:'login.html' }
   };
@@ -15,17 +16,37 @@
      </a>`;
 
   function menuFor(role, current) {
+    // if (role === 'admin') {
+    //   return `
+    //     <div class="sb-label">Main</div>
+    //     ${link(ROUTES.admin.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
+    //     ${link(ROUTES.admin.books,'bi-journal-text','Books',current==='books')}
+    //     ${link(ROUTES.admin.users,'bi-people','Users',current==='users')}
+    //     ${link(ROUTES.admin.overdue,'bi-exclamation-triangle','Overdue',current==='overdue')}
+    //     ${link(ROUTES.admin.history,'bi-clock-history','History',current==='history')}
+    //     ${link(ROUTES.admin.emails,'bi-envelope-paper-heart','Emails',current==='emails')}
+    //   `;
+    // }
+    // inside menuFor(role, current)
     if (role === 'admin') {
       return `
         <div class="sb-label">Main</div>
         ${link(ROUTES.admin.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
         ${link(ROUTES.admin.books,'bi-journal-text','Books',current==='books')}
         ${link(ROUTES.admin.users,'bi-people','Users',current==='users')}
-        ${link(ROUTES.admin.overdue,'bi-exclamation-triangle','Overdue',current==='overdue')}
-        ${link(ROUTES.admin.history,'bi-clock-history','History',current==='history')}
-        ${link(ROUTES.admin.emails,'bi-envelope-paper-heart','Emails',current==='emails')}
+
+        <div class="sb-label mt-3">Account</div>
+        ${link(ROUTES.admin.profile,'bi-person-gear','Profile',current==='profile')}
+
+        <!-- Future:
+        <div class="sb-label mt-3">Administration</div>
+        ${/* ${link(ROUTES.admin.settings,'bi-gear','Settings',current==='settings')} */''}
+        ${/* ${link(ROUTES.admin.reports,'bi-graph-up-arrow','Reports',current==='reports')} */''}
+        ${/* ${link(ROUTES.admin.audit,'bi-clipboard-data','Audit Logs',current==='audit')} */''}
+        -->
       `;
     }
+
     if (role === 'student') {
       return `
         <div class="sb-label">Main</div>
@@ -65,7 +86,7 @@
     `;
   }
 
-  window.renderSidebar = function(current='dashboard', role='librarian'){
+  window.renderSidebar = function(current='dashboard', role='student'){
     const root = document.getElementById('sidebar-root');
     if (!root) return;
 

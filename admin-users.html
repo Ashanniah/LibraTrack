@@ -312,27 +312,53 @@
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script>
-    // Sidebar hooks
-    if (typeof renderSidebar === 'function') renderSidebar('admin');
-    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-      if (typeof toggleSidebar === 'function') toggleSidebar();
-      else document.body.classList.toggle('sb-collapsed');
-    });
+    // ---- Auth helper (same contract as dashboard) ----
+    async function getMe() {
+      const res = await fetch('backend/check-auth.php', { credentials: 'include' });
+      if (res.status === 401) { location.href = 'login.html'; return null; }
+      const data = await res.json();
+      if (!data.success) { location.href = 'login.html'; return null; }
+      return data.user; // {id, first_name, last_name, role, status, email}
+    }
 
-    // Elements
-    const search      = document.getElementById('searchInput');
-    const filterRole  = document.getElementById('filterRole');
-    const filterStatus= document.getElementById('filterStatus');
-    const tbody       = document.getElementById('usersBody');
-    const pageInfo    = document.getElementById('pageInfo');
-    const pager       = document.getElementById('pager');
-    const checkAll    = document.getElementById('checkAll');
+    // ---- Page bootstrap ----
+    (async () => {
+      const me = await getMe();
+      if (!me) return;
+
+      // Gate to admins only
+      if (me.role !== 'admin') {
+        location.href = 'dashboard.html';
+        return;
+      }
+
+      // Build sidebar for this page (active: users)
+      renderSidebar('users', me.role);
+
+      // Sidebar toggle
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        if (typeof toggleSidebar === 'function') toggleSidebar();
+        else document.body.classList.toggle('sb-collapsed');
+      });
+
+      // Initial data load after auth
+      loadUsers();
+    })();
+
+    // ---- Elements ----
+    const search       = document.getElementById('searchInput');
+    const filterRole   = document.getElementById('filterRole');
+    const filterStatus = document.getElementById('filterStatus');
+    const tbody        = document.getElementById('usersBody');
+    const pageInfo     = document.getElementById('pageInfo');
+    const pager        = document.getElementById('pager');
+    const checkAll     = document.getElementById('checkAll');
 
     const userModal = new bootstrap.Modal('#userModal');
     const viewModal = new bootstrap.Modal('#viewUserModal');
 
-    const form       = document.getElementById('userForm');
-    const userModalTitle = document.getElementById('userModalTitle');
+    const form            = document.getElementById('userForm');
+    const userModalTitle  = document.getElementById('userModalTitle');
 
     const fId        = document.getElementById('fId');
     const fFirst     = document.getElementById('fFirst');
@@ -354,7 +380,7 @@
     const errPassword= document.getElementById('errPassword');
     const errConfirm = document.getElementById('errConfirm');
 
-    // Password toggles
+    // ---- Password toggles ----
     function setupPwToggle(inputEl, btnId, iconId){
       const btn  = document.getElementById(btnId);
       const icon = document.getElementById(iconId);
@@ -370,7 +396,7 @@
     setupPwToggle(fPassword, 'pwToggle1', 'pwIcon1');
     setupPwToggle(fConfirm,  'pwToggle2', 'pwIcon2');
 
-    // Data + helpers
+    // ---- Data + helpers ----
     let users = [];
     const pageSize = 10;
     let currentPage = 1;
@@ -380,9 +406,9 @@
       const base = parts.join(' ');
       return base + (u.suffix ? ', ' + u.suffix : '');
     }
-    const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||'');
+    const validEmail   = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||'');
     const strongEnough = pw => /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{}|\\:;'"<>,.?/~`]).{8,}$/.test(pw||'');
-    const escapeHtml = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+    const escapeHtml   = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
     function clearError(inputEl, errEl){ inputEl?.classList.remove('is-invalid'); if (errEl){ errEl.textContent=''; errEl.classList.add('d-none'); } }
     function setError(inputEl, errEl, msg){ inputEl?.classList.add('is-invalid'); if (errEl){ errEl.textContent=msg; errEl.classList.remove('d-none'); } }
 
@@ -473,7 +499,7 @@
       checkAll.checked = false;
     }
 
-    // Load users from DB
+    // ---- Load users from DB ----
     async function loadUsers(){
       try {
         const res = await fetch('backend/list-users.php');
@@ -499,8 +525,9 @@
       }
     }
 
-    // Open modal as "Add User"
+    // ---- Open modal as "Add User" ----
     document.querySelector('[data-bs-target="#userModal"]').addEventListener('click', () => {
+      const userModalTitle = document.getElementById('userModalTitle');
       userModalTitle.textContent = "Add User";
       fId.value = '';
       fFirst.value = fMiddle.value = fLast.value = fSuffix.value = '';
@@ -514,7 +541,7 @@
         .forEach(([a,b])=>clearError(a,b));
     });
 
-    // Export, bulk, etc.
+    // ---- Export, bulk, etc. ----
     document.getElementById('btnExport').onclick = () => {
       const rows = applyFilters().map(u => [
         u.id, fullName(u), u.firstName, u.middleName||"", u.lastName, u.suffix||"", u.email, u.role, u.studentNo||"", u.status
@@ -533,7 +560,7 @@
       if (!ids.length) return alert('Select users first.');
       users = users.map(u => ids.includes(u.id) ? {...u, status:'disabled'} : u);
       render();
-      // TODO: Add backend endpoint if you want to persist bulk disables.
+      // TODO: Persist bulk disables server-side if needed.
     };
     document.getElementById('btnBulkDelete').onclick = () => {
       const ids = selectedIds();
@@ -541,11 +568,10 @@
       alert('Delete action not implemented against DB in this demo.');
     };
 
-    // Submit handler — create librarian
+    // ---- Submit handler — create librarian ----
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      // clear previous errors
       [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fRole,errRole],[fPassword,errPassword],[fConfirm,errConfirm]]
         .forEach(([a,b])=>clearError(a,b));
 
@@ -606,7 +632,6 @@
           return;
         }
 
-        // Add immediately to UI for a snappy feel
         const newId = Number(data.id);
         users.unshift({
           id: newId,
@@ -626,7 +651,7 @@
           .forEach(([a,b])=>clearError(a,b));
         render();
 
-        // Also refresh from DB to stay canonical
+        // Stay canonical
         loadUsers();
 
       } catch (err) {
@@ -634,7 +659,7 @@
       }
     });
 
-    // Search & filter
+    // ---- Search & filter ----
     search.addEventListener('input', () => { currentPage = 1; render(); });
     filterRole.addEventListener('change', () => { currentPage = 1; render(); });
     filterStatus.addEventListener('change', () => { currentPage = 1; render(); });
@@ -642,7 +667,7 @@
       document.querySelectorAll('.row-check').forEach(cb => cb.checked = checkAll.checked);
     });
 
-    // View/Edit/Delete
+    // ---- View/Edit/Delete ----
     const viewFmt = d => d ? new Date(d).toLocaleString() : '—';
     function setTxt(id, val){ const el=document.getElementById(id); if (el) el.textContent = val ?? '—'; }
 
@@ -684,6 +709,7 @@
 
     window.editUser = function(id){
       const u = users.find(x=>x.id===id); if (!u) return;
+      const userModalTitle = document.getElementById('userModalTitle');
       userModalTitle.textContent = "Edit User";
       fId.value = u.id;
       fFirst.value = u.firstName || "";
@@ -711,9 +737,6 @@
       document.querySelectorAll('.row-check:checked').forEach(cb => ids.push(Number(cb.value)));
       return ids;
     }
-
-    // initial load
-    loadUsers();
   </script>
 </body>
 </html>

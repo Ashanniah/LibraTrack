@@ -1,8 +1,16 @@
+
+
 <?php
-require __DIR__ . "/db.php";
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/db.php';   // has json_response()
+
+requireRole(['librarian','admin']);
 
 // requireRole(['admin','librarian']); // enable when auth is ready
+
+// <?php
+// require __DIR__ . "/db.php";
+// header('Content-Type: application/json; charset=utf-8');
+
 
 function json_response($arr, $code=200){
   http_response_code($code);

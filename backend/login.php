@@ -1,82 +1,70 @@
 <?php
-// backend/login.php
 declare(strict_types=1);
 
+require_once __DIR__ . '/db.php';
 header('Content-Type: application/json');
-ini_set('display_errors','0');
-ini_set('log_errors','1');
 
-// --- DB config (edit if yours is different) ---
-$host = 'localhost';
-$user = 'root';
-$pass = '';
-$db   = 'libratrack';
+// keep raw errors out of the response; log instead
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 
-// helpers
-function bad(string $msg, ?string $field=null, int $code=400): never {
-  http_response_code($code);
-  echo json_encode(['success'=>false,'message'=>$msg,'field'=>$field]);
-  exit;
+// Guard
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+  json_response(['success' => false, 'error' => 'Method not allowed'], 405);
 }
 
-// method guard
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') bad('Method not allowed', null, 405);
-
-// read JSON (or form fallback)
+// Read JSON body or form-POST
 $raw = file_get_contents('php://input') ?: '';
 $req = json_decode($raw, true);
 if (!is_array($req) || !$req) $req = $_POST;
 
-$email    = trim((string)($req['email'] ?? ''));
-$password = (string)($req['password'] ?? '');
+// Collect
+$email = trim((string)($req['email'] ?? ''));
+$pass  = (string)($req['password'] ?? '');
 
-if ($email === '') bad('Email address is required', 'email', 422);
-if (!filter_var($email, FILTER_VALIDATE_EMAIL)) bad('Invalid email address', 'email', 422);
-if ($password === '') bad('Password is required', 'password', 422);
+// Validate
+if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+  json_response(['success' => false, 'error' => 'Invalid email', 'field' => 'email'], 422);
+}
+if ($pass === '') {
+  json_response(['success' => false, 'error' => 'Password is required', 'field' => 'password'], 422);
+}
 
-// connect
-$mysqli = @new mysqli($host, $user, $pass, $db);
-if ($mysqli->connect_errno) bad('Database connection failed', null, 500);
-
-// lookup ANY user by email (admin/librarian/student)
-$sql = "SELECT id, first_name, last_name, email, password, role, status 
-        FROM users WHERE email=? LIMIT 1";
-$stmt = $mysqli->prepare($sql);
-if (!$stmt) bad('Server error (prep)', null, 500);
+// Lookup
+$stmt = $conn->prepare(
+  "SELECT id, first_name, last_name, email, password, role, status
+   FROM users WHERE email = ? LIMIT 1"
+);
 $stmt->bind_param('s', $email);
 $stmt->execute();
-$res = $stmt->get_result();
-$row = $res?->fetch_assoc();
+$user = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-if (!$row) bad('Account not found', 'email', 401);
-if (strtolower((string)$row['status']) !== 'active') bad('Your account is disabled. Please contact admin.', 'status', 403);
-if (!password_verify($password, (string)$row['password'])) bad('Incorrect password', 'password', 401);
+if (!$user) {
+  usleep(250000); // slow down brute force a bit
+  json_response(['success' => false, 'error' => 'Invalid email or password', 'field' => 'password'], 401);
+}
 
-// start secure session
-session_set_cookie_params([
-  'lifetime' => 0,
-  'path'     => '/',
-  'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-  'httponly' => true,
-  'samesite' => 'Lax'
-]);
-session_start();
+if (strtolower((string)$user['status']) !== 'active') {
+  json_response(['success' => false, 'error' => 'Account is disabled'], 403);
+}
 
-$_SESSION['user'] = [
-  'id'         => (int)$row['id'],
-  'first_name' => (string)$row['first_name'],
-  'last_name'  => (string)$row['last_name'],
-  'email'      => (string)$row['email'],
-  'role'       => strtolower((string)$row['role']),
-  'status'     => (string)$row['status'],
-  'logged_in'  => time(),
-];
+if (!password_verify($pass, (string)$user['password'])) {
+  usleep(250000);
+  json_response(['success' => false, 'error' => 'Invalid email or password', 'field' => 'password'], 401);
+}
 
-echo json_encode([
+// Good login → renew session and stash essentials
+session_regenerate_id(true);
+$_SESSION['uid']        = (int)$user['id'];
+$_SESSION['role']       = strtolower((string)$user['role']);
+$_SESSION['email']      = (string)$user['email'];
+$_SESSION['first_name'] = (string)$user['first_name'];
+$_SESSION['last_name']  = (string)$user['last_name'];
+$_SESSION['logged_in']  = time();
+
+json_response([
   'success'  => true,
-  'message'  => 'Login successful',
-  // single, unified dashboard for every role
   'redirect' => '/libratrack/dashboard.html',
-  'role'     => strtolower((string)$row['role'])
+  'role'     => $_SESSION['role'],
 ]);
