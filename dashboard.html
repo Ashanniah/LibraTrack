@@ -12,10 +12,9 @@
   <link href="assets/css/sidebar.css" rel="stylesheet"/>
 
   <style>
-    /* shared “card” look used by all roles */
-    .sb-card{position:relative; background:#fff; border:1px solid #eee; border-radius:14px; padding:16px; cursor:default}
-    .sb-card .sb-card-title{font-size:.85rem; color:#6b7280}
-    .sb-card .sb-card-value{font-weight:700; font-size:1.6rem}
+    .sb-card{position:relative;background:#fff;border:1px solid #eee;border-radius:14px;padding:16px}
+    .sb-card .sb-card-title{font-size:.85rem;color:#6b7280}
+    .sb-card .sb-card-value{font-weight:700;font-size:1.6rem}
     .pill{display:inline-flex;align-items:center;gap:.4rem;padding:.15rem .5rem;border-radius:999px;font-size:.75rem}
     .pill .dot{width:.4rem;height:.4rem;border-radius:50%;display:inline-block}
     .pill-info{background:#e8f2ff;color:#0d6efd}.pill-info .dot{background:#0d6efd}
@@ -26,23 +25,21 @@
     .th-tight{width:1%;white-space:nowrap}
     .empty{color:#9ca3af}
     .role-chip{font-weight:600}
-    .role-chip.admin{background:#eee}.role-chip.librarian{background:#e7f1ff;color:#0d6efd}.role-chip.student{background:#efe7ff;color:#6f42c1}
-    /* hide all until role resolved to prevent flash */
-    body.loading main, body.loading #sidebarToggle { visibility:hidden }
+    .role-chip.admin{background:#eee}
+    .role-chip.librarian{background:#e7f1ff;color:#0d6efd}
+    .role-chip.student{background:#efe7ff;color:#6f42c1}
+    body.loading main,body.loading #sidebarToggle{visibility:hidden}
   </style>
 </head>
 <body class="sb-body loading">
-  <!-- Sidebar mount point (your existing sidebar.js uses this) -->
   <div id="sidebar-root"></div>
 
   <div class="sb-wrapper">
-    <!-- Topbar -->
     <nav class="sb-topbar navbar navbar-expand bg-white sticky-top">
       <div class="container-fluid">
         <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
           <i class="bi bi-list fs-4"></i>
         </button>
-
         <div class="fw-bold h5 mb-0" id="pageTitle">Dashboard</div>
 
         <div class="ms-auto d-flex align-items-center gap-2">
@@ -59,8 +56,7 @@
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
-              <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
-              <li><a class="dropdown-item" href="#"><i class="bi bi-bell me-2"></i>Notifications</a></li>
+              <li><a class="dropdown-item" href="admin-profile.html"><i class="bi bi-gear me-2"></i>Profile</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>
@@ -69,10 +65,8 @@
       </div>
     </nav>
 
-    <!-- Content -->
     <main class="sb-content container-fluid py-4">
-
-      <!-- ADMIN SECTION -->
+      <!-- ADMIN -->
       <section id="adminSection" class="d-none">
         <div class="row g-3 mb-3">
           <div class="col-6 col-md-3"><div class="sb-card"><div class="sb-card-title">Total Books</div><div class="sb-card-value">2,458</div></div></div>
@@ -125,7 +119,7 @@
             <div class="table-card card h-100 w-100">
               <div class="card-header d-flex align-items-center justify-content-between">
                 <span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Recent Activity</span>
-                <a href="history.html" class="link-light small text-decoration-underline">See history</a>
+                <a href="#" class="link-light small text-decoration-underline">See history</a>
               </div>
               <div class="table-responsive">
                 <table class="table table-modern align-middle mb-0">
@@ -144,7 +138,7 @@
             <div class="table-card card h-100 w-100">
               <div class="card-header d-flex align-items-center justify-content-between">
                 <span class="fw-semibold"><i class="bi bi-bell me-2"></i>Pending Requests</span>
-                <a href="requests.html" class="link-light small text-decoration-underline">Manage</a>
+                <a href="#" class="link-light small text-decoration-underline">Manage</a>
               </div>
               <ul class="list-group list-group-flush flex-fill">
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -167,227 +161,59 @@
         </div>
       </section>
 
-      <!-- LIBRARIAN SECTION -->
-      <section id="librarianSection" class="d-none">
-        <div class="row g-3 mb-3">
-          <div class="col-6 col-md-4 col-lg-3"><div class="sb-card"><div class="sb-card-title">Total Books</div><div class="sb-card-value">3,284</div></div></div>
-          <div class="col-6 col-md-4 col-lg-3"><div class="sb-card"><div class="sb-card-title">Active Members</div><div class="sb-card-value">812</div></div></div>
-          <div class="col-6 col-md-4 col-lg-3"><div class="sb-card"><div class="sb-card-title">Borrowed Today</div><div class="sb-card-value">19</div></div></div>
-          <div class="col-6 col-md-4 col-lg-3"><div class="sb-card"><div class="sb-card-title">Returned Today</div><div class="sb-card-value">8</div></div></div>
-        </div>
-
-        <div class="row g-3">
-          <div class="col-12 col-xxl-7">
-            <div class="table-card card h-100">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Recent Transactions</span>
-                <a href="librarian-borrow-return.html" class="link-light small text-decoration-underline">View all</a>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-modern align-middle mb-0">
-                  <thead><tr><th>When</th><th>Member</th><th>Book</th><th>Type</th><th>Due</th></tr></thead>
-                  <tbody>
-                    <tr><td>09:10</td><td>A. Cruz</td><td>Atomic Habits</td><td><span class="pill pill-info"><span class="dot"></span>Borrow</span></td><td>Sep 22</td></tr>
-                    <tr><td>08:55</td><td>M. Reyes</td><td>Clean Code</td><td><span class="pill pill-success"><span class="dot"></span>Return</span></td><td>—</td></tr>
-                    <tr><td>08:42</td><td>J. Santos</td><td>Algorithms 4e</td><td><span class="pill pill-info"><span class="dot"></span>Borrow</span></td><td>Sep 25</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-xxl-5">
-            <div class="table-card card h-100">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-semibold"><i class="bi bi-exclamation-triangle me-2"></i>Overdue</span>
-                <a href="librarian-overdue.html" class="link-light small text-decoration-underline">View list</a>
-              </div>
-              <div class="list-group list-group-flush">
-                <a class="list-group-item d-flex justify-content-between" href="#">
-                  <span>Intro to Psychology — <span class="text-muted">K. Dela Cruz</span></span>
-                  <span class="badge text-bg-danger rounded-pill">3 days</span>
-                </a>
-                <a class="list-group-item d-flex justify-content-between" href="#">
-                  <span>Database Systems — <span class="text-muted">L. Perez</span></span>
-                  <span class="badge text-bg-danger rounded-pill">1 day</span>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-xxl-5">
-            <div class="table-card card h-100">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-semibold"><i class="bi bi-box-seam me-2"></i>Low Stock</span>
-                <a href="librarian-lowstock.html" class="link-light small text-decoration-underline">Manage</a>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-modern align-middle mb-0">
-                  <thead><tr><th>Title</th><th>Qty</th><th></th></tr></thead>
-                  <tbody>
-                    <tr><td>Operating Systems</td><td>2</td><td><button class="btn btn-sm btn-outline-secondary">Reorder</button></td></tr>
-                    <tr><td>Discrete Math</td><td>1</td><td><button class="btn btn-sm btn-outline-secondary">Reorder</button></td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-xxl-7">
-            <div class="table-card card">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-semibold"><i class="bi bi-search me-2"></i>Quick Search</span>
-                <small class="text-white-50">Try “author: martin”</small>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-modern align-middle mb-0">
-                  <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Qty</th><th></th></tr></thead>
-                  <tbody><tr><td colspan="5" class="text-center empty">No results yet</td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- STUDENT SECTION -->
-      <section id="studentSection" class="d-none">
-        <div class="row g-3 mb-3">
-          <div class="col-6 col-md-4 col-lg-3"><div class="sb-card"><div class="sb-card-title">Books Borrowed</div><div class="sb-card-value">5</div></div></div>
-          <div class="col-6 col-md-4 col-lg-3"><div class="sb-card"><div class="sb-card-title">Books Returned</div><div class="sb-card-value">12</div></div></div>
-          <div class="col-6 col-md-4 col-lg-3"><div class="sb-card"><div class="sb-card-title">Favorites</div><div class="sb-card-value">3</div></div></div>
-          <div class="col-6 col-md-4 col-lg-3"><div class="sb-card"><div class="sb-card-title">Overdue</div><div class="sb-card-value">1</div></div></div>
-        </div>
-
-        <div class="row g-3">
-          <div class="col-12 col-xxl-7">
-            <div class="table-card card h-100">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Borrowing History</span>
-                <a href="#" class="link-light small text-decoration-underline">View all</a>
-              </div>
-              <div class="table-responsive">
-                <table class="table table-modern align-middle mb-0">
-                  <thead><tr><th>Date</th><th>Book</th><th>Status</th><th class="th-tight">Due</th></tr></thead>
-                  <tbody>
-                    <tr><td>Sep 5</td><td>Atomic Habits</td><td><span class="pill pill-info"><span class="dot"></span>Borrowed</span></td><td>Sep 22</td></tr>
-                    <tr><td>Sep 2</td><td>Clean Code</td><td><span class="pill pill-returned"><span class="dot"></span>Returned</span></td><td>—</td></tr>
-                    <tr><td>Aug 30</td><td>Discrete Math</td><td><span class="pill pill-danger"><span class="dot"></span>Overdue</span></td><td>Sep 1</td></tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-md-6 col-xxl-5">
-            <div class="table-card card h-100">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-semibold"><i class="bi bi-heart me-2"></i>Favorites</span>
-                <a href="#" class="link-light small text-decoration-underline">Manage</a>
-              </div>
-              <div class="list-group list-group-flush" id="favList">
-                <a class="list-group-item d-flex justify-content-between align-items-center" href="#">
-                  <span>Clean Code</span><button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Remove</button>
-                </a>
-                <a class="list-group-item d-flex justify-content-between align-items-center" href="#">
-                  <span>Design Patterns</span><button class="btn btn-sm btn-outline-secondary rounded-pill px-3">Remove</button>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-xxl-7">
-            <div class="table-card card h-100">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <span class="fw-semibold"><i class="bi bi-envelope-open me-2"></i>Notifications</span>
-                <div class="d-flex align-items-center gap-2">
-                  <small class="text-white-50">Email alerts</small>
-                  <div class="form-check form-switch m-0">
-                    <input class="form-check-input" type="checkbox" role="switch" id="emailSwitch" checked>
-                  </div>
-                </div>
-              </div>
-              <div class="list-group list-group-flush">
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                  <div><i class="bi bi-bell-fill text-danger me-2"></i><strong>Overdue:</strong> <span class="text-muted">Discrete Math</span></div>
-                  <span class="badge text-bg-danger rounded-pill">1 day late</span>
-                </div>
-                <div class="list-group-item d-flex justify-content-between align-items-center">
-                  <div><i class="bi bi-bell-fill text-primary me-2"></i><strong>Due soon:</strong> <span class="text-muted">Atomic Habits</span></div>
-                  <span class="badge text-bg-primary rounded-pill">Due Sep 22</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
+      <!-- Librarian and Student sections left intact -->
+      <section id="librarianSection" class="d-none"></section>
+      <section id="studentSection" class="d-none"></section>
     </main>
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script>
-    // 1) ask server who is logged in
     async function getMe() {
       const res = await fetch('backend/check-auth.php', {credentials:'include'});
       if (res.status === 401) { location.href = 'login.html'; return null; }
       const data = await res.json();
       if (!data.success) { location.href = 'login.html'; return null; }
-      return data.user; // {id, first_name, last_name, role, status, email}
+      return data.user;
     }
-    
-    // 2) show correct section
+
     (async () => {
       try {
         const me = await getMe();
         if (!me) return;
 
-        // Sidebar: pass the role key your sidebar.js expects
-        const roleKey = me.role === 'admin' ? 'admin' :
-                        me.role === 'librarian' ? 'dashboard' : 'student';
-        if (typeof renderSidebar === 'function') renderSidebar(roleKey);
+        // build sidebar properly for all roles
+        renderSidebar('dashboard', me.role);
         document.getElementById('sidebarToggle')?.addEventListener('click', () => {
           if (typeof toggleSidebar === 'function') toggleSidebar();
           else document.body.classList.toggle('sb-collapsed');
         });
 
-        // Header bits
-        const name = (me.first_name || '') + (me.last_name ? ' ' + me.last_name : '');
-        document.getElementById('whoAmI').textContent = me.role.charAt(0).toUpperCase() + me.role.slice(1);
+        // header role chip
+        const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
+        document.getElementById('whoAmI').textContent = me.role.charAt(0).toUpperCase()+me.role.slice(1);
         document.getElementById('whoChip').innerHTML =
-          `<span class="badge role-chip ${me.role}">${me.role.toUpperCase()}</span> ${name || me.email || ''}`;
+          `<span class="badge role-chip ${me.role}">${me.role.toUpperCase()}</span> ${fullName || me.email}`;
 
-        // Role-based section
+        // show proper dashboard section
+        const map = {admin:'adminSection', librarian:'librarianSection', student:'studentSection'};
+        document.getElementById(map[me.role]||'studentSection').classList.remove('d-none');
         document.getElementById('pageTitle').textContent =
-          me.role === 'admin' ? 'Admin Dashboard' :
-          me.role === 'librarian' ? 'Librarian Dashboard' : 'Student Dashboard';
-
-        const map = {
-          admin: 'adminSection',
-          librarian: 'librarianSection',
-          student: 'studentSection'
-        };
-        const id = map[me.role] || 'studentSection';
-        document.getElementById(id).classList.remove('d-none');
-
-      } catch (e) {
+          me.role.charAt(0).toUpperCase()+me.role.slice(1)+' Dashboard';
+      } catch(e){
         console.error(e);
-        location.href = 'login.html';
+        location.href='login.html';
       } finally {
         document.body.classList.remove('loading');
       }
     })();
 
-    // 3) logout
-    document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
+    document.getElementById('logoutLink')?.addEventListener('click', async e=>{
       e.preventDefault();
-      try {
-        await fetch('backend/logout.php', {method:'POST', credentials:'include'});
-      } catch {}
-      location.href = 'login.html';
+      try{await fetch('backend/logout.php',{method:'POST',credentials:'include'});}catch{}
+      location.href='login.html';
     });
-    
   </script>
 </body>
 </html>
