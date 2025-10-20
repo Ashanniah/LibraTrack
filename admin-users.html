@@ -50,7 +50,6 @@
 
     #btnPrimary{border-radius:8px;padding:.6rem 1rem;font-weight:600;font-size:.95rem;}
 
-    /* Filters dropdown (now in topbar, left of Add Librarian) */
     .filter-btn{display:inline-flex;align-items:center;gap:.45rem}
     .filter-menu{min-width:260px;padding:.5rem;border-radius:12px;border:1px solid var(--ui-border);box-shadow:0 8px 24px rgba(0,0,0,.08)}
     .filter-title{font-weight:600;font-size:.85rem;color:#111;padding:.4rem .5rem .2rem}
@@ -58,7 +57,6 @@
     .filter-option{display:flex;align-items:center;gap:.5rem;padding:.35rem .4rem;border-radius:8px;cursor:pointer}
     .filter-option:hover{background:var(--ui-soft)}
 
-    /* Footer + pager */
     .table-footer{display:flex;align-items:center;justify-content:center;gap:12px;padding:16px var(--card-pad);border-top:1px solid var(--ui-border); position:relative}
     .page-info{font-size:.85rem;color:var(--ui-muted); position:absolute; right:var(--card-pad); padding:.35rem .6rem; background:#f8f9fb; border:1px solid var(--ui-border); border-radius:8px}
     .pagination{gap:.35rem}
@@ -80,7 +78,6 @@
 
     .count-pill{font-size:.85rem;color:#374151;background:#f3f4f6;border:1px solid var(--ui-border);padding:.15rem .5rem;border-radius:999px}
 
-    /* User Details (black theme header row) */
     .userview-2col .vu-head{display:flex;gap:16px;align-items:center}
     .userview-2col .vu-avatar img{width:64px;height:64px;border-radius:50%}
     .userview-2col .vu-name{font-weight:700;font-size:1.05rem}
@@ -92,7 +89,6 @@
     .chip-role{background:#eef2ff;color:#4338ca}
     .chip-status.disabled{background:rgba(220,53,69,.12); color:#dc3545}
 
-    /* Search: taller */
     .search-group .input-group-text,
     .search-group .form-control{
       background:#fff;border:1px solid var(--brand-border);height:44px;
@@ -101,7 +97,6 @@
     .search-group .form-control{border-left:0;border-top-right-radius:8px;border-bottom-right-radius:8px;}
     .search-group .form-control:focus{box-shadow:none;border-color:#000;}
 
-    /* Dark modal headers */
     .modal-header-dark{background:var(--brand-black);color:#fff;border-bottom:none;}
     .modal-header-dark .modal-title{color:#fff;}
     .modal-header-dark .btn-close{filter:invert(1) grayscale(1);opacity:.8;}
@@ -114,7 +109,6 @@
     .role-badge.librarian{background:rgba(13,110,253,.12); color:#0d6efd}
     .role-badge.student{background:rgba(111,66,193,.12); color:#6f42c1;}
 
-    /* Modal spacing / inputs */
     .name-grid{display:grid;grid-template-columns:1fr 1fr 1fr minmax(130px,180px);gap:12px}
     @media (max-width: 768px){ .name-grid{grid-template-columns:1fr 1fr} }
     .modal .form-label{font-weight:600;margin-bottom:.35rem}
@@ -123,6 +117,28 @@
     .modal .modal-footer{padding:14px 20px}
     .form-text-hint{font-size:.8rem;color:var(--ui-muted)}
     .field-error{color:#dc3545;font-size:.85rem;margin-top:.35rem}
+
+    .toolbar-44 .form-control,
+    .toolbar-44 .input-group-text,
+    .toolbar-44 .btn { height:44px; }
+
+    .btn-icon {width:44px;height:44px; display:inline-flex; align-items:center; justify-content:center; padding:0;}
+    .avatar-32 {width:32px; height:32px; border-radius:50%; object-fit:cover;}
+
+    .toolbar-44 { flex-wrap: nowrap !important; gap: 8px; }
+    .toolbar-44 .form-control,
+    .toolbar-44 .input-group-text,
+    .toolbar-44 .btn { height:44px; }
+
+    .search-wide { width: 460px; max-width: 48vw; }
+
+    .btn-profile {
+      height:44px; display:flex; align-items:center; gap:10px;
+      padding:0 12px; background:#fff; border:1px solid var(--ui-border);
+      border-radius:8px;
+    }
+    .btn-profile .avatar-28 { width:28px;height:28px;border-radius:50%;object-fit:cover; }
+    .btn-profile .name { max-width:22ch; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   </style>
 </head>
 <body class="sb-body">
@@ -138,44 +154,20 @@
 
         <div class="fw-bold h5 mb-0">Users Management</div>
 
-        <!-- Spacer -->
-        <div class="flex-grow-1"></div>
-
-        <!-- Search (taller) -->
-        <form class="d-none d-md-flex me-2" role="search" style="max-width:460px;width:100%;">
-          <div class="input-group search-group">
-            <span class="input-group-text"><i class="bi bi-search"></i></span>
-            <input id="searchInput" class="form-control" type="search" placeholder="Search name, email, ID…">
-          </div>
-        </form>
-
-        <!-- Filters (LEFT of Add Librarian) -->
-        <div class="dropdown me-2">
-          <button class="btn btn-outline-secondary btn-sm filter-btn" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-sliders"></i> Filters
-          </button>
-          <div class="dropdown-menu dropdown-menu-end filter-menu">
-            <div class="filter-title">Role</div>
-            <div class="filter-section" id="filterRole">
-              <label class="filter-option"><input type="radio" name="role" value="" checked> All</label>
-              <label class="filter-option"><input type="radio" name="role" value="librarian"> Librarian</label>
-              <label class="filter-option"><input type="radio" name="role" value="student"> Student</label>
-            </div>
-            <div class="filter-title">Status</div>
-            <div class="filter-section" id="filterStatus">
-              <label class="filter-option"><input type="radio" name="status" value="" checked> All</label>
-              <label class="filter-option"><input type="radio" name="status" value="active"> Active</label>
-              <label class="filter-option"><input type="radio" name="status" value="disabled"> Disabled</label>
-            </div>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <div class="dropdown">
+            <button class="btn btn-light border btn-icon" data-bs-toggle="dropdown" aria-expanded="false" id="profileBtn">
+              <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><h6 class="dropdown-header">Signed in</h6></li>
+              <li><a class="dropdown-item" href="admin-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="backend/logout.php"><i class="bi bi-box-arrow-right me-2"></i>Sign out</a></li>
+            </ul>
           </div>
         </div>
-
-        <!-- Primary action (RIGHT of Filters, under/near profile) -->
-        <button id="btnPrimary" class="btn btn-dark btn-sm d-flex align-items-center gap-2">
-          <i class="bi bi-person-plus"></i> <span id="btnPrimaryText">Add Librarian</span>
-        </button>
-
-        <!-- Your profile avatar sits to the far-right in your app -->
       </div>
     </nav>
 
@@ -183,13 +175,46 @@
     <main class="container-fluid">
       <section class="table-card card p-0 position-relative">
         <div class="card-header">
-          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div class="d-flex align-items-center justify-content-between gap-2">
             <div class="d-flex align-items-center gap-3">
               <span class="fw-semibold d-flex align-items-center gap-2">
                 <i class="bi bi-people-fill"></i>
                 <span id="hdrTitle">Users</span>
                 <span class="count-pill" id="acctCount">0</span>
               </span>
+            </div>
+
+            <div class="d-flex align-items-center toolbar-44 flex-nowrap">
+              <form role="search" class="me-2">
+                <div class="input-group search-group search-wide">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input id="searchInput" class="form-control" type="search" placeholder="Search name, email, ID…">
+                </div>
+              </form>
+
+              <div class="dropdown me-2">
+                <button class="btn btn-outline-secondary filter-btn" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-sliders"></i> Filters
+                </button>
+                <div class="dropdown-menu dropdown-menu-end filter-menu">
+                  <div class="filter-title">Role</div>
+                  <div class="filter-section" id="filterRole">
+                    <label class="filter-option"><input type="radio" name="role" value="" checked> All</label>
+                    <label class="filter-option"><input type="radio" name="role" value="librarian"> Librarian</label>
+                    <label class="filter-option"><input type="radio" name="role" value="student"> Student</label>
+                  </div>
+                  <div class="filter-title">Status</div>
+                  <div class="filter-section" id="filterStatus">
+                    <label class="filter-option"><input type="radio" name="status" value="" checked> All</label>
+                    <label class="filter-option"><input type="radio" name="status" value="active"> Active</label>
+                    <label class="filter-option"><input type="radio" name="status" value="disabled"> Disabled</label>
+                  </div>
+                </div>
+              </div>
+
+              <button id="btnPrimary" class="btn btn-dark d-flex align-items-center gap-2">
+                <i class="bi bi-person-plus"></i> <span id="btnPrimaryText">Add Librarian</span>
+              </button>
             </div>
           </div>
         </div>
@@ -214,9 +239,7 @@
         </div>
 
         <div class="table-footer">
-          <nav>
-            <ul class="pagination pagination-sm mb-0" id="pager"></ul>
-          </nav>
+          <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
           <div class="page-info" id="pageInfo">Showing 0–0 of 0</div>
         </div>
       </section>
@@ -241,7 +264,7 @@
                   <div class="field-error d-none" id="errFirst"></div>
                 </div>
                 <div>
-                  <input id="fMiddle" type="text" class="form-control" placeholder="Middle name (optional)">
+                  <input id="fMiddle" type="text" class="form-control" placeholder="Middle name">
                   <div class="form-text-hint">Optional</div>
                 </div>
                 <div>
@@ -267,16 +290,9 @@
               <div class="field-error d-none" id="errEmail"></div>
             </div>
 
-            <div class="col-12 col-md-3">
-              <label class="form-label">Role</label>
-              <select id="fRole" class="form-select" required>
-                <option value="librarian" selected>Librarian</option>
-              </select>
-              <div class="form-text-hint">Admins can create Librarians only.</div>
-              <div class="field-error d-none" id="errRole"></div>
-            </div>
+            <!-- Role removed from dialog -->
 
-            <div class="col-12 col-md-3">
+            <div class="col-12 col-md-6">
               <label class="form-label">Status</label>
               <select id="fStatus" class="form-select" required>
                 <option value="active">Active</option>
@@ -306,10 +322,7 @@
               <div class="field-error d-none" id="errConfirm"></div>
             </div>
 
-            <div class="col-12 col-md-4">
-              <label class="form-label">ID / Student No.</label>
-              <input id="fStudentNo" type="text" class="form-control" placeholder="(not used for librarians)" disabled>
-            </div>
+            <!-- ID / Student No. removed from dialog -->
 
             <div class="col-12">
               <label class="form-label">Notes</label>
@@ -381,6 +394,28 @@
     </div>
   </div>
 
+  <!-- Confirm Delete Modal -->
+  <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-dark">
+          <h5 class="modal-title">Delete User</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-1">You’re about to delete:</p>
+          <div class="fw-semibold" id="delWho">—</div>
+          <div class="text-muted small" id="delEmail">—</div>
+          <div class="alert alert-warning mt-3 mb-0">This action can’t be undone.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-danger" id="confirmDeleteBtn"><i class="bi bi-trash me-1"></i>Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js"></script>
@@ -394,11 +429,23 @@
       return data.user;
     }
 
-    // ---- Page bootstrap ----
     (async () => {
       const me = await getMe();
       if (!me) return;
       if (me.role !== 'admin') { location.href = 'dashboard.html'; return; }
+
+      // set profile name (optional UI nicety)
+      {
+        const profileNameEl   = document.getElementById('profileName');
+        const profileHeaderEl = document.getElementById('profileHeader');
+        const displayName =
+          me.full_name ||
+          [me.first_name, me.middle_name, me.last_name].filter(Boolean).join(' ') ||
+          me.name || me.email || 'Account';
+
+        if (profileNameEl)   profileNameEl.textContent   = displayName;
+        if (profileHeaderEl) profileHeaderEl.textContent = 'Signed in as ' + displayName;
+      }
 
       renderSidebar('users', me.role);
       document.getElementById('sidebarToggle')?.addEventListener('click', () => {
@@ -418,9 +465,9 @@
     const acctCount    = document.getElementById('acctCount');
     const btnPrimary   = document.getElementById('btnPrimary');
 
-    // Filters in topbar
-    let roleFilter   = ""; // "", "librarian", "student"
-    let statusFilter = ""; // "", "active", "disabled"
+    // Filters
+    let roleFilter   = "";
+    let statusFilter = "";
 
     document.querySelectorAll('#filterRole input[name="role"]').forEach(r=>{
       r.addEventListener('change', () => { roleFilter = document.querySelector('#filterRole input:checked').value; render(); });
@@ -432,6 +479,8 @@
     // Modals + form refs
     const userModal = new bootstrap.Modal('#userModal');
     const viewModal = new bootstrap.Modal('#viewUserModal');
+    const confirmModal = new bootstrap.Modal('#confirmDeleteModal');
+
     const form            = document.getElementById('userForm');
     const userModalTitle  = document.getElementById('userModalTitle');
 
@@ -441,9 +490,7 @@
     const fLast      = document.getElementById('fLast');
     const fSuffix    = document.getElementById('fSuffix');
     const fEmail     = document.getElementById('fEmail');
-    const fRole      = document.getElementById('fRole');
     const fStatus    = document.getElementById('fStatus');
-    const fStudentNo = document.getElementById('fStudentNo');
     const fNotes     = document.getElementById('fNotes');
     const fPassword  = document.getElementById('fPassword');
     const fConfirm   = document.getElementById('fConfirm');
@@ -451,9 +498,14 @@
     const errFirst   = document.getElementById('errFirst');
     const errLast    = document.getElementById('errLast');
     const errEmail   = document.getElementById('errEmail');
-    const errRole    = document.getElementById('errRole');
     const errPassword= document.getElementById('errPassword');
     const errConfirm = document.getElementById('errConfirm');
+
+    // Delete modal refs
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const delWho = document.getElementById('delWho');
+    const delEmail = document.getElementById('delEmail');
+    let deleteId = null;
 
     // ---- State ----
     let users = [];
@@ -595,7 +647,7 @@
         btn.onclick = () => {
           if (action==='view')      viewUser(id);
           else if (action==='edit') editUser(id);
-          else if (action==='delete') deleteUser(id);
+          else if (action==='delete') askDelete(id);
         };
       });
     }
@@ -616,8 +668,8 @@
           lastName: u.last_name,
           suffix: u.suffix,
           email: u.email,
-          role: u.role,                 // 'admin' | 'librarian' | 'student'
-          status: u.status,             // 'active' | 'disabled'
+          role: u.role,
+          status: u.status,
           studentNo: u.student_no || "",
           lastActive: u.last_active || null,
           joined: u.joined || null,
@@ -635,27 +687,24 @@
       fId.value = '';
       fFirst.value = fMiddle.value = fLast.value = fSuffix.value = '';
       fEmail.value = '';
-      fRole.value = 'librarian';
       fStatus.value = 'active';
       fPassword.value = fConfirm.value = '';
-      fStudentNo.value = '';
       fNotes.value = '';
-      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fRole,errRole],[fPassword,errPassword],[fConfirm,errConfirm]]
+      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]]
         .forEach(([a,b])=>clearError(a,b));
       userModal.show();
     });
 
-    // ---- Create / Update librarian ----
+    // ---- Create librarian ----
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fRole,errRole],[fPassword,errPassword],[fConfirm,errConfirm]]
+      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]]
         .forEach(([a,b])=>clearError(a,b));
 
       let ok = true;
       if(!(fFirst.value||'').trim()){ setError(fFirst,errFirst,'First name is required.'); ok=false; }
       if(!(fLast.value||'').trim()){  setError(fLast,errLast,'Last name is required.');   ok=false; }
       if(!validEmail(fEmail.value)){  setError(fEmail,errEmail,'Enter a valid email.');   ok=false; }
-      if(!fRole.value){               setError(fRole,errRole,'Role is required.');        ok=false; }
 
       const isCreate = !(fId.value||'').trim();
       const pw = fPassword.value || '';
@@ -716,7 +765,7 @@
         userModal.hide();
         form.reset();
         render();
-        loadUsers(); // refresh from source of truth
+        loadUsers(); // refresh from DB
       } catch (err) {
         alert(err.message || 'Network/Server error. Please try again.');
       }
@@ -761,7 +810,7 @@
       setTxt('fldNotes', u.notes || '—');
 
       document.getElementById('vuEditBtn').onclick   = () => { viewModal.hide(); editUser(u.id); };
-      document.getElementById('vuDeleteBtn').onclick = () => { viewModal.hide(); deleteUser(u.id); };
+      document.getElementById('vuDeleteBtn').onclick = () => { viewModal.hide(); askDelete(u.id); };
 
       viewModal.show();
     };
@@ -775,20 +824,48 @@
       fLast.value  = u.lastName || "";
       fSuffix.value= u.suffix || "";
       fEmail.value = u.email || "";
-      fRole.value  = 'librarian';
       fStatus.value= u.status || "active";
-      fStudentNo.value = u.studentNo || "";
       fNotes.value  = u.notes || "";
       fPassword.value = '';
       fConfirm.value  = '';
-      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fRole,errRole],[fPassword,errPassword],[fConfirm,errConfirm]]
+      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]]
         .forEach(([a,b])=>clearError(a,b));
       userModal.show();
     };
 
-    window.deleteUser = function(id){
-      alert('Delete action not implemented against DB in this demo.');
-    };
+    // --- Delete flow ---
+    function askDelete(id){
+      const u = users.find(x=>x.id===id);
+      if(!u) return;
+      deleteId = id;
+      delWho.textContent = fullName(u) || '(no name)';
+      delEmail.textContent = u.email || '';
+      confirmModal.show();
+    }
+
+    async function performDelete(){
+      if(!deleteId) return;
+      try{
+        const res = await fetch('backend/delete-user.php', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ id: deleteId })
+        });
+        const data = await res.json();
+        if(!res.ok || !data?.success){
+          alert(data?.message || 'Failed to delete user.');
+          return;
+        }
+        users = users.filter(u => u.id !== deleteId);
+        render();
+        confirmModal.hide();
+      }catch(err){
+        alert('Network/Server error while deleting: ' + (err?.message || err));
+      }finally{
+        deleteId = null;
+      }
+    }
+    confirmDeleteBtn.addEventListener('click', performDelete);
   </script>
 </body>
 </html>

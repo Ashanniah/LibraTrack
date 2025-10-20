@@ -3,7 +3,13 @@
  * DB bootstrap + JSON response helper
  */
 
-require_once __DIR__ . '/config.php';
+//require_once __DIR__ . '/config.php';
+
+$configFile = __DIR__ . '/config.php';
+if (is_file($configFile)) {
+  require_once $configFile;
+}
+
 
 // --- DB config ---
 $DB_HOST = '127.0.0.1';
@@ -22,7 +28,8 @@ $opts = [
 // Helper: JSON Response
 // -------------------------------------------------------------------
 if (!function_exists('json_response')) {
-  function json_response(array $arr, int $code = 200): never {
+  // avoid type hints/return types for compatibility with older PHP versions
+  function json_response($arr, $code = 200) {
     http_response_code($code);
     header('Content-Type: application/json');
     echo json_encode($arr);
@@ -63,7 +70,7 @@ try {
 // Role helpers
 // -------------------------------------------------------------------
 if (!function_exists('requireLogin')) {
-  function requireLogin(): void {
+  function requireLogin() {
     if (empty($_SESSION['uid'])) {
       json_response(['success' => false, 'error' => 'Unauthorized'], 401);
     }
@@ -71,7 +78,7 @@ if (!function_exists('requireLogin')) {
 }
 
 if (!function_exists('requireRole')) {
-  function requireRole(array $allowed): void {
+  function requireRole($allowed) {
     requireLogin();
     $role = strtolower($_SESSION['role'] ?? '');
     if (!in_array($role, array_map('strtolower', $allowed), true)) {
