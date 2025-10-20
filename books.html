@@ -13,17 +13,19 @@
   <!-- App -->
   <link href="assets/css/sidebar.css" rel="stylesheet">
   <link href="assets/css/librarian-add-book.css" rel="stylesheet">
-  <script src="assets/js/sidebar.js?v=7"></script>
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <script src="assets/js/sidebar.js?v=7" defer></script>
 
   <style>
     .thumb { width:48px; height:64px; object-fit:cover; border-radius:.25rem; background:#f3f4f6; }
     .empty { padding:3rem 0; color:#777; text-align:center; }
     .tab-btn { border-bottom: 2px solid transparent; }
     .tab-btn.active { border-bottom-color: var(--bs-primary); color: var(--bs-primary)!important; }
+    /* hide content until auth resolved to avoid flicker */
+    body.loading main, body.loading #sidebarToggle { visibility:hidden }
   </style>
 </head>
-<body class="sb-body">
+<body class="sb-body loading">
   <!-- Sidebar -->
   <div id="sidebar-root"></div>
 
@@ -203,164 +205,194 @@
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
-    /*** CONSTANTS ***/
-    const role = (localStorage.getItem('userRole') || 'librarian').toLowerCase();
-    // Absolute paths so the browser never guesses wrong directories
-    const API_CREATE = '/libratrack/backend/add-book.php';
-    const API_LIST   = '/libratrack/backend/books-list.php';
-
-    /*** SIDEBAR ***/
-    renderSidebar('books', role);
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
-
-    /*** TABS ***/
-    const tabList   = document.getElementById('tabList');
-    const tabAdd    = document.getElementById('tabAdd');
-    const panelList = document.getElementById('panelList');
-    const panelAdd  = document.getElementById('panelAdd');
-    const btnGoList = document.getElementById('btnGoList');
-
-    function showList(){
-      tabList.classList.add('active'); tabAdd.classList.remove('active');
-      panelList.classList.remove('d-none'); panelAdd.classList.add('d-none');
-    }
-    function showAdd(){
-      if (role === 'student') return;
-      tabAdd.classList.add('active'); tabList.classList.remove('active');
-      panelAdd.classList.remove('d-none'); panelList.classList.add('d-none');
-    }
-    tabList.onclick = showList;
-    tabAdd.onclick  = showAdd;
-    btnGoList.onclick = showList;
-
-    // Role banner
-    const banner = document.getElementById('roleBanner');
-    if (role === 'student') {
-      tabAdd.classList.add('disabled','text-muted');
-      banner.className = 'alert alert-warning';
-      banner.textContent = 'Students can view books but cannot add them.';
-      banner.classList.remove('d-none');
+    /*** AUTH + SIDEBAR ***/
+    async function getMe(){
+      const res = await fetch('backend/check-auth.php', { credentials:'include' });
+      if (res.status === 401) { location.href = 'login.html'; return null; }
+      const data = await res.json().catch(()=>null);
+      if (!data || !data.success) { location.href = 'login.html'; return null; }
+      return data.user; // {id, first_name, last_name, role, status, email}
     }
 
-    /*** LIST ***/
-    const state = { page: 1, pagesize: 10, q: '' };
-
-    async function load(){
-      const url = `${API_LIST}?page=${state.page}&pagesize=${state.pagesize}&q=${encodeURIComponent(state.q)}`;
-      const res = await fetch(url);
-      const raw = await res.text();               // read ONCE
-      const tbody = document.getElementById('rows');
-
-      let data;
-      try { data = JSON.parse(raw); }
-      catch {
-        tbody.innerHTML = `<tr><td colspan="7" class="empty">HTTP ${res.status} ${res.statusText}<br><small>${raw.slice(0,200)}</small></td></tr>`;
-        return;
-      }
-
-      if (!data.ok) {
-        tbody.innerHTML = `<tr><td colspan="7" class="empty">${data.error || 'Failed to load.'}</td></tr>`;
-        return;
-      }
-
-      const items = data.items || [];
-      if (!items.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="empty">No books found.</td></tr>`;
-      } else {
-        tbody.innerHTML = items.map(b => {
-          const cover = b.cover ? `/libratrack/uploads/covers/${b.cover}` : 'assets/img/no-cover.png';
-          return `
-            <tr>
-              <td><img class="thumb" src="${cover}" alt=""></td>
-              <td>
-                <div class="fw-semibold text-wrap">${escapeHtml(b.title)}</div>
-                <div class="text-muted small">ISBN: ${escapeHtml(b.isbn)}</div>
-              </td>
-              <td class="d-none d-md-table-cell">${escapeHtml(b.author)}</td>
-              <td class="d-none d-lg-table-cell">${escapeHtml(b.category)}</td>
-              <td class="text-end">${b.quantity}</td>
-              <td class="d-none d-lg-table-cell">${escapeHtml(b.publisher)}</td>
-              <td class="d-none d-xl-table-cell">${b.date_published||''}</td>
-            </tr>`;
-        }).join('');
-      }
-
-      document.getElementById('countInfo').textContent = `${data.total.toLocaleString()} total`;
-      const start = (data.page-1)*data.pagesize + 1, end = Math.min(data.total, data.page*data.pagesize);
-      document.getElementById('pageInfo').textContent = data.total ? `Showing ${start}-${end} of ${data.total}` : '';
-      document.getElementById('prev').disabled = data.page<=1;
-      document.getElementById('next').disabled = data.page>=data.pages;
-    }
-
-    function escapeHtml(s=''){ return s.replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
-    document.getElementById('prev').onclick = ()=>{ state.page=Math.max(1,state.page-1); load(); };
-    document.getElementById('next').onclick = ()=>{ state.page+=1; load(); };
-    document.getElementById('q').addEventListener('input', e=>{ state.q=e.target.value.trim(); state.page=1; load(); });
-
-    /*** ADD ***/
-    const form = document.getElementById('bookForm');
-    const toastSaved = new bootstrap.Toast(document.getElementById('toastSaved'));
-    const coverInput   = document.getElementById('coverInput');
-    const coverPreview = document.getElementById('coverPreview');
-    const dropHint     = document.getElementById('dropHint');
-
-    document.getElementById('dropArea').onclick = () => coverInput.click();
-    document.getElementById('btnChangeImage').onclick = () => coverInput.click();
-    document.getElementById('btnRemoveImage').onclick = () => {
-      coverPreview.src=''; coverPreview.classList.add('d-none'); dropHint.classList.remove('d-none'); coverInput.value='';
-    };
-    coverInput.onchange = () => {
-      const f = coverInput.files?.[0]; if (!f) return;
-      if (f.size > 5*1024*1024){ alert('Max file size is 5 MB'); coverInput.value=''; return; }
-      const r = new FileReader(); r.onload = ()=>{ coverPreview.src=r.result; coverPreview.classList.remove('d-none'); dropHint.classList.add('d-none'); }; r.readAsDataURL(f);
-    };
-
-    let lastClickedWasSaveNew = false;
-    document.getElementById('btnSaveNew').addEventListener('click', ()=>{ lastClickedWasSaveNew=true; form.requestSubmit(); });
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      if (role === 'student') { alert('Students cannot add books.'); return; }
-
-      form.classList.add('was-validated');
-      if (!form.checkValidity()) return;
-
-      const fd = new FormData(form);
-      fd.set('quantity', String(Math.max(1, parseInt(fd.get('quantity') || '0', 10))));
-      if (!fd.get('threshold')) fd.set('threshold', '0');
-
+    (async () => {
+      let role = 'student'; // default until we know
       try {
-        const res  = await fetch(API_CREATE, { method:'POST', body: fd });
-        const raw  = await res.text();      // read ONCE
+        const me = await getMe();
+        if (!me) return;
+        role = (me.role || 'student').toLowerCase();
 
-        let data = null;
+        // Sidebar: current='books'
+        if (typeof renderSidebar === 'function') renderSidebar('books', role);
+        document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+          if (typeof toggleSidebar === 'function') toggleSidebar();
+          else document.body.classList.toggle('sb-collapsed');
+        });
+
+        initBooksPage(role);
+      } catch (e) {
+        console.error(e);
+        location.href = 'login.html';
+      } finally {
+        document.body.classList.remove('loading');
+      }
+    })();
+
+    /*** BOOKS PAGE INIT (role-aware) ***/
+    function initBooksPage(role){
+      // Absolute paths so the browser never guesses wrong directories
+      const API_CREATE = '/libratrack/backend/add-book.php';
+      const API_LIST   = '/libratrack/backend/books-list.php';
+
+      /*** TABS ***/
+      const tabList   = document.getElementById('tabList');
+      const tabAdd    = document.getElementById('tabAdd');
+      const panelList = document.getElementById('panelList');
+      const panelAdd  = document.getElementById('panelAdd');
+      const btnGoList = document.getElementById('btnGoList');
+
+      function showList(){
+        tabList.classList.add('active'); tabAdd.classList.remove('active');
+        panelList.classList.remove('d-none'); panelAdd.classList.add('d-none');
+      }
+      function showAdd(){
+        if (!canAdd()) return;
+        tabAdd.classList.add('active'); tabList.classList.remove('active');
+        panelAdd.classList.remove('d-none'); panelList.classList.add('d-none');
+      }
+      tabList.onclick = showList;
+      tabAdd.onclick  = showAdd;
+      btnGoList.onclick = showList;
+
+      // Role banner + disable Add for students only
+      const banner = document.getElementById('roleBanner');
+      const canAdd = () => role === 'admin' || role === 'librarian';
+      if (!canAdd()){
+        tabAdd.classList.add('disabled','text-muted');
+        banner.className = 'alert alert-warning';
+        banner.textContent = 'Students can view books but cannot add them.';
+        banner.classList.remove('d-none');
+      }
+
+      /*** LIST ***/
+      const state = { page: 1, pagesize: 10, q: '' };
+
+      async function load(){
+        const url = `${API_LIST}?page=${state.page}&pagesize=${state.pagesize}&q=${encodeURIComponent(state.q)}`;
+        const res = await fetch(url, { credentials:'include' });
+        const raw = await res.text();
+        const tbody = document.getElementById('rows');
+
+        let data;
         try { data = JSON.parse(raw); }
         catch {
-          alert(`Network/server error: HTTP ${res.status} ${res.statusText}\n\n${raw.slice(0,800)}`);
+          tbody.innerHTML = `<tr><td colspan="7" class="empty">HTTP ${res.status} ${res.statusText}<br><small>${raw.slice(0,200)}</small></td></tr>`;
           return;
         }
 
-        if (!res.ok || !data.ok) { alert(data.error || `Save failed (HTTP ${res.status})`); return; }
-
-        toastSaved.show();
-        state.page = 1;
-        await load();
-
-        if (lastClickedWasSaveNew) {
-          form.reset(); form.classList.remove('was-validated');
-          coverPreview.src=''; coverPreview.classList.add('d-none'); dropHint.classList.remove('d-none');
-          lastClickedWasSaveNew = false;
-        } else {
-          showList();
+        if (!data.ok) {
+          tbody.innerHTML = `<tr><td colspan="7" class="empty">${data.error || 'Failed to load.'}</td></tr>`;
+          return;
         }
-      } catch (err) {
-        alert('Network/server error: ' + err.message);
-      }
-    });
 
-    // Initial
-    showList();
-    load();
+        const items = data.items || [];
+        if (!items.length) {
+          tbody.innerHTML = `<tr><td colspan="7" class="empty">No books found.</td></tr>`;
+        } else {
+          tbody.innerHTML = items.map(b => {
+            const cover = b.cover ? `/libratrack/uploads/covers/${b.cover}` : 'assets/img/no-cover.png';
+            return `
+              <tr>
+                <td><img class="thumb" src="${cover}" alt=""></td>
+                <td>
+                  <div class="fw-semibold text-wrap">${escapeHtml(b.title)}</div>
+                  <div class="text-muted small">ISBN: ${escapeHtml(b.isbn)}</div>
+                </td>
+                <td class="d-none d-md-table-cell">${escapeHtml(b.author)}</td>
+                <td class="d-none d-lg-table-cell">${escapeHtml(b.category)}</td>
+                <td class="text-end">${b.quantity}</td>
+                <td class="d-none d-lg-table-cell">${escapeHtml(b.publisher)}</td>
+                <td class="d-none d-xl-table-cell">${b.date_published||''}</td>
+              </tr>`;
+          }).join('');
+        }
+
+        document.getElementById('countInfo').textContent = `${data.total.toLocaleString()} total`;
+        const start = (data.page-1)*data.pagesize + 1, end = Math.min(data.total, data.page*data.pagesize);
+        document.getElementById('pageInfo').textContent = data.total ? `Showing ${start}-${end} of ${data.total}` : '';
+        document.getElementById('prev').disabled = data.page<=1;
+        document.getElementById('next').disabled = data.page>=data.pages;
+      }
+
+      function escapeHtml(s=''){ return s.replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+      document.getElementById('prev').onclick = ()=>{ state.page=Math.max(1,state.page-1); load(); };
+      document.getElementById('next').onclick = ()=>{ state.page+=1; load(); };
+      document.getElementById('q').addEventListener('input', e=>{ state.q=e.target.value.trim(); state.page=1; load(); });
+
+      /*** ADD ***/
+      const form = document.getElementById('bookForm');
+      const toastSaved = new bootstrap.Toast(document.getElementById('toastSaved'));
+      const coverInput   = document.getElementById('coverInput');
+      const coverPreview = document.getElementById('coverPreview');
+      const dropHint     = document.getElementById('dropHint');
+
+      document.getElementById('dropArea').onclick = () => coverInput.click();
+      document.getElementById('btnChangeImage').onclick = () => coverInput.click();
+      document.getElementById('btnRemoveImage').onclick = () => {
+        coverPreview.src=''; coverPreview.classList.add('d-none'); dropHint.classList.remove('d-none'); coverInput.value='';
+      };
+      coverInput.onchange = () => {
+        const f = coverInput.files?.[0]; if (!f) return;
+        if (f.size > 5*1024*1024){ alert('Max file size is 5 MB'); coverInput.value=''; return; }
+        const r = new FileReader(); r.onload = ()=>{ coverPreview.src=r.result; coverPreview.classList.remove('d-none'); dropHint.classList.add('d-none'); }; r.readAsDataURL(f);
+      };
+
+      let lastClickedWasSaveNew = false;
+      document.getElementById('btnSaveNew').addEventListener('click', ()=>{ lastClickedWasSaveNew=true; form.requestSubmit(); });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!canAdd()){ alert('Only admins and librarians can add books.'); return; }
+
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) return;
+
+        const fd = new FormData(form);
+        fd.set('quantity', String(Math.max(1, parseInt(fd.get('quantity') || '0', 10))));
+        if (!fd.get('threshold')) fd.set('threshold', '0');
+
+        try {
+          const res  = await fetch(API_CREATE, { method:'POST', body: fd, credentials:'include' });
+          const raw  = await res.text();
+
+          let data = null;
+          try { data = JSON.parse(raw); }
+          catch {
+            alert(`Network/server error: HTTP ${res.status} ${res.statusText}\n\n${raw.slice(0,800)}`);
+            return;
+          }
+
+          if (!res.ok || !data.ok) { alert(data.error || `Save failed (HTTP ${res.status})`); return; }
+
+          toastSaved.show();
+          state.page = 1;
+          await load();
+
+          if (lastClickedWasSaveNew) {
+            form.reset(); form.classList.remove('was-validated');
+            coverPreview.src=''; coverPreview.classList.add('d-none'); dropHint.classList.remove('d-none');
+            lastClickedWasSaveNew = false;
+          } else {
+            showList();
+          }
+        } catch (err) {
+          alert('Network/server error: ' + err.message);
+        }
+      });
+
+      // Initial
+      showList();
+      load();
+    }
   </script>
 </body>
 </html>

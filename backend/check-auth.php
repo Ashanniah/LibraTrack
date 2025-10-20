@@ -1,15 +1,26 @@
 <?php
-// returns the logged-in user from session
-declare(strict_types=1);
+require_once __DIR__ . '/db.php';
 header('Content-Type: application/json');
-session_start();
 
-if (empty($_SESSION['user'])) {
+if (empty($_SESSION['uid'])) {
   http_response_code(401);
-  echo json_encode(['success'=>false, 'message'=>'Not authenticated']);
+  echo json_encode(['success' => false]);
   exit;
 }
 
-// You stored this in login.php already:
-// $_SESSION['user'] = ['id'=>..,'first_name'=>..,'last_name'=>..,'email'=>..,'role'=>..,'status'=>..]
-echo json_encode(['success'=>true, 'user'=>$_SESSION['user']]);
+$stmt = $conn->prepare(
+  "SELECT id, first_name, last_name, email, role, status
+   FROM users WHERE id = ? LIMIT 1"
+);
+$stmt->bind_param('i', $_SESSION['uid']);
+$stmt->execute();
+$user = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+if (!$user || strtolower((string)$user['status']) !== 'active') {
+  http_response_code(401);
+  echo json_encode(['success' => false]);
+  exit;
+}
+
+echo json_encode(['success' => true, 'user' => $user]);
