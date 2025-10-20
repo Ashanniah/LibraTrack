@@ -1,116 +1,230 @@
-/* =====================================================
-   LibraTrack – Books Page Styles
-   Includes: general layout, add book form, and card view
-   ===================================================== */
+/* General */
+body{font-family:Poppins,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+.empty{padding:2.5rem 0;color:#777;text-align:center}
+.tab-btn{border-bottom:2px solid transparent}
+.tab-btn.active{border-bottom-color:var(--bs-primary);color:var(--bs-primary)!important}
+body.loading main, body.loading #sidebarToggle{visibility:hidden}
 
-/* ---------- base ---------- */
-body {
-  font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+/* Add-cover uploader */
+.cover-drop{
+  width:100%;
+  border:2px dashed #dfe5ef;
+  border-radius:16px;
+  padding:16px;                 /* a bit tighter */
+  min-height:220px;             /* shorter default height */
+  cursor:pointer;
+  transition:.2s;
+  display:flex;                 /* center hint nicely */
+  align-items:center;
+  justify-content:center;
+}
+.cover-drop.compact{
+  min-height:auto;              /* let it hug content */
+  padding:12px;
+  display:inline-flex;          /* shrink-wrap around image */
+  width:auto;                   /* avoid full column width */
+  max-width:100%;               /* still responsive */
 }
 
-/* ---------- table view ---------- */
-.thumb {
-  width: 48px;
-  height: 64px;
-  object-fit: cover;
-  border-radius: .25rem;
-  background: #f3f4f6;
+.cover-drop:hover{background:#f7f9fc}
+.cover-drop.ring{outline:2px solid var(--bs-primary);outline-offset:2px}
+#coverPreview{
+  max-width:100%;
+  height:auto;
+  max-height:300px;             /* reduce the visual height */
+  object-fit:contain;
+  border-radius:12px;
+  background:#f3f4f6;
 }
 
-.empty {
-  padding: 3rem 0;
-  color: #777;
-  text-align: center;
+/* Optional: keep the empty-state hint from stretching */
+#dropHint{ width:100%; text-align:center; }
+.section-title{font-weight:600;margin-bottom:.75rem}
+
+/* Horizontal scroll strip (Recommended) */
+.h-scroll{display:flex;overflow-x:auto;gap:12px;padding-bottom:.25rem}
+.h-scroll::-webkit-scrollbar{height:8px}
+.h-scroll::-webkit-scrollbar-thumb{background:#e1e7f0;border-radius:8px}
+
+/* Cards (Recommended + Grid) */
+.rec-card,.book-card{width:180px;min-width:180px;border:1px solid #e7edf6;border-radius:14px;background:#fff;overflow:hidden}
+.rec-card img,.book-card .thumb-lg{width:100%;height:220px;object-fit:cover;border-radius:12px;background:#f3f4f6}
+
+/* Titles & meta */
+.title{font-weight:600;font-size:.95rem;margin-top:.5rem}
+.meta{color:#6b7280;font-size:.8rem}
+
+/* Stars + Heart overlay */
+.stars i{font-size:.85rem;margin-right:2px}
+.cover-wrap{position:relative}
+.btn-fav{
+  position:absolute;top:8px;right:8px;
+  background:rgba(255,255,255,.9);
+  border:none;border-radius:50%;
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:.2s
+}
+.btn-fav:hover{background:#fff}
+
+/* Category chips */
+.chips{display:flex;gap:.5rem;flex-wrap:wrap}
+.chip{border:1px solid #e7edf6;background:#fff;border-radius:999px;padding:.35rem .75rem;font-size:.85rem;cursor:pointer}
+.chip.active{background:#0d6efd;color:#fff;border-color:#0d6efd}
+
+/* Grid layout */
+#grid{display:flex;flex-wrap:wrap;gap:12px}
+.grid-item{flex:0 0 auto;width:180px}
+/* Action bar under cards (admin/librarian only) */
+/* Action bar under cards (admin/librarian only) */
+/* Action bar under cards (admin/librarian only) */
+.card-actions{
+  display:flex; align-items:center; gap:8px; margin:6px 8px; justify-content:center;
 }
 
-.tab-btn {
-  border-bottom: 2px solid transparent;
+/* Base pill */
+.card-actions .icon-btn{
+  border:none; border-radius:10px; padding:6px 10px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s ease, transform .1s ease;
 }
 
-.tab-btn.active {
-  border-bottom-color: var(--bs-primary);
-  color: var(--bs-primary) !important;
+/* EDIT = blue pill */
+.card-actions .icon-btn.btn-edit{
+  background:#3b82f6 !important;   /* blue-500 */
+  color:#fff !important;
+}
+.card-actions .icon-btn.btn-edit:hover{
+  background:#2563eb !important;   /* blue-600 */
+  transform:scale(1.05);
 }
 
-body.loading main,
-body.loading #sidebarToggle {
-  visibility: hidden;
+/* DELETE = red pill */
+.card-actions .icon-btn.btn-delete{
+  background:#ef4444 !important;   /* red-500 */
+  color:#fff !important;
+}
+.card-actions .icon-btn.btn-delete:hover{
+  background:#dc2626 !important;   /* red-600 */
+  transform:scale(1.05);
 }
 
-/* ---------- add book form ---------- */
-.cover-drop {
-  width: 100%;
-  border: 2px dashed #dfe5ef;
-  border-radius: 16px;
-  padding: 24px;
-  cursor: pointer;
-  transition: .2s;
+/* Ensure icon glyphs are white */
+.card-actions .icon-btn i{
+  color:#fff !important;
+  font-size:16px;
 }
 
-.cover-drop:hover {
-  background: #f7f9fc;
-}
-
-.cover-drop.ring {
-  outline: 2px solid var(--bs-primary);
-  outline-offset: 2px;
-}
-
-#coverPreview {
-  max-height: 360px;
-  object-fit: contain;
-  width: 100%;
-}
-
-.section-title {
-  font-weight: 600;
-  margin-bottom: .75rem;
-}
-
-/* ---------- card view ---------- */
-.book-card {
-  border: 1px solid #e7edf6;
-  border-radius: 14px;
-  background: #fff;
-  transition: 0.2s ease;
-}
-
-.book-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.book-card .thumb-lg {
-  width: 100%;
-  height: 200px;
-  object-fit: cover;
+.success-modal {
   border-radius: 12px;
-  background: #f3f4f6;
+  background-color: #fff;
+  font-family: 'Poppins';
 }
 
-.book-card .title {
+.success-icon i {
+  font-size: 70px;
+  color: #039b27;
+}
+
+.success-modal .modal-title {
+  font-size: 20px;
+  color: #000;
+  font-family: 'Poppins';
+}
+
+.btn-close-modal {
+  width: 150px;
+  height: 45px;
+  border-radius: 50px;
   font-weight: 600;
-  margin: 8px 0 2px;
+  font-size: 15px;
+  background-color: #e0e0e0;
+  color: #000;
+  border: none;
+  transition: 0.3s;
 }
 
-.book-card .meta {
-  color: #6b7280;
-  font-size: .85rem;
+.btn-close-modal:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+  color: #a7a7a7;
 }
 
-.book-card .actions .btn {
-  padding: .35rem .5rem;
+.modal-actions {
+  gap: 2.5rem !important; 
 }
 
-/* ---------- responsive tweaks ---------- */
-@media (max-width: 768px) {
-  .book-card .thumb-lg {
-    height: 180px;
-  }
+.modal-sm-fixed { max-width: 480px; }  /* make both modals same width */
+
+.lt-modal {
+  border-radius: 16px;
+  background: #fff;
+  padding: 28px 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-family: Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  box-shadow: 0 10px 35px rgba(2, 6, 23, 0.15);
 }
 
-@media (max-width: 576px) {
-  .book-card {
-    border-radius: 10px;
-  }
+.lt-icon {
+  width: 84px;
+  height: 84px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
 }
+
+.lt-icon i { font-size: 40px; line-height: 1; }
+
+.lt-icon-danger { background: #fee2e2; color: #dc2626; }
+.lt-icon-success { background: #e7f7ed; color: #039b27; }
+
+.lt-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 4px 0 0;
+  color: #0b1220;
+}
+
+.lt-text {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.lt-actions {
+  display: flex;
+  gap: 18px;
+  margin-top: 14px;
+}
+
+/* Same-sized pill buttons */
+.lt-btn {
+  width: 150px;
+  height: 46px;
+  border-radius: 999px !important;
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  transition: transform .12s ease, opacity .2s ease;
+}
+
+.lt-btn:hover { transform: scale(1.03); }
+
+.lt-btn-neutral {
+  background: #e5e7eb;
+  color: #111827;
+}
+.lt-btn-neutral:hover { opacity: .9; }
+
+.lt-btn-danger {
+  background: #ef4444;
+  color: #fff;
+}
+.lt-btn-danger:hover { background: #dc2626; }

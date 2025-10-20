@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack — My Favorites</title>
+
+  <!-- Fonts & Vendor -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- App CSS (reuse your books styles) -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/books.css" rel="stylesheet">
+  <link rel="icon" href="assets/img/LibraTrack-logo.png"/>
+
+  <script src="assets/js/sidebar.js" defer></script>
+
+  <style>
+    .page-title{ font-weight:600; }
+    .fav-header{ display:flex; align-items:center; justify-content:space-between; gap:12px }
+    .fav-header h5{ margin:0; font-weight:700 }
+    .subtle{ color:#6b7280 }
+    .grid-wrap{ display:flex; flex-wrap:wrap; gap:12px }
+    .grid-item{ flex:0 0 auto; width:180px }
+    .badge-ghost{ background:#f3f4f6; color:#111827; border-radius:999px; padding:.25rem .5rem; font-size:.75rem }
+  </style>
+</head>
+
+<body class="sb-body loading">
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <div class="topbar">
+      <div class="page-head d-flex align-items-center gap-2">
+        <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <div class="page-title">My Favorites</div>
+      </div>
+    </div>
+
+    <main class="container-fluid py-4">
+      <div class="card p-3 p-md-4">
+        <div class="fav-header mb-3">
+          <h5 class="m-0">Books you’ve favorited</h5>
+          <a href="books.html" class="btn btn-light btn-sm"><i class="bi bi-book me-1"></i>Browse books</a>
+        </div>
+
+        <div id="countLine" class="subtle small mb-2"></div>
+
+        <!-- Grid -->
+        <div id="grid" class="grid-wrap"></div>
+
+        <!-- Empty state -->
+        <div id="empty" class="empty d-none">
+          You have no favorites yet. Go to <a href="books.html">Books</a> and tap the heart to add some.
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Offcanvas: book details -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="bookDetails" aria-labelledby="bookDetailsLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="bookDetailsLabel">Book</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body" id="detailsBody"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index:1080">
+    <div id="toastInfo" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="polite" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body"><i class="bi bi-check2-circle me-2"></i><span id="toastMsg">Updated.</span></div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // === Helpers ===
+    const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+    const toast = new bootstrap.Toast(document.getElementById('toastInfo'));
+    const toastMsg = document.getElementById('toastMsg');
+
+    function showToast(msg){ toastMsg.textContent = msg; toast.show(); }
+
+    async function getMe(){
+      try{
+        const r = await fetch('backend/check-auth.php', {credentials:'include'});
+        const d = await r.json().catch(()=>null);
+        return d?.user || null;
+      }catch{ return null; }
+    }
+
+    // === Page init ===
+    (async ()=>{
+      const me = await getMe();
+      const role = (me?.role || 'student').toLowerCase();
+      if (typeof renderSidebar === 'function') renderSidebar('favorites', role);
+      document.getElementById('sidebarToggle')?.addEventListener('click', ()=>{
+        if (typeof toggleSidebar === 'function') toggleSidebar(); else document.body.classList.toggle('sb-collapsed');
+      });
+
+      await loadFavorites();
+      document.body.classList.remove('loading');
+    })();
+
+    // === API routes ===
+    const API_FAVORITES = 'backend/favorites-list.php';
+    const API_TOGGLE    = 'backend/favorite-toggle.php';
+
+    // === Rendering ===
+    function renderStars(rating=0){
+      const r = Math.max(0, Math.min(5, Math.round(Number(rating)||0)));
+      return Array.from({length:5},(_,i)=>`<i class="bi ${i<r?'bi-star-fill text-warning':'bi-star text-secondary'}"></i>`).join('');
+    }
+
+    function renderCard(b){
+      const cover = b.cover_url || 'assets/img/no-cover.png';
+      const t = esc(b.title||''), a = esc(b.author||'');
+      const c = esc(b.category||''), i = esc(b.isbn||'');
+      return `
+        <div class="grid-item">
+          <div class="book-card p-2">
+            <div class="cover-wrap position-relative" role="button" onclick='showDetails(${JSON.stringify(b).replace(/'/g,"&#39;")})'>
+              <img class="thumb-lg" src="${cover}" alt="${t}">
+              <button class="btn-fav active" title="Remove from favorites" data-id="${b.id}">
+                <i class="bi bi-heart-fill text-danger"></i>
+              </button>
+            </div>
+            <div class="p-2">
+              <div class="title text-truncate" title="${t}">${t}</div>
+              <div class="meta text-truncate">${a||'Unknown author'}</div>
+              <div class="meta">${c}${c&&i?' • ':''}${i?('ISBN: '+i):''}</div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    async function loadFavorites(){
+      const grid = document.getElementById('grid');
+      const empty = document.getElementById('empty');
+      const countLine = document.getElementById('countLine');
+      grid.innerHTML = '<div class="subtle">Loading…</div>';
+
+      let data = null;
+      try{
+        const res = await fetch(API_FAVORITES, {credentials:'include'});
+        data = await res.json();
+      }catch{
+        grid.innerHTML = '<div class="empty w-100">Failed to load favorites.</div>';
+        return;
+      }
+
+      if (!data?.ok){
+        grid.innerHTML = `<div class="empty w-100">${data?.error || 'Failed to load favorites.'}</div>`;
+        return;
+      }
+
+      const items = data.items || [];
+      countLine.textContent = `${items.length} favorite${items.length===1?'':'s'}`;
+      empty.classList.toggle('d-none', items.length>0);
+
+      grid.innerHTML = items.length ? items.map(renderCard).join('') : '';
+
+      // bind unfavorite
+      grid.querySelectorAll('.btn-fav').forEach(btn=>{
+        btn.onclick = async (e)=>{
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          try{
+            const r = await fetch(API_TOGGLE, {
+              method:'POST',
+              credentials:'include',
+              headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ book_id: id })
+            });
+            const out = await r.json().catch(()=>null);
+            if (out?.ok){
+              // remove card if unfavorited
+              if (out.favorited === false){
+                btn.closest('.grid-item')?.remove();
+                const left = document.querySelectorAll('#grid .grid-item').length;
+                countLine.textContent = `${left} favorite${left===1?'':'s'}`;
+                if (left === 0) document.getElementById('empty').classList.remove('d-none');
+                showToast('Removed from favorites');
+              } else {
+                showToast('Added to favorites');
+              }
+            } else {
+              alert(out?.error || 'Failed to update favorite.');
+            }
+          }catch{
+            alert('Network error.');
+          }
+        };
+      });
+    }
+
+    // details offcanvas (same pattern as books)
+    window.showDetails = function(b){
+      const cover = b.cover_url || 'assets/img/no-cover.png';
+      const body = `
+        <div class="d-flex gap-3">
+          <img src="${cover}" alt="${esc(b.title)}" style="width:110px;height:150px;object-fit:cover;border-radius:8px;background:#f3f4f6">
+          <div>
+            <div class="fw-semibold">${esc(b.title||'')}</div>
+            <div class="text-muted">${esc(b.author||'')}</div>
+            <div class="small text-muted mt-1">${esc(b.category||'')}${b.category&&b.isbn?' • ':''}${b.isbn?('ISBN: '+esc(b.isbn)) : ''}</div>
+            <div class="small mt-1">Qty: <span class="badge text-bg-light">${b.quantity??0}</span></div>
+            <div class="small mt-1">Published: ${b.published_at||''}</div>
+            <div class="small mt-1">Publisher: ${esc(b.publisher||'')}</div>
+          </div>
+        </div>`;
+      document.getElementById('bookDetailsLabel').textContent = b.title || 'Book';
+      document.getElementById('detailsBody').innerHTML = body;
+      bootstrap.Offcanvas.getOrCreateInstance('#bookDetails').show();
+    };
+  </script>
+</body>
+</html>
