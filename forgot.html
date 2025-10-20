@@ -10,14 +10,14 @@
   <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
 
+  <!-- Vendor / site CSS (no inline CSS per your request) -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&family=Poppins:wght@100..900&display=swap" rel="stylesheet">
-
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/vendor/aos/aos.css" rel="stylesheet">
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-
   <link href="assets/css/main.css" rel="stylesheet">
+  <link href="assets/css/verify-code.css" rel="stylesheet">
 </head>
 <body class="index-page d-flex flex-column min-vh-100">
 
@@ -61,28 +61,72 @@
   <!-- Main -->
   <main class="main flex-grow-1">
     <section class="page-bg min-vh-100 d-flex align-items-center justify-content-center">
-      <div class="forgot-card border-0 shadow-sm mx-auto" style="max-width: 420px; width: 100%;">
+      <div class="forgot-card border-0 shadow-sm mx-auto" style="max-width: 480px; width: 100%;">
         <div class="card-body p-5">
+
           <div class="text-center mb-4">
-            <img src="assets/img/LibraTrack-logo.png" alt="LibraTrack Logo" width="84" height="84">
+            <img class="brand-logo" src="assets/img/LibraTrack-logo.png" alt="LibraTrack Logo" width="84" height="84">
           </div>
-          <h3 class="form-big-label text-center mb-2">Forgot Password</h3>
-          <p class="form-label-login-register text-center mb-4">
+
+          <h3 class="form-big-label text-center mb-2" id="mainTitle" style="white-space:nowrap;">FORGOT PASSWORD</h3>
+          <p id="requestBlurb" class="form-label-login-register text-center mb-4">
             Enter your email address and we'll send you instructions to reset your password.
           </p>
 
-          <form id="forgotForm" novalidate>
+          <!-- Step 1: Request code -->
+          <form id="requestForm" novalidate>
             <div class="mb-3">
               <label for="email" class="form-label-login-register">Email</label>
               <input type="email" id="email" class="form-control" required />
               <div class="invalid-feedback" id="emailError"></div>
             </div>
-            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 form-button-label">Reset</button>
+            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 form-button-label">
+              Reset
+            </button>
+
+            <div class="text-center mt-4">
+              <a href="login.html" class="form-label-create">Back to Login</a>
+            </div>
           </form>
 
-          <div class="text-center mt-4">
-            <a href="login.html" class="form-label-create">Back to Login</a>
+          <!-- Step 2: Verify code -->
+          <div id="verifyPane" class="d-none">
+            <!-- Combined helper text (filled via JS) -->
+            <p id="pIntro" class="form-label-login-register text-center mb-3"></p>
+
+            <!-- OTP boxes (6) -->
+            <div class="otp-wrap" aria-label="Enter verification code">
+              <div class="otp-grid" id="otpGrid">
+                <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" />
+                <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+                <input class="otp-input" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" />
+              </div>
+              <div class="invalid-feedback d-block mt-2" id="codeError" style="display:none;"></div>
+            </div>
+
+            <!-- Gold verify button (uses .btn-primary brand gold from your CSS) -->
+            <button id="btnVerify" class="btn btn-primary w-100 rounded-pill py-2 form-button-label mt-3" disabled>
+            VERIFY CODE
+          </button>
+            <!-- Resend row (forced white via Bootstrap utility classes) -->
+            <div class="d-flex justify-content-between align-items-center mt-3 small text-white">
+              <span>Resend code</span>
+              <span>
+                <button id="btnResend" class="btn btn-link p-0 small text-white text-decoration-underline" type="button">Resend</button>
+                <span id="cooldown" class="ms-1 text-white"></span>
+              </span>
+            </div>
+
+            <div class="text-center mt-3">
+              <span class="cursor-pointer text-decoration-underline" id="btnChangeEmail">Change email</span>
+            </div>
           </div>
+
+          <!-- Status (errors only) -->
+          <div id="status" class="alert d-none mt-4 mb-0" role="alert"></div>
         </div>
       </div>
     </section>
@@ -94,49 +138,217 @@
     </div>
   </footer>
 
+  <!-- Vendor JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
   <script src="assets/js/main.js"></script>
 
+  <!-- Page JS -->
   <script>
-    document.getElementById('forgotForm').addEventListener('submit', async function (e) {
+    // ---------- helpers ----------
+    const $  = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+    const show = (el) => el.classList.remove('d-none');
+    const hide = (el) => el.classList.add('d-none');
+
+    const statusEl = $('#status');
+    function showStatus(kind, msg){
+      statusEl.className='alert mt-4 mb-0 alert-'+kind;
+      statusEl.textContent=msg;
+      show(statusEl);
+    }
+    function clearStatus(){ hide(statusEl); statusEl.textContent=''; }
+
+    // step 1
+    const requestForm = $('#requestForm');
+    const emailInput  = $('#email');
+    const emailError  = $('#emailError');
+    const requestBlurb = $('#requestBlurb');
+    const mainTitle   = $('#mainTitle');
+
+    // step 2
+    const verifyPane  = $('#verifyPane');
+    const pIntro      = $('#pIntro');
+    const btnVerify   = $('#btnVerify');
+    const btnResend   = $('#btnResend');
+    const cooldownEl  = $('#cooldown');
+    const btnChangeEmail = $('#btnChangeEmail');
+    const codeError   = $('#codeError');
+    const otpInputs   = () => $$('.otp-input');
+
+    let currentEmail = '';
+    let cooldownTimer = null;
+    const COOLDOWN_SECONDS = 60;
+
+    // ---------- request code ----------
+    requestForm.addEventListener('submit', async (e)=>{
       e.preventDefault();
-      const email = document.getElementById('email');
-      const emailError = document.getElementById('emailError');
-      const val = email.value.trim();
+      clearStatus();
+
+      const val = emailInput.value.trim();
       const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      if (!val || !emailRe.test(val)) {
-        email.classList.add('is-invalid');
+      if(!val || !emailRe.test(val)){
+        emailInput.classList.add('is-invalid');
         emailError.textContent = 'Please enter a valid email address';
         return;
       }
+      emailInput.classList.remove('is-invalid'); emailError.textContent='';
 
-      email.classList.remove('is-invalid');
-      emailError.textContent = '';
-
-      // call backend to send reset code
-      try {
-        const res = await fetch('backend/request-reset.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+      try{
+        const res  = await fetch('backend/request-reset.php', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ email: val })
         });
-        const data = await res.json().catch(() => ({}));
-        if (!data.success) throw new Error(data.message || 'Failed to send code.');
-        // redirect to verify page with email in query
-        window.location.href = `verify-code.html?email=${encodeURIComponent(val)}`;
-      } catch (err) {
-        alert(err.message);
+        const data = await res.json().catch(()=>({}));
+        if(!data.success) throw new Error(data.message || 'Failed to send code.');
+
+        currentEmail = val;
+
+        // Switch UI to OTP and update copy
+        mainTitle.textContent = 'ACCOUNT VERIFICATION';
+        requestBlurb.classList.add('d-none');
+        pIntro.innerHTML = `We emailed a 6-digit code to <span class="fw-semibold">${currentEmail}</span>. It’s valid for 15 minutes. Please check your inbox.`;
+
+        hide(requestForm);
+        show(verifyPane);
+        resetOtp();
+        startCooldown();
+
+        // No success toast here (per your request)
+        clearStatus();
+      }catch(err){
+        showStatus('danger', err.message);
       }
     });
 
-    document.getElementById('email').addEventListener('input', function () {
-      this.classList.remove('is-invalid');
-      document.getElementById('emailError').textContent = '';
+    // ---------- OTP helpers ----------
+    function resetOtp(){
+      otpInputs().forEach((inp)=>{ inp.value=''; inp.classList.remove('filled','is-invalid'); });
+      codeError.style.display='none';
+      btnVerify.disabled = true;
+      otpInputs()[0].focus();
+    }
+    function getOtpValue(){ return otpInputs().map(i=>i.value).join(''); }
+    function updateVerifyState(){
+      const full = getOtpValue().length === 6;
+      btnVerify.disabled = !full;
+    }
+    function setupOtpBehavior(){
+      otpInputs().forEach((input, idx)=>{
+        input.addEventListener('input', ()=>{
+          input.value = input.value.replace(/\D/g,'').slice(0,1);
+          input.classList.toggle('filled', !!input.value);
+          if(input.value && idx < 5){ otpInputs()[idx+1].focus(); }
+          updateVerifyState();
+        });
+
+        input.addEventListener('keydown', (e)=>{
+          if(e.key === 'Backspace' && !input.value && idx>0){ otpInputs()[idx-1].focus(); }
+          if(e.key === 'ArrowLeft' && idx>0){ otpInputs()[idx-1].focus(); }
+          if(e.key === 'ArrowRight' && idx<5){ otpInputs()[idx+1].focus(); }
+        });
+      });
+
+      // paste entire code into first field
+      $('#otpGrid').addEventListener('paste', (e)=>{
+        const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+        if(!text) return;
+        e.preventDefault();
+        otpInputs().forEach((i, k)=>{ i.value = text[k] || ''; i.classList.toggle('filled', !!i.value); });
+        updateVerifyState();
+        const next = text.length>=6 ? 5 : Math.max(text.length,1)-1;
+        otpInputs()[next].focus();
+      });
+    }
+    setupOtpBehavior();
+
+    // ---------- verify code ----------
+    btnVerify.addEventListener('click', async ()=>{
+      clearStatus();
+      const code = getOtpValue();
+      if(code.length !== 6){
+        codeError.textContent = 'Enter the 6-digit code';
+        codeError.style.display = 'block';
+        otpInputs().forEach(i=>i.classList.add('is-invalid'));
+        return;
+      }
+      codeError.style.display = 'none';
+      otpInputs().forEach(i=>i.classList.remove('is-invalid'));
+
+      try{
+        const res = await fetch('backend/verify-code.php', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email: currentEmail, code })
+        });
+        const data = await res.json().catch(()=>({}));
+        if(!data.success) throw new Error(data.message || 'Incorrect or expired code.');
+
+        const token = data.token;
+        window.location.href = `reset-password.html?email=${encodeURIComponent(currentEmail)}&token=${encodeURIComponent(token)}`;
+      }catch(err){
+        showStatus('danger', err.message);
+      }
     });
 
+    // ---------- resend ----------
+    btnResend.addEventListener('click', async ()=>{
+      if(btnResend.disabled) return;
+      clearStatus();
+      try{
+        const res = await fetch('backend/request-reset.php', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email: currentEmail })
+        });
+        const data = await res.json().catch(()=>({}));
+        if(!data.success) throw new Error(data.message || 'Could not resend code.');
+        resetOtp();
+        startCooldown();
+        // No success toast here either
+        clearStatus();
+      }catch(err){
+        showStatus('danger', err.message);
+      }
+    });
+
+    // ---------- change email ----------
+    btnChangeEmail.addEventListener('click', ()=>{
+      clearInterval(cooldownTimer);
+      btnResend.disabled = false;
+      cooldownEl.textContent = '';
+      show(requestForm); hide(verifyPane);
+      emailInput.value = currentEmail || '';
+      mainTitle.textContent = 'FORGOT PASSWORD';
+      requestBlurb.classList.remove('d-none');
+      clearStatus();
+    });
+
+    // ---------- cooldown ----------
+    function startCooldown(){
+      let left = COOLDOWN_SECONDS;
+      btnResend.disabled = true;
+      cooldownEl.textContent = `(available in ${left}s)`;
+      clearInterval(cooldownTimer);
+      cooldownTimer = setInterval(()=>{
+        left -= 1;
+        if(left<=0){
+          clearInterval(cooldownTimer);
+          btnResend.disabled=false;
+          cooldownEl.textContent='';
+        } else {
+          cooldownEl.textContent = `(available in ${left}s)`;
+        }
+      }, 1000);
+    }
+
+    // inline email validation
+    emailInput.addEventListener('input', ()=>{ emailInput.classList.remove('is-invalid'); emailError.textContent=''; });
+
+    // footer year
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
