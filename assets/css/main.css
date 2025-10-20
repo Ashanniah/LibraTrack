@@ -57,7 +57,13 @@
 :root {
   scroll-behavior: smooth;
 }
-
+:root{
+  --otp-bg:#0f0f0f;
+  --otp-border:#262626;
+  --otp-text:#ffffff;
+  --otp-muted:#ffffff;   /* make timer white */
+  --otp-gold:#C69C2E;    /* keep for borders/focus */
+}
 /*--------------------------------------------------------------
 # General Styling & Shared Classes
 --------------------------------------------------------------*/
@@ -108,7 +114,49 @@ h6 {
   margin-bottom: 24px;
   font-weight: 600;
 }
+.otp-wrap{ display:flex; flex-direction:column; align-items:center; }
 
+.otp-grid{
+  display:grid;
+  grid-template-columns: repeat(6, 56px);   /* fixed width so 6 show in one row */
+  gap:12px;
+  justify-content:center;                   /* center the grid */
+  margin: 6px auto 0;
+}
+
+.otp-input{
+  width:56px; height:64px;                  /* no aspect-ratio quirks */
+  text-align:center;
+  font-weight:700;
+  font-size:22px;
+  border-radius:12px;
+  border:1px solid var(--otp-border);
+  background:var(--otp-bg);
+  color:var(--otp-text);
+  outline:none;
+  transition: box-shadow .2s, border-color .2s;
+}
+.otp-input:focus{ border-color:var(--otp-gold); box-shadow:0 0 0 .2rem rgba(198,156,46,.25); }
+.otp-input.filled{ box-shadow: inset 0 0 0 1px rgba(198,156,46,.25); }
+.otp-input.is-invalid{ border-color:#dc3545!important; box-shadow:0 0 0 .2rem rgba(220,53,69,.15)!important; }
+
+/* Verify button should be gold */
+#btnVerify{
+  background: var(--gold);                  /* uses your global --gold */
+  border:none; color:#111; font-weight:700; letter-spacing:.3px;
+}
+#btnVerify:disabled{ opacity:.7; cursor:not-allowed; }
+#btnVerify:hover:not(:disabled){ filter:brightness(1.06); }
+
+/* Resend row forced to white */
+#verifyPane .small, 
+#verifyPane .small a,
+#cooldown{ color:#fff !important; }
+
+@media (max-width: 420px){
+  .otp-grid{ grid-template-columns: repeat(6, 44px); gap:10px; }
+  .otp-input{ width:44px; height:54px; font-size:20px; border-radius:10px; }
+}
 .php-email-form .sent-message {
   display: none;
   color: #ffffff;
@@ -3420,23 +3468,54 @@ html, body {
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0,0,0,.3));
 }
-/* Success Modal Custom Styles */
+/* --- Success Modal Styles --- */
 .success-modal {
   border-radius: 12px;
-  color: #000; 
+  background-color: #fff;
+  font-family: 'Poppins',
 }
 
-.success-icon {
-  font-size: 80px;   
-  color: #28a745;    
+.success-icon i {
+  font-size: 70px;
+  color: #039b27; /* ✅ green check icon */
 }
 
-.success-modal h5,
-.success-modal p {
-  color: #000 !important; 
+.success-modal .modal-title {
+  font-size: 20px;
+  color: #000;
+  font-family: 'Poppins',
 }
 
-/* Equal button sizes */
-.success-modal .btn {
-  flex: 1;
+
+/* --- Buttons --- */
+.btn-close-modal,
+.btn-login-modal {
+  width: 150px;
+  height: 45px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.btn-close-modal {
+  background-color: #e0e0e0;
+  color: #000;
+  border: none;
+}
+
+.btn-login-modal {
+  background-color: #039b27;
+  color: #ffffff;
+  border: none;
+}
+
+.btn-close-modal:hover,
+.btn-login-modal:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+  color: #a7a7a7;
+}
+.modal-actions {
+  gap: 2.5rem !important; 
 }

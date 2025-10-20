@@ -227,24 +227,21 @@
   <div id="preloader"></div>
 
   <!-- Success Modal -->
-  <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content success-modal text-center p-4">
-        <div class="success-icon">
-          <i class="bi bi-check-circle-fill"></i>
-        </div>
-        <h5 class="modal-title">Registration Successful</h5>
-        <p id="successMsg">Your account has been created.</p>
-        <div class="d-flex justify-content-center gap-2 mt-3">
-          <button type="button" class="btn btn-outline-secondary w-50" data-bs-dismiss="modal">
-            Close
-          </button>
-          <button id="goLoginBtn" type="button" class="btn btn-primary w-50">Go to Login</button>
-        </div>
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content success-modal text-center p-4">
+      <div class="success-icon mb-3">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <h5 class="modal-title fw-bold">Registration Successful</h5>
+      <div class="modal-actions d-flex justify-content-center gap-4 mt-2">
+        <button type="button" class="btn btn-close-modal" data-bs-dismiss="modal">Close</button>
+        <button id="goLoginBtn" type="button" class="btn btn-login-modal">Go to Login</button>
       </div>
     </div>
   </div>
-  
+</div>
+
 
   <!-- Vendor JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
