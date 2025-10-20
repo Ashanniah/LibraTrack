@@ -15,8 +15,19 @@
   <link href="assets/css/admin-profile.css" rel="stylesheet">
 
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
+
+  <style>
+    body.loading main, body.loading #sidebarToggle { visibility:hidden }
+    .role-pill{display:inline-block;padding:.25rem .6rem;border-radius:999px;background:#eee;font-weight:600;font-size:.75rem}
+    .role-admin{background:#efefef;color:#111}
+    .avatar-wrap{position:relative;width:112px;height:112px}
+    .avatar-img{width:112px;height:112px;border-radius:50%;object-fit:cover;border:2px solid #eee}
+    .avatar-edit{position:absolute;right:-6px;bottom:-6px;border-radius:999px}
+    .stat-num{font-weight:700}
+    .profile-card .stat-label{font-size:.8rem;color:#6b7280}
+  </style>
 </head>
-<body class="sb-body">
+<body class="sb-body loading">
   <!-- Shared Sidebar -->
   <div id="sidebar-root"></div>
 
@@ -33,14 +44,14 @@
 
         <!-- Account dropdown -->
         <div class="dropdown ms-auto">
-          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
-            <i class="bi bi-person-gear me-2"></i>Admin
+          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" id="userMenuBtn">
+            <i class="bi bi-person-gear me-2"></i><span id="whoAmI">Admin</span>
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
-            <li><a class="dropdown-item" href="#"><i class="bi bi-bell me-2"></i>Notifications</a></li>
+            <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
+            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="login.html"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
           </ul>
         </div>
       </div>
@@ -60,8 +71,8 @@
                 </label>
                 <input id="avatarInput" type="file" accept="image/*" class="d-none">
               </div>
-              <h5 class="mb-1">Admin Name</h5>
-              <div class="text-muted small mb-3">admin@library.edu</div>
+              <h5 id="adminName" class="mb-1">—</h5>
+              <div id="adminEmail" class="text-muted small mb-3">—</div>
               <span class="role-pill role-admin">Administrator</span>
             </div>
 
@@ -70,19 +81,19 @@
             <div class="row text-center g-3">
               <div class="col-4">
                 <div class="stat">
-                  <div class="stat-num">3</div>
+                  <div class="stat-num" id="statAdmins">—</div>
                   <div class="stat-label">Admins</div>
                 </div>
               </div>
               <div class="col-4">
                 <div class="stat">
-                  <div class="stat-num">7</div>
+                  <div class="stat-num" id="statLibrarians">—</div>
                   <div class="stat-label">Librarians</div>
                 </div>
               </div>
               <div class="col-4">
                 <div class="stat">
-                  <div class="stat-num">2,034</div>
+                  <div class="stat-num" id="statStudents">—</div>
                   <div class="stat-label">Students</div>
                 </div>
               </div>
@@ -91,7 +102,7 @@
             <hr class="my-4">
 
             <div class="quick-actions d-grid gap-2">
-              <a href="admin-dashboard.html" class="btn btn-outline-primary">
+              <a href="dashboard.html" class="btn btn-outline-primary">
                 <i class="bi bi-speedometer2 me-2"></i>Dashboard
               </a>
               <a href="admin-users.html" class="btn btn-outline-secondary">
@@ -106,22 +117,24 @@
           <section class="card p-4">
             <h5 class="mb-3">Personal Information</h5>
 
-            <form class="row g-3">
+            <form id="profileForm" class="row g-3" novalidate>
               <div class="col-12 col-md-6">
                 <label class="form-label">Full Name</label>
-                <input type="text" class="form-control" placeholder="e.g., Admin Name">
+                <input id="fName" type="text" class="form-control" required>
+                <div class="invalid-feedback">Name is required.</div>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Email</label>
-                <input type="email" class="form-control" placeholder="admin@library.edu">
+                <input id="fEmail" type="email" class="form-control" required>
+                <div class="invalid-feedback">Valid email is required.</div>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Phone</label>
-                <input type="text" class="form-control" placeholder="09xx xxx xxxx">
+                <input id="fPhone" type="text" class="form-control" placeholder="09xx xxx xxxx">
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Address</label>
-                <input type="text" class="form-control" placeholder="City, Country">
+                <input id="fAddress" type="text" class="form-control" placeholder="City, Country">
               </div>
 
               <div class="col-12">
@@ -131,16 +144,16 @@
 
               <div class="col-12 col-md-6">
                 <label class="form-label">New Password</label>
-                <input type="password" class="form-control" placeholder="********">
+                <input id="fPw" type="password" class="form-control" placeholder="********">
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" placeholder="********">
+                <input id="fPw2" type="password" class="form-control" placeholder="********">
               </div>
 
               <div class="col-12 d-flex gap-2 justify-content-end pt-2">
                 <button type="reset" class="btn btn-light">Reset</button>
-                <button type="button" class="btn btn-primary">Save Changes</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
               </div>
             </form>
           </section>
@@ -160,8 +173,67 @@
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script>
-    renderSidebar('admin');
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+    // --- Auth helper (same contract as dashboard) ---
+    async function getMe() {
+      const res = await fetch('backend/check-auth.php', { credentials:'include' });
+      if (res.status === 401) { location.href = 'login.html'; return null; }
+      const data = await res.json();
+      if (!data.success) { location.href = 'login.html'; return null; }
+      return data.user; // {id, first_name, last_name, role, email, ...}
+    }
+
+    // --- Page bootstrap ---
+    (async () => {
+      try {
+        const me = await getMe();
+        if (!me) return;
+
+        // Gate to admins only
+        if (me.role !== 'admin') { location.href = 'dashboard.html'; return; }
+
+        // Build sidebar for this page (active: profile)
+        renderSidebar('profile', me.role);
+
+        // Sidebar toggle
+        document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+          if (typeof toggleSidebar === 'function') toggleSidebar();
+          else document.body.classList.toggle('sb-collapsed');
+        });
+
+        // Header chip
+        const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
+        document.getElementById('whoAmI').textContent = 'Admin';
+        document.getElementById('whoChip').innerHTML =
+          `<span class="badge role-chip admin">ADMIN</span> ${fullName || me.email || ''}`;
+
+        // Populate summary + form
+        document.getElementById('adminName').textContent  = fullName || '—';
+        document.getElementById('adminEmail').textContent = me.email || '—';
+
+        document.getElementById('fName').value    = fullName || '';
+        document.getElementById('fEmail').value   = me.email || '';
+        document.getElementById('fPhone').value   = me.phone || '';
+        document.getElementById('fAddress').value = me.address || '';
+
+        // (Optional) quick stats – you can wire this to a backend later
+        document.getElementById('statAdmins').textContent     = me.stats_admins ?? '—';
+        document.getElementById('statLibrarians').textContent = me.stats_librarians ?? '—';
+        document.getElementById('statStudents').textContent   = me.stats_students ?? '—';
+
+      } catch (e) {
+        console.error(e);
+        location.href = 'login.html';
+      } finally {
+        document.body.classList.remove('loading');
+      }
+    })();
+
+    // Logout
+    document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try { await fetch('backend/logout.php', { method:'POST', credentials:'include' }); } catch {}
+      location.href = 'login.html';
+    });
 
     // UI-only avatar preview
     const avatarInput = document.getElementById('avatarInput');
@@ -169,9 +241,41 @@
     avatarInput.addEventListener('change', () => {
       const f = avatarInput.files?.[0];
       if (!f) return;
-      const reader = new FileReader();
-      reader.onload = e => avatarPreview.src = e.target.result;
-      reader.readAsDataURL(f);
+      if (f.size > 5*1024*1024) { alert('Max image size is 5MB.'); avatarInput.value=''; return; }
+      const r = new FileReader();
+      r.onload = e => avatarPreview.src = e.target.result;
+      r.readAsDataURL(f);
+    });
+
+    // Save (stub – wire to backend when ready)
+    document.getElementById('profileForm').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const form = e.currentTarget;
+      form.classList.add('was-validated');
+      if (!form.checkValidity()) return;
+
+      const pw = document.getElementById('fPw').value.trim();
+      const pw2= document.getElementById('fPw2').value.trim();
+      if (pw || pw2) {
+        if (pw !== pw2) { alert('Passwords do not match.'); return; }
+        if (!/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{}|\\:;'"<>,.?/~`]).{8,}$/.test(pw)) {
+          alert('Use ≥8 chars with 1 uppercase & 1 special character.');
+          return;
+        }
+      }
+
+      // Example payload
+      const payload = {
+        name: document.getElementById('fName').value.trim(),
+        email: document.getElementById('fEmail').value.trim(),
+        phone: document.getElementById('fPhone').value.trim(),
+        address: document.getElementById('fAddress').value.trim(),
+        password: pw || undefined
+      };
+
+      // TODO: POST to backend/update-admin-profile.php
+      console.log('Would save profile:', payload);
+      alert('Changes saved (demo).');
     });
   </script>
 </body>
