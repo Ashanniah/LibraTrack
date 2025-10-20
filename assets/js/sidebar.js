@@ -32,7 +32,6 @@
       return `
         <div class="sb-label">Main</div>
         ${link(ROUTES.admin.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
-        ${link(ROUTES.admin.books,'bi-journal-text','Books',current==='books')}
         ${link(ROUTES.admin.users,'bi-people','Users',current==='users')}
 
         <div class="sb-label mt-3">Account</div>
