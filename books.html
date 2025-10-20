@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,20 +14,12 @@
   <!-- App -->
   <link href="assets/css/sidebar.css" rel="stylesheet">
   <link href="assets/css/librarian-add-book.css" rel="stylesheet">
+  <link href="assets/css/books.css" rel="stylesheet"><!-- moved inline styles here -->
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
   <script src="assets/js/sidebar.js?v=7" defer></script>
-
-  <style>
-    .thumb { width:48px; height:64px; object-fit:cover; border-radius:.25rem; background:#f3f4f6; }
-    .empty { padding:3rem 0; color:#777; text-align:center; }
-    .tab-btn { border-bottom: 2px solid transparent; }
-    .tab-btn.active { border-bottom-color: var(--bs-primary); color: var(--bs-primary)!important; }
-    /* hide content until auth resolved to avoid flicker */
-    body.loading main, body.loading #sidebarToggle { visibility:hidden }
-  </style>
 </head>
 <body class="sb-body loading">
-  <!-- Sidebar -->
+  <!-- Sidebar mount (optional) -->
   <div id="sidebar-root"></div>
 
   <div class="sb-wrapper">
@@ -44,25 +37,32 @@
 
     <!-- Content -->
     <main class="container-fluid py-4">
-      <div id="roleBanner" class="alert d-none" role="alert"></div>
-
       <!-- Tabs -->
       <div class="d-flex gap-3 mb-3 border-bottom">
         <button id="tabList" class="btn btn-link tab-btn active px-0">List</button>
         <button id="tabAdd"  class="btn btn-link tab-btn px-0">Add</button>
       </div>
 
-      <!-- LIST PANEL -->
+      <!-- LIST -->
       <section id="panelList" class="card p-3">
         <div class="row g-2 align-items-center">
           <div class="col-sm-6 col-lg-4">
-            <input id="q" class="form-control" placeholder="Search title / author / ISBN">
+            <div class="position-relative" style="max-width:520px">
+              <i class="bi bi-search position-absolute" style="left:10px;top:50%;transform:translateY(-50%);opacity:.5"></i>
+              <input id="q" class="form-control ps-5" placeholder="Search title / author / ISBN">
+            </div>
           </div>
-          <div class="col-sm-6 col-lg-3 ms-auto text-end small text-muted">
-            <span id="countInfo"></span>
+
+          <div class="col-sm-6 col-lg-4 ms-auto d-flex justify-content-end align-items-center gap-2">
+            <div class="btn-group btn-group-sm" role="group" aria-label="View">
+              <button id="viewTableBtn" class="btn btn-outline-secondary active">Table</button>
+              <button id="viewCardsBtn" class="btn btn-outline-secondary">Cards</button>
+            </div>
+            <div class="small text-muted ms-2"><span id="countInfo"></span></div>
           </div>
         </div>
 
+        <!-- Table -->
         <div class="table-responsive mt-3">
           <table class="table align-middle">
             <thead>
@@ -82,7 +82,10 @@
           </table>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-2">
+        <!-- Cards grid -->
+        <div id="cardGrid" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-3 d-none"></div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
           <div class="small text-muted" id="pageInfo"></div>
           <div class="btn-group">
             <button id="prev" class="btn btn-outline-secondary btn-sm"><i class="bi bi-chevron-left"></i></button>
@@ -91,11 +94,10 @@
         </div>
       </section>
 
-      <!-- ADD PANEL -->
+      <!-- ADD -->
       <section id="panelAdd" class="card p-3 p-md-4 mt-3 d-none">
         <form id="bookForm" novalidate enctype="multipart/form-data">
           <div class="row g-4">
-            <!-- Cover -->
             <div class="col-12 col-lg-4">
               <h6 class="section-title">Cover</h6>
               <div id="dropArea" class="cover-drop" role="button" tabindex="0" aria-label="Upload cover (click or drop)">
@@ -117,7 +119,6 @@
               </div>
             </div>
 
-            <!-- Fields -->
             <div class="col-12 col-lg-8">
               <h6 class="section-title">Details</h6>
               <div class="row g-3">
@@ -154,14 +155,11 @@
                   </select>
                   <div class="invalid-feedback">Category is required.</div>
                 </div>
+
                 <div class="col-6 col-md-3">
                   <label class="form-label">Quantity <span class="text-danger">*</span></label>
                   <input id="quantity" name="quantity" type="number" min="1" step="1" class="form-control" required>
                   <div class="invalid-feedback">Quantity is required.</div>
-                </div>
-                <div class="col-6 col-md-3">
-                  <label class="form-label">Low-stock Threshold</label>
-                  <input id="threshold" name="threshold" type="number" min="0" step="1" class="form-control" placeholder="e.g., 3">
                 </div>
 
                 <div class="col-12 col-md-6">
@@ -180,9 +178,6 @@
               <div class="d-flex flex-wrap gap-2">
                 <button id="btnSave" type="submit" class="btn btn-primary">
                   <i class="bi bi-save me-1"></i> Save Book
-                </button>
-                <button id="btnSaveNew" type="button" class="btn btn-outline-primary">
-                  <i class="bi bi-save2 me-1"></i> Save & Add Another
                 </button>
                 <button type="button" id="btnGoList" class="btn btn-light">Back to List</button>
               </div>
@@ -205,23 +200,22 @@
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script>
-    /*** AUTH + SIDEBAR ***/
+    // If you have auth: keep; else you can just call initBooksPage('student')
     async function getMe(){
-      const res = await fetch('backend/check-auth.php', { credentials:'include' });
-      if (res.status === 401) { location.href = 'login.html'; return null; }
-      const data = await res.json().catch(()=>null);
-      if (!data || !data.success) { location.href = 'login.html'; return null; }
-      return data.user; // {id, first_name, last_name, role, status, email}
+      try{
+        const res = await fetch('backend/check-auth.php', { credentials:'include' });
+        if (!res.ok) return null;
+        const data = await res.json().catch(()=>null);
+        return data?.user || null;
+      }catch{ return null; }
     }
 
     (async () => {
-      let role = 'student'; // default until we know
+      let role = 'student';
       try {
         const me = await getMe();
-        if (!me) return;
-        role = (me.role || 'student').toLowerCase();
+        role = (me?.role || 'student').toLowerCase();
 
-        // Sidebar: current='books'
         if (typeof renderSidebar === 'function') renderSidebar('books', role);
         document.getElementById('sidebarToggle')?.addEventListener('click', () => {
           if (typeof toggleSidebar === 'function') toggleSidebar();
@@ -229,167 +223,206 @@
         });
 
         initBooksPage(role);
-      } catch (e) {
-        console.error(e);
-        location.href = 'login.html';
       } finally {
         document.body.classList.remove('loading');
       }
     })();
 
-    /*** BOOKS PAGE INIT (role-aware) ***/
     function initBooksPage(role){
-      // Absolute paths so the browser never guesses wrong directories
-      const API_CREATE = '/libratrack/backend/add-book.php';
-      const API_LIST   = '/libratrack/backend/books-list.php';
+      // RELATIVE paths (avoid folder/case 404s)
+      const API_CREATE = 'backend/add-book.php';
+      const API_LIST   = 'backend/books-list.php';
 
-      /*** TABS ***/
       const tabList   = document.getElementById('tabList');
       const tabAdd    = document.getElementById('tabAdd');
       const panelList = document.getElementById('panelList');
       const panelAdd  = document.getElementById('panelAdd');
       const btnGoList = document.getElementById('btnGoList');
 
-      function showList(){
-        tabList.classList.add('active'); tabAdd.classList.remove('active');
-        panelList.classList.remove('d-none'); panelAdd.classList.add('d-none');
-      }
-      function showAdd(){
-        if (!canAdd()) return;
-        tabAdd.classList.add('active'); tabList.classList.remove('active');
-        panelAdd.classList.remove('d-none'); panelList.classList.add('d-none');
-      }
+      const canAdd = () => ['admin','librarian','student'].includes(role);
+
+      function showList(){ tabList.classList.add('active'); tabAdd.classList.remove('active'); panelList.classList.remove('d-none'); panelAdd.classList.add('d-none'); }
+      function showAdd(){ if (!canAdd()) return; tabAdd.classList.add('active'); tabList.classList.remove('active'); panelAdd.classList.remove('d-none'); panelList.classList.add('d-none'); }
+
       tabList.onclick = showList;
       tabAdd.onclick  = showAdd;
       btnGoList.onclick = showList;
 
-      // Role banner + disable Add for students only
-      const banner = document.getElementById('roleBanner');
-      const canAdd = () => role === 'admin' || role === 'librarian';
-      if (!canAdd()){
-        tabAdd.classList.add('disabled','text-muted');
-        banner.className = 'alert alert-warning';
-        banner.textContent = 'Students can view books but cannot add them.';
-        banner.classList.remove('d-none');
-      }
+      const state = { page:1, pagesize:10, q:'', view:'table' };
+      const tbody = document.getElementById('rows');
+      const cardGrid = document.getElementById('cardGrid');
+      const tableWrap= document.querySelector('.table-responsive');
 
-      /*** LIST ***/
-      const state = { page: 1, pagesize: 10, q: '' };
+      const viewTableBtn = document.getElementById('viewTableBtn');
+      const viewCardsBtn = document.getElementById('viewCardsBtn');
+      viewTableBtn.onclick = () => { state.view='table'; viewTableBtn.classList.add('active'); viewCardsBtn.classList.remove('active'); tableWrap.classList.remove('d-none'); cardGrid.classList.add('d-none'); };
+      viewCardsBtn.onclick = () => { state.view='cards'; viewCardsBtn.classList.add('active'); viewTableBtn.classList.remove('active'); tableWrap.classList.add('d-none'); cardGrid.classList.remove('d-none'); };
 
       async function load(){
         const url = `${API_LIST}?page=${state.page}&pagesize=${state.pagesize}&q=${encodeURIComponent(state.q)}`;
-        const res = await fetch(url, { credentials:'include' });
-        const raw = await res.text();
-        const tbody = document.getElementById('rows');
-
         let data;
-        try { data = JSON.parse(raw); }
-        catch {
-          tbody.innerHTML = `<tr><td colspan="7" class="empty">HTTP ${res.status} ${res.statusText}<br><small>${raw.slice(0,200)}</small></td></tr>`;
+        try{
+          const res = await fetch(url, { credentials:'include' });
+          const raw = await res.text();
+          data = JSON.parse(raw);
+        }catch(e){
+          tbody.innerHTML = `<tr><td colspan="7" class="empty">Failed to load.</td></tr>`;
+          cardGrid.innerHTML = `<div class="col"><div class="empty">Failed to load.</div></div>`;
           return;
         }
 
-        if (!data.ok) {
-          tbody.innerHTML = `<tr><td colspan="7" class="empty">${data.error || 'Failed to load.'}</td></tr>`;
+        if (!data.ok){
+          tbody.innerHTML = `<tr><td colspan="7" class="empty">${data.error||'Failed to load.'}</td></tr>`;
+          cardGrid.innerHTML = `<div class="col"><div class="empty">${data.error||'Failed to load.'}</div></div>`;
           return;
         }
 
         const items = data.items || [];
+
+        // TABLE
         if (!items.length) {
           tbody.innerHTML = `<tr><td colspan="7" class="empty">No books found.</td></tr>`;
         } else {
           tbody.innerHTML = items.map(b => {
-            const cover = b.cover ? `/libratrack/uploads/covers/${b.cover}` : 'assets/img/no-cover.png';
+            const cover = b.cover_url ? b.cover_url : 'assets/img/no-cover.png';
             return `
               <tr>
                 <td><img class="thumb" src="${cover}" alt=""></td>
                 <td>
-                  <div class="fw-semibold text-wrap">${escapeHtml(b.title)}</div>
-                  <div class="text-muted small">ISBN: ${escapeHtml(b.isbn)}</div>
+                  <div class="fw-semibold text-wrap">${escapeHtml(b.title||'')}</div>
+                  <div class="text-muted small">ISBN: ${escapeHtml(b.isbn||'')}</div>
                 </td>
-                <td class="d-none d-md-table-cell">${escapeHtml(b.author)}</td>
-                <td class="d-none d-lg-table-cell">${escapeHtml(b.category)}</td>
-                <td class="text-end">${b.quantity}</td>
-                <td class="d-none d-lg-table-cell">${escapeHtml(b.publisher)}</td>
-                <td class="d-none d-xl-table-cell">${b.date_published||''}</td>
+                <td class="d-none d-md-table-cell">${escapeHtml(b.author||'')}</td>
+                <td class="d-none d-lg-table-cell">${escapeHtml(b.category||'')}</td>
+                <td class="text-end">${b.quantity??''}</td>
+                <td class="d-none d-lg-table-cell">${escapeHtml(b.publisher||'')}</td>
+                <td class="d-none d-xl-table-cell">${b.published_at||''}</td>
               </tr>`;
           }).join('');
         }
 
+        // CARDS
+        if (!items.length) {
+          cardGrid.innerHTML = `<div class="col"><div class="empty">No books found.</div></div>`;
+        } else {
+          cardGrid.innerHTML = items.map(b => {
+            const cover = b.cover_url ? b.cover_url : 'assets/img/no-cover.png';
+            const title = escapeHtml(b.title||'');
+            const author= escapeHtml(b.author||'');
+            const cat   = escapeHtml(b.category||'');
+            const isbn  = escapeHtml(b.isbn||'');
+            const qty   = (b.quantity ?? '') + '';
+            return `
+            <div class="col">
+              <div class="book-card p-2">
+                <img class="thumb-lg" src="${cover}" alt="${title}">
+                <div class="p-2">
+                  <div class="title">${title}</div>
+                  <div class="meta">${author || 'Unknown author'}</div>
+                  <div class="meta">${cat || ''}${cat && isbn ? ' • ' : ''}${isbn ? ('ISBN: ' + isbn) : ''}</div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center px-2 pb-2">
+                  <span class="badge text-bg-light">Qty: ${qty}</span>
+                  <div class="actions btn-group" role="group">
+                    <button class="btn btn-outline-secondary btn-sm" title="Details" onclick="alert('Details for: ${title}')"><i class="bi bi-info-circle"></i></button>
+                    <button class="btn btn-outline-secondary btn-sm" title="Edit"    onclick="alert('Edit not implemented')"><i class="bi bi-pencil-square"></i></button>
+                    <button class="btn btn-outline-secondary btn-sm" title="Delete"  onclick="alert('Delete not implemented')"><i class="bi bi-trash"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          }).join('');
+        }
+
+        // Count + pager
         document.getElementById('countInfo').textContent = `${data.total.toLocaleString()} total`;
-        const start = (data.page-1)*data.pagesize + 1, end = Math.min(data.total, data.page*data.pagesize);
+        const start=(data.page-1)*data.pagesize+1, end=Math.min(data.total, data.page*data.pagesize);
         document.getElementById('pageInfo').textContent = data.total ? `Showing ${start}-${end} of ${data.total}` : '';
         document.getElementById('prev').disabled = data.page<=1;
         document.getElementById('next').disabled = data.page>=data.pages;
+
+        // Honor view
+        if (state.view === 'cards') {
+          tableWrap.classList.add('d-none'); cardGrid.classList.remove('d-none');
+          viewCardsBtn.classList.add('active'); viewTableBtn.classList.remove('active');
+        } else {
+          tableWrap.classList.remove('d-none'); cardGrid.classList.add('d-none');
+          viewTableBtn.classList.add('active'); viewCardsBtn.classList.remove('active');
+        }
       }
 
-      function escapeHtml(s=''){ return s.replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+      function escapeHtml(s=''){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
       document.getElementById('prev').onclick = ()=>{ state.page=Math.max(1,state.page-1); load(); };
       document.getElementById('next').onclick = ()=>{ state.page+=1; load(); };
       document.getElementById('q').addEventListener('input', e=>{ state.q=e.target.value.trim(); state.page=1; load(); });
 
-      /*** ADD ***/
+      // ADD form
       const form = document.getElementById('bookForm');
       const toastSaved = new bootstrap.Toast(document.getElementById('toastSaved'));
       const coverInput   = document.getElementById('coverInput');
       const coverPreview = document.getElementById('coverPreview');
       const dropHint     = document.getElementById('dropHint');
+      const dropArea     = document.getElementById('dropArea');
 
-      document.getElementById('dropArea').onclick = () => coverInput.click();
-      document.getElementById('btnChangeImage').onclick = () => coverInput.click();
-      document.getElementById('btnRemoveImage').onclick = () => {
-        coverPreview.src=''; coverPreview.classList.add('d-none'); dropHint.classList.remove('d-none'); coverInput.value='';
-      };
-      coverInput.onchange = () => {
-        const f = coverInput.files?.[0]; if (!f) return;
-        if (f.size > 5*1024*1024){ alert('Max file size is 5 MB'); coverInput.value=''; return; }
-        const r = new FileReader(); r.onload = ()=>{ coverPreview.src=r.result; coverPreview.classList.remove('d-none'); dropHint.classList.add('d-none'); }; r.readAsDataURL(f);
-      };
+        dropArea.onclick = () => coverInput.click();
 
-      let lastClickedWasSaveNew = false;
-      document.getElementById('btnSaveNew').addEventListener('click', ()=>{ lastClickedWasSaveNew=true; form.requestSubmit(); });
+        ['dragenter','dragover'].forEach((evt) =>
+          dropArea.addEventListener(evt, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropArea.classList.add('ring');
+          })
+        );
+
+        ['dragleave','drop'].forEach((evt) =>
+          dropArea.addEventListener(evt, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropArea.classList.remove('ring');
+          })
+        );
+
+        dropArea.addEventListener('drop', (e) => {
+          const f = e.dataTransfer.files?.[0];
+          if (!f) return;
+          if (f.size > 5 * 1024 * 1024) {
+            alert('Max file size is 5 MB');
+            return;
+          }
+          coverInput.files = e.dataTransfer.files;
+          const r = new FileReader();
+          r.onload = () => {
+            coverPreview.src = r.result;
+            coverPreview.classList.remove('d-none');
+            dropHint.classList.add('d-none');
+          };
+          r.readAsDataURL(f);
+        });
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!canAdd()){ alert('Only admins and librarians can add books.'); return; }
+        if (!canAdd()){ alert('You are not allowed to add books.'); return; }
 
         form.classList.add('was-validated');
         if (!form.checkValidity()) return;
 
         const fd = new FormData(form);
         fd.set('quantity', String(Math.max(1, parseInt(fd.get('quantity') || '0', 10))));
-        if (!fd.get('threshold')) fd.set('threshold', '0');
 
-        try {
-          const res  = await fetch(API_CREATE, { method:'POST', body: fd, credentials:'include' });
-          const raw  = await res.text();
-
-          let data = null;
-          try { data = JSON.parse(raw); }
-          catch {
-            alert(`Network/server error: HTTP ${res.status} ${res.statusText}\n\n${raw.slice(0,800)}`);
-            return;
-          }
-
-          if (!res.ok || !data.ok) { alert(data.error || `Save failed (HTTP ${res.status})`); return; }
+        try{
+          const res = await fetch(API_CREATE, { method:'POST', body: fd, credentials:'include' });
+          const raw = await res.text();
+          let data=null; try{ data=JSON.parse(raw);}catch{ alert(`HTTP ${res.status} ${res.statusText}\n\n${raw.slice(0,800)}`); return; }
+          if (!res.ok || !data.ok){ alert(data.error || `Save failed (HTTP ${res.status})`); return; }
 
           toastSaved.show();
-          state.page = 1;
-          await load();
-
-          if (lastClickedWasSaveNew) {
-            form.reset(); form.classList.remove('was-validated');
-            coverPreview.src=''; coverPreview.classList.add('d-none'); dropHint.classList.remove('d-none');
-            lastClickedWasSaveNew = false;
-          } else {
-            showList();
-          }
-        } catch (err) {
-          alert('Network/server error: ' + err.message);
-        }
+          showList();
+          form.reset(); form.classList.remove('was-validated');
+          coverPreview.src=''; coverPreview.classList.add('d-none'); dropHint.classList.remove('d-none');
+          state.page=1; await load();
+        }catch(err){ alert('Network/server error: '+err.message); }
       });
 
-      // Initial
       showList();
       load();
     }

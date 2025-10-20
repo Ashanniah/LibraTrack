@@ -1,88 +1,82 @@
-
-
 <?php
-require_once __DIR__ . '/db.php';   // has json_response()
+// /LibraTrack/backend/add-book.php
+session_start();
+header('Content-Type: application/json');
 
-requireRole(['librarian','admin']);
+// DB
+$DB_HOST = '127.0.0.1';
+$DB_USER = 'root';
+$DB_PASS = '';
+$DB_NAME = 'libratrack';
 
-// requireRole(['admin','librarian']); // enable when auth is ready
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-// <?php
-// require __DIR__ . "/db.php";
-// header('Content-Type: application/json; charset=utf-8');
-
-
-function json_response($arr, $code=200){
-  http_response_code($code);
-  echo json_encode($arr);
+try {
+  $conn = new mysqli($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME);
+  $conn->set_charset('utf8mb4');
+} catch (Throwable $e) {
+  http_response_code(500);
+  echo json_encode(['ok'=>false,'error'=>'DB connection failed']);
   exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-  json_response(['ok'=>false,'error'=>'Use POST'], 405);
+/* If you want to enforce login later:
+$userId = $_SESSION['user_id'] ?? null;
+if (!$userId) { http_response_code(401); echo json_encode(['ok'=>false,'error'=>'Not authenticated']); exit; }
+*/
+
+$title          = trim($_POST['title'] ?? '');
+$isbn           = trim($_POST['isbn'] ?? '');
+$author         = trim($_POST['author'] ?? '');
+$category       = trim($_POST['category'] ?? '');
+$quantity       = (int)($_POST['quantity'] ?? 0);
+$publisher      = trim($_POST['publisher'] ?? '');
+$date_published = $_POST['date_published'] ?? null;
+
+if ($title === '' || $isbn === '' || $author === '' || $category === '' || $quantity < 1 || $publisher === '') {
+  http_response_code(422);
+  echo json_encode(['ok'=>false,'error'=>'Missing required fields']);
+  exit;
 }
+if ($date_published === '') $date_published = null;
 
-$title     = trim($_POST["title"] ?? "");
-$isbn      = trim($_POST["isbn"] ?? "");
-$author    = trim($_POST["author"] ?? "");
-$category  = trim($_POST["category"] ?? "");
-$quantity  = (int)($_POST["quantity"] ?? 0);
-$publisher = trim($_POST["publisher"] ?? "");
-$date_pub  = trim($_POST["date_published"] ?? "");
-
-if ($title===""||$isbn===""||$author===""||$category===""||$publisher===""||$quantity<=0) {
-  json_response(['ok'=>false,'error'=>'Please fill all required fields.'],400);
-}
-
-// cover (optional)
-$coverName = null;
+// Upload cover (save filename in `cover`)
+$coverFilename = null;
 if (!empty($_FILES['cover']['name'])) {
-  $err = $_FILES['cover']['error'];
-  if ($err !== UPLOAD_ERR_OK) {
-    $msgs = [
-      UPLOAD_ERR_INI_SIZE=>'File exceeds upload_max_filesize.',
-      UPLOAD_ERR_FORM_SIZE=>'File exceeds MAX_FILE_SIZE.',
-      UPLOAD_ERR_PARTIAL=>'Partial upload.',
-      UPLOAD_ERR_NO_FILE=>'No file uploaded.',
-      UPLOAD_ERR_NO_TMP_DIR=>'Missing temp folder.',
-      UPLOAD_ERR_CANT_WRITE=>'Failed to write file.',
-      UPLOAD_ERR_EXTENSION=>'PHP extension blocked upload.'
-    ];
-    json_response(['ok'=>false,'error'=>$msgs[$err] ?? ('Upload error: '.$err)],400);
-  }
-
-  $dir = __DIR__.'/../uploads/covers';
-  if (!is_dir($dir) && !mkdir($dir,0777,true)) {
-    json_response(['ok'=>false,'error'=>'Cannot create uploads/covers'],500);
-  }
-
   $ext = strtolower(pathinfo($_FILES['cover']['name'], PATHINFO_EXTENSION));
-  if (!in_array($ext, ['jpg','jpeg','png','gif','webp'], true)) {
-    json_response(['ok'=>false,'error'=>'Invalid image type (jpg, jpeg, png, gif, webp)'],400);
+  $allowed = ['png','jpg','jpeg','webp','gif'];
+  if (!in_array($ext, $allowed, true)) {
+    http_response_code(422); echo json_encode(['ok'=>false,'error'=>'Invalid image type']); exit;
   }
   if ($_FILES['cover']['size'] > 5*1024*1024) {
-    json_response(['ok'=>false,'error'=>'Max image size is 5 MB'],400);
+    http_response_code(422); echo json_encode(['ok'=>false,'error'=>'Image too large (max 5MB)']); exit;
   }
 
-  $coverName = uniqid('cover_', true).'.'.$ext;
-  if (!move_uploaded_file($_FILES['cover']['tmp_name'], $dir.'/'.$coverName)) {
-    json_response(['ok'=>false,'error'=>'Failed to save image'],500);
+  $uploadsFs = dirname(__DIR__) . '/uploads/covers/';
+  if (!is_dir($uploadsFs)) @mkdir($uploadsFs, 0777, true);
+
+  $coverFilename = uniqid('cover_', true) . '.' . $ext;
+  if (!move_uploaded_file($_FILES['cover']['tmp_name'], $uploadsFs . $coverFilename)) {
+    http_response_code(500); echo json_encode(['ok'=>false,'error'=>'Failed to save image']); exit;
   }
 }
 
-// insert
-$dp = $date_pub !== '' ? $date_pub : null;
-$stmt = $conn->prepare("
-  INSERT INTO books (title, isbn, author, category, quantity, publisher, date_published, cover)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-");
-if (!$stmt) json_response(['ok'=>false,'error'=>'Prepare failed: '.$conn->error],500);
+// Only columns that exist in your table
+$sql = "INSERT INTO books
+          (title, isbn, author, category, quantity, publisher, date_published, cover, created_at)
+        VALUES
+          (?,?,?,?,?,?,?,?,NOW())";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param(
+  'ssssisss',
+  $title, $isbn, $author, $category, $quantity, $publisher, $date_published, $coverFilename
+);
 
-$stmt->bind_param("ssssisss", $title,$isbn,$author,$category,$quantity,$publisher,$dp,$coverName);
-
-if (!$stmt->execute()) {
-  $err = ($conn->errno === 1062) ? 'ISBN already exists.' : ('Insert failed: '.$conn->error);
-  json_response(['ok'=>false,'error'=>$err],400);
+try {
+  $stmt->execute();
+  $cover_url = $coverFilename ? ('uploads/covers/' . $coverFilename) : null;
+  echo json_encode(['ok'=>true, 'id'=>$stmt->insert_id, 'cover_url'=>$cover_url]);
+} catch (Throwable $e) {
+  http_response_code(500);
+  echo json_encode(['ok'=>false,'error'=>'DB error']);
 }
-
-json_response(['ok'=>true,'id'=>$stmt->insert_id]);
