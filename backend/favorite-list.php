@@ -26,3 +26,4 @@ while ($row = $res->fetch_assoc()) $items[] = $row;
 $stmt->close();
 
 json_response(['ok'=>true, 'items'=>$items]);
+    
