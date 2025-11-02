@@ -58,14 +58,58 @@ body.loading main, body.loading #sidebarToggle{visibility:hidden}
 .stars i{font-size:.85rem;margin-right:2px}
 .cover-wrap{position:relative}
 .btn-fav{
+   --fav-size: 36px;    
   position:absolute;top:8px;right:8px;
   background:rgba(255,255,255,.9);
   border:none;border-radius:50%;
-  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:.2s
+  width: var(--fav-size);
+  height: var(--fav-size);
+  aspect-ratio: 1 / 1;                  /* guarantees a square */
+  padding: 0;                            /* nuke bootstrap padding */
+  border: 1px solid rgba(2, 6, 23, .08);
+  border-radius: 50% !important;         /* force a circle */
+  box-sizing: border-box;
+  display: grid;                         /* perfect centering */
+  place-items: center;
+
+  background: rgba(255,255,255,.96);
+  backdrop-filter: saturate(180%) blur(4px);
+  box-shadow: 0 2px 6px rgba(15,23,42,.10);
+
+  cursor: pointer;
+  transition: transform .12s ease, background .2s ease, box-shadow .2s ease;
+  -webkit-appearance: none;              /* avoid oddities on Safari */
+  outline: none;
 }
 .btn-fav:hover{background:#fff}
+.btn-fav{
+  --fav-size: 30px;
+  position:absolute; top:8px; right:8px;
+  width:var(--fav-size); height:var(--fav-size);
+  border-radius:50% !important;
+  display:flex; align-items:center; justify-content:center;
+  padding:0; box-sizing:border-box;
+  border:1px solid rgba(2,6,23,.08);
+  background:rgba(255,255,255,.96);
+  box-shadow:0 2px 6px rgba(15,23,42,.10);
+}
 
+/* Fix Bootstrap Icons defaults that cause the off-center look */
+.btn-fav .bi{
+  vertical-align: middle !important;  /* override .bi { vertical-align:-.125em } */
+}
+
+/* Remove extra line box + nudge glyph for optical centering */
+.btn-fav i{
+  display:block !important;
+  line-height:0 !important;           /* kill bottom extra space */
+  font-size:18px;
+  transform: translateY(1.5px);       /* adjust 1–2px to taste */
+  pointer-events:none;
+}
+
+/* Filled heart color */
+.btn-fav .bi-heart-fill{ color:#dc2626 !important; }
 /* Category chips */
 .chips{display:flex;gap:.5rem;flex-wrap:wrap}
 .chip{border:1px solid #e7edf6;background:#fff;border-radius:999px;padding:.35rem .75rem;font-size:.85rem;cursor:pointer}

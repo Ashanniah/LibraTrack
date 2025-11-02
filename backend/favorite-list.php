@@ -1,15 +1,28 @@
 <?php
 // backend/favorites-list.php
 declare(strict_types=1);
-header('Content-Type: application/json; charset=utf-8');
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/session.php';
 
-$uid  = isset($_SESSION['uid']) ? (int)$_SESSION['uid'] : (int)($_SESSION['user']['id'] ?? 0);
-$role = strtolower($_SESSION['role'] ?? ($_SESSION['user']['role'] ?? ''));
+header('Content-Type: application/json');
 
-if ($uid <= 0) json_response(['ok'=>false,'error'=>'Unauthorized'], 401);
-if ($role !== 'student') json_response(['ok'=>false,'error'=>'Only students have favorites'], 403);
+// accept both uid or user_id
+$userId = $_SESSION['user_id'] ?? ($_SESSION['uid'] ?? null);
+if (!$userId) {
+  echo json_encode(['ok' => false, 'error' => 'Not logged in']);
+  exit;
+}
 
+try {
+  $stmt = $pdo->prepare("
+    SELECT b.id, b.title, b.author, b.cover_url, b.category, b.isbn, b.quantity, b.publisher, b.date_published AS published_at
+    FROM favorites f
+    JOIN books b ON b.id = f.book_id
+    WHERE f.user_id = ?
+    ORDER BY f.id DESC
+  ");
+  $stmt->execute([$userId]);
+  $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $sql = "SELECT b.id, b.title, b.author, b.category, b.publisher, b.isbn,
                b.quantity, DATE_FORMAT(b.date_published,'%Y-%m-%d') AS published_at,
                b.cover
@@ -28,4 +41,7 @@ while ($row = $res->fetch_assoc()) {
 }
 $stmt->close();
 
-json_response(['ok'=>true, 'items'=>$items]);
+  echo json_encode(['ok' => true, 'items' => $items]);
+} catch (Throwable $e) {
+  echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
+}

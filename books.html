@@ -379,6 +379,40 @@ function initBooks(role){
   function bindFavoriteButtons(){
     if (role!=='student') return;
     document.querySelectorAll('.btn-fav').forEach(btn=>{
+btn.onclick = async (e)=>{
+  e.stopPropagation();
+  const id = btn.dataset.id;
+
+  try{
+    const fd = new FormData();
+    fd.set('book_id', id);
+
+    const res  = await fetch(API_FAVORITE, {
+      method: 'POST',
+      body: fd,
+      credentials: 'include'
+    });
+
+    // Always try to parse JSON, but keep a readable fallback
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { data = null; }
+
+    if (!res.ok || !data || !data.ok) {
+      const msg = (data && data.error) ? data.error : (`HTTP ${res.status} ${res.statusText}\n${text}`);
+      alert(msg || 'Failed to update favorites.');
+      return;
+    }
+
+    const icon = btn.querySelector('i');
+    icon.classList.toggle('bi-heart-fill', data.favorited);
+    icon.classList.toggle('bi-heart', !data.favorited);
+    icon.classList.toggle('text-danger', data.favorited);
+    btn.title = data.favorited ? 'Remove from favorites' : 'Add to favorites';
+  }catch(err){
+    alert('Network error: ' + err.message);
+  }
+};
       btn.onclick = async (e)=>{
         e.stopPropagation();
         const id = btn.dataset.id;
