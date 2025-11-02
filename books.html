@@ -16,7 +16,7 @@
   <link href="assets/css/books.css" rel="stylesheet">
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
 
-  <script src="assets/js/sidebar.js" defer></script>
+  <script src="assets/js/sidebar.js?v=2025-10-29-1"></script>
 
   <!-- Small inline overrides -->
   <style>
@@ -365,6 +365,17 @@ function initBooks(role){
     if (canManage()) bindManageButtons(items);
   }
 
+  function setFavStateForId(bookId, favorited){
+    document.querySelectorAll(`.btn-fav[data-id="${bookId}"]`).forEach(b=>{
+      const icon = b.querySelector('i');
+      if (!icon) return;
+      icon.classList.toggle('bi-heart-fill', favorited);
+      icon.classList.toggle('bi-heart', !favorited);
+      icon.classList.toggle('text-danger', favorited);
+      b.title = favorited ? 'Remove from favorites' : 'Add to favorites';
+    });
+  }
+
   function bindFavoriteButtons(){
     if (role!=='student') return;
     document.querySelectorAll('.btn-fav').forEach(btn=>{
@@ -402,6 +413,23 @@ btn.onclick = async (e)=>{
     alert('Network error: ' + err.message);
   }
 };
+      btn.onclick = async (e)=>{
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        try{
+          const res = await fetch(API_FAVORITE,{
+            method:'POST', credentials:'include',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({book_id: id})
+          });
+          const data = await res.json().catch(()=>null);
+          if (data?.ok){
+            setFavStateForId(id, data.favorited);
+          }else{
+            alert(data?.error || 'Failed to update favorites.');
+          }
+        }catch{ alert('Network error.'); }
+      };
     });
   }
 

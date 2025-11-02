@@ -1,13 +1,22 @@
 <?php
+// backend/delete-user.php
 declare(strict_types=1);
 
+session_start();
 require_once __DIR__ . '/db.php';
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-// Method guard
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   http_response_code(405);
   echo json_encode(['success' => false, 'message' => 'Method not allowed']);
+  exit;
+}
+
+$role = strtolower($_SESSION['role'] ?? '');
+$uid  = (int)($_SESSION['uid'] ?? 0);
+if ($uid <= 0) {
+  http_response_code(401);
+  echo json_encode(['success'=>false,'message'=>'Unauthorized']);
   exit;
 }
 
@@ -23,41 +32,68 @@ if ($id <= 0) {
   exit;
 }
 
-// Optional safety rails:
-// 1) Prevent deleting yourself
-if (isset($_SESSION['user_id']) && (int)$_SESSION['user_id'] === $id) {
+// ✅ Safety: Prevent self-delete
+if (isset($_SESSION['uid']) && (int)$_SESSION['uid'] === $id) {
   http_response_code(403);
   echo json_encode(['success' => false, 'message' => "You can't delete your own account."]);
   exit;
 }
 
-// 2) Prevent deleting admins (uncomment if desired)
-$chk = $conn->prepare("SELECT role FROM users WHERE id = ? LIMIT 1");
-$chk->bind_param("i", $id);
-$chk->execute();
-$res = $chk->get_result();
-if ($res && ($row = $res->fetch_assoc()) && strtolower((string)$row['role']) === 'admin') {
-  http_response_code(403);
-  echo json_encode(['success' => false, 'message' => "Admin accounts can't be deleted."]);
-  $chk->close();
+// 🔎 Fetch target user
+$stmt = $conn->prepare("SELECT id, role, school_id FROM users WHERE id = ? LIMIT 1");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$res = $stmt->get_result();
+if (!$res || $res->num_rows === 0) {
+  http_response_code(404);
+  echo json_encode(['success'=>false,'message'=>'User not found']);
   exit;
 }
-$chk->close();
+$target = $res->fetch_assoc();
+$stmt->close();
 
-// Delete
-$stmt = $conn->prepare("DELETE FROM users WHERE id = ? LIMIT 1");
-if (!$stmt) {
-  http_response_code(500);
-  echo json_encode(['success' => false, 'message' => 'Server error (prepare): '.$conn->error]);
-  exit;
+// 🔐 Rules based on current role
+switch ($role) {
+  case 'admin':
+    // Optional: prevent deleting other admins
+    if (strtolower($target['role']) === 'admin') {
+      http_response_code(403);
+      echo json_encode(['success' => false, 'message' => "Admin accounts can't be deleted."]);
+      exit;
+    }
+    break;
+
+  case 'librarian':
+    // Librarians can delete only their own students
+    $stmt = $conn->prepare("SELECT school_id FROM users WHERE id=? LIMIT 1");
+    $stmt->bind_param("i", $uid);
+    $stmt->execute();
+    $stmt->bind_result($schoolId);
+    $stmt->fetch();
+    $stmt->close();
+
+    if (strtolower($target['role']) !== 'student' || (int)$target['school_id'] !== (int)$schoolId) {
+      http_response_code(403);
+      echo json_encode(['success' => false, 'message' => "You can only delete students from your own school."]);
+      exit;
+    }
+    break;
+
+  default:
+    http_response_code(403);
+    echo json_encode(['success'=>false,'message'=>'Access denied.']);
+    exit;
 }
+
+// 🗑️ Perform delete
+$stmt = $conn->prepare("DELETE FROM users WHERE id = ? LIMIT 1");
 $stmt->bind_param("i", $id);
 
 if ($stmt->execute()) {
-  echo json_encode(['success' => true, 'deleted' => $stmt->affected_rows]);
+  echo json_encode(['success'=>true, 'deleted'=>$stmt->affected_rows]);
 } else {
   http_response_code(500);
-  echo json_encode(['success' => false, 'message' => 'Server error: '.$stmt->error]);
+  echo json_encode(['success'=>false,'message'=>'Server error: '.$stmt->error]);
 }
 
 $stmt->close();

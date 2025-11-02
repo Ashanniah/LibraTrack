@@ -3,10 +3,43 @@
   const APP_BASE = '/libratrack/';
 
   const ROUTES = {
-    admin:     { dashboard:'dashboard.html', books:'books.html', users:'admin-users.html',  profile:   'admin-profile.html', // settings:  'admin-settings.html',   // TODO // reports:   'admin-reports.html',    // TODO // audit:     'admin-audit.html'       // TODO 
+    admin: {
+      dashboard: 'dashboard.html',
+      books: 'books.html',
+      users: 'admin-users.html',
+      profile: 'admin-profile.html',
+      // settings/reports/audit reserved
     },
-    librarian: { dashboard:'dashboard.html', books:'books.html', members:'members.html', borrow:'borrow-return.html', overdue:'overdue.html', lowstock:'lowstock.html', history:'history.html', emails:'emails.html', regMember:'registered-members.html' },
-    student:   { dashboard:'dashboard.html', books:'books.html', search:'search.html', history:'history.html', favorites:'favorites.html', overdue:'overdue.html', notifications:'notifications.html', profile:'profile.html', logout:'login.html' }
+    // librarian members now points to librarian-users.html
+    librarian: {
+      dashboard:'dashboard.html',
+      books:'books.html',
+      users:'librarian-users.html', 
+      borrow:'borrow-return.html',
+      overdue:'overdue.html',
+      lowstock:'lowstock.html',
+      history:'history.html',
+      emails:'emails.html',
+      regMember:'registered-members.html'
+    },
+
+    student: {
+      dashboard: 'dashboard.html',
+      books: 'books.html',
+      search: 'search.html',
+      history: 'history.html',
+      favorites: 'favorites.html',
+      overdue: 'overdue.html',
+      notifications: 'notifications.html',
+      profile: 'profile.html',
+      logout: 'login.html'
+    }
+  };
+
+  // Allow pages to pass either "members" or "librarian-users" as the active key
+  const ACTIVE_ALIASES = {
+    'members': 'users',            // ✅ old key points to new one
+    'librarian-users': 'users'
   };
 
   const url  = (page) => APP_BASE + page;
@@ -16,18 +49,6 @@
      </a>`;
 
   function menuFor(role, current) {
-    // if (role === 'admin') {
-    //   return `
-    //     <div class="sb-label">Main</div>
-    //     ${link(ROUTES.admin.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
-    //     ${link(ROUTES.admin.books,'bi-journal-text','Books',current==='books')}
-    //     ${link(ROUTES.admin.users,'bi-people','Users',current==='users')}
-    //     ${link(ROUTES.admin.overdue,'bi-exclamation-triangle','Overdue',current==='overdue')}
-    //     ${link(ROUTES.admin.history,'bi-clock-history','History',current==='history')}
-    //     ${link(ROUTES.admin.emails,'bi-envelope-paper-heart','Emails',current==='emails')}
-    //   `;
-    // }
-    // inside menuFor(role, current)
     if (role === 'admin') {
       return `
         <div class="sb-label">Main</div>
@@ -36,13 +57,6 @@
 
         <div class="sb-label mt-3">Account</div>
         ${link(ROUTES.admin.profile,'bi-person-gear','Profile',current==='profile')}
-
-        <!-- Future:
-        <div class="sb-label mt-3">Administration</div>
-        ${/* ${link(ROUTES.admin.settings,'bi-gear','Settings',current==='settings')} */''}
-        ${/* ${link(ROUTES.admin.reports,'bi-graph-up-arrow','Reports',current==='reports')} */''}
-        ${/* ${link(ROUTES.admin.audit,'bi-clipboard-data','Audit Logs',current==='audit')} */''}
-        -->
       `;
     }
 
@@ -61,12 +75,13 @@
         ${link(ROUTES.student.logout,'bi-box-arrow-right','Logout',false)}
       `;
     }
+
     // librarian
     return `
       <div class="sb-label">Main</div>
       ${link(ROUTES.librarian.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
       ${link(ROUTES.librarian.books,'bi-journal-text','Books',current==='books')}
-      ${link(ROUTES.librarian.members,'bi-people','Members',current==='members')}
+      ${link(ROUTES.librarian.users,'bi-people','Users',current==='users')}   <!-- ✅ label -->
       ${link(ROUTES.librarian.borrow,'bi-arrow-left-right','Borrow/Return',current==='borrow')}
 
       <div class="sb-label mt-3">Monitoring</div>
@@ -85,9 +100,26 @@
     `;
   }
 
+  // --- shim: patch any stale "members.html" links to "librarian-users.html"
+  function patchOldMembersLink() {
+    document.querySelectorAll('.sb-link').forEach(a => {
+      const href = a.getAttribute('href') || '';
+      if (href === APP_BASE + 'members.html') {
+        a.setAttribute('href', APP_BASE + 'librarian-users.html');
+      }
+    });
+  }
+
   window.renderSidebar = function(current='dashboard', role='student'){
+    // normalize active key (so pages can use either alias)
+    const normalized = ACTIVE_ALIASES[current] || current;
+
     const root = document.getElementById('sidebar-root');
     if (!root) return;
+
+    // harden role string
+    role = String(role || '').toLowerCase();
+    if (!['admin','librarian','student'].includes(role)) role = 'student';
 
     root.innerHTML = `
       <nav id="sidebar" class="sb-sidebar d-flex flex-column">
@@ -95,11 +127,15 @@
           <img src="assets/img/LibraTrack-logo.png" alt="LibraTrack" class="sb-logo">
           <span class="sb-text fw-semibold">LibraTrack</span>
         </a>
-        <div class="sb-menu flex-grow-1">${menuFor(role,current)}</div>
+        <div class="sb-menu flex-grow-1">${menuFor(role, normalized)}</div>
         <div class="mt-auto small text-secondary px-3 pb-3 sb-text">© <span id="year"></span> LibraTrack</div>
       </nav>
     `;
 
+    // apply shim after DOM is inserted
+    patchOldMembersLink();
+
+    // quick actions
     root.querySelector('#qaAddBook')?.addEventListener('click', () => location.href = url('books.html#add'));
     root.querySelector('#qaRegMember')?.addEventListener('click', () => location.href = url('registered-members.html'));
     root.querySelector('#year')?.append(new Date().getFullYear());
@@ -111,5 +147,7 @@
     document.body.classList.toggle(cls);
     if (isDesktop) document.body.classList.remove('sb-toggled');
   };
-  window.addEventListener('resize', () => { if (window.innerWidth >= 992) document.body.classList.remove('sb-toggled'); });
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 992) document.body.classList.remove('sb-toggled');
+  });
 })();

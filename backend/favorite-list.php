@@ -23,6 +23,23 @@ try {
   ");
   $stmt->execute([$userId]);
   $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$sql = "SELECT b.id, b.title, b.author, b.category, b.publisher, b.isbn,
+               b.quantity, DATE_FORMAT(b.date_published,'%Y-%m-%d') AS published_at,
+               b.cover
+        FROM favorites f
+        JOIN books b ON b.id = f.book_id
+        WHERE f.user_id = ?
+        ORDER BY f.created_at DESC";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('i', $uid);
+$stmt->execute();
+$res = $stmt->get_result();
+$items = [];
+while ($row = $res->fetch_assoc()) {
+  $row['cover_url'] = $row['cover'] ? ("/libratrack/uploads/covers/".$row['cover']) : null;
+  $items[] = $row;
+}
+$stmt->close();
 
   echo json_encode(['ok' => true, 'items' => $items]);
 } catch (Throwable $e) {

@@ -5,12 +5,18 @@ require_once __DIR__ . '/db.php';
 function current_user(mysqli $conn): ?array {
   if (empty($_SESSION['uid'])) return null;
   $uid = (int)$_SESSION['uid'];
-  $stmt = $conn->prepare("SELECT id, first_name, last_name, email, role, status FROM users WHERE id=? LIMIT 1");
+  $sql = "SELECT u.id, u.first_name, u.last_name, u.email, u.role, u.status,
+                 u.school_id, s.name AS school_name
+          FROM users u
+          LEFT JOIN schools s ON s.id = u.school_id
+          WHERE u.id = ?
+          LIMIT 1";
+  $stmt = $conn->prepare($sql);
   $stmt->bind_param('i', $uid);
   $stmt->execute();
   $res = $stmt->get_result()->fetch_assoc();
   $stmt->close();
-  if (!$res || strtolower($res['status']) !== 'active') return null;
+  if (!$res || strtolower((string)$res['status']) !== 'active') return null;
   return $res;
 }
 

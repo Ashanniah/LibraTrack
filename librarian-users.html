@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack – Librarian · Students</title>
+
+  <!-- Fonts & Vendor -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- App CSS -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/admin-users.css" rel="stylesheet">
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+
+  <style>
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+    }
+    html{font-size:14px}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+
+    .table-card.card{border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.06); border:1px solid var(--ui-border)}
+    .table-card .card-header{padding:var(--card-pad); border-bottom:1px solid var(--ui-border)}
+    .table-card .card-body{padding:0}
+    .table-modern th,.table-modern td{vertical-align:middle; padding:var(--cell-pad-y) var(--cell-pad-x)}
+    .th-tight{width:1%;white-space:nowrap}
+    .col-actions{width:56px}
+    .col-status{width:120px}
+    .col-id{width:180px}
+    .avatar{width:32px;height:32px;border-radius:50%;object-fit:cover}
+
+    .toolbar-44 { flex-wrap: nowrap !important; gap: 8px; }
+    .toolbar-44 .form-control,
+    .toolbar-44 .input-group-text,
+    .toolbar-44 .btn { height:44px; }
+
+    .search-group .input-group-text,
+    .search-group .form-control{
+      background:#fff;border:1px solid #333;height:44px;
+    }
+    .search-group .input-group-text{border-right:0;border-top-left-radius:8px;border-bottom-left-radius:8px;}
+    .search-group .form-control{border-left:0;border-top-right-radius:8px;border-bottom-right-radius:8px;}
+    .search-group .form-control:focus{box-shadow:none;border-color:#000;}
+
+    .btn-dark{background:var(--brand-black);border-color:var(--brand-black);}
+    .btn-dark:hover{background:#000;border-color:#000;}
+
+    .count-pill{font-size:.85rem;color:#374151;background:#f3f4f6;border:1px solid var(--ui-border);padding:.15rem .5rem;border-radius:999px}
+
+    .badge.text-bg-success-soft{background:rgba(25,135,84,.12); color:#198754; font-weight:600}
+    .badge.text-bg-danger-soft{background:rgba(220,53,69,.12); color:#dc3545; font-weight:600}
+
+    .table-footer{display:flex;align-items:center;justify-content:center;gap:12px;padding:16px var(--card-pad);border-top:1px solid var(--ui-border); position:relative}
+    .page-info{font-size:.85rem;color:var(--ui-muted); position:absolute; right:var(--card-pad); padding:.35rem .6rem; background:#f8f9fb; border:1px solid var(--ui-border); border-radius:8px}
+    .pagination{gap:.35rem}
+    .pagination .page-link{border:1px solid var(--ui-border);border-radius:10px !important;padding:.35rem .6rem;color:#374151;background:#fff;}
+    .pagination .page-link:hover{background:#f5f5f5;border-color:#000}
+    .pagination .page-item.active .page-link{background:#111827;color:#fff;border-color:#111827;}
+    .pagination .page-item.disabled .page-link{opacity:.4}
+
+    .empty-row td{padding:40px 16px; text-align:center; color:var(--ui-muted)}
+
+    /* Password toggle */
+    .pw-wrap{position:relative}
+    .pw-toggle{position:absolute; right:.5rem; top:50%; transform:translateY(-50%); border:0; background:transparent; cursor:pointer}
+    .pw-toggle:hover{opacity:.7}
+    .pw-wrap .form-control{padding-right:2.5rem}
+
+    /* Modal form */
+    .modal-header-dark{background:#111827;color:#fff;border-bottom:none;}
+    .modal-header-dark .btn-close{filter:invert(1) grayscale(1);opacity:.8;}
+    .modal .form-label{font-weight:600;margin-bottom:.35rem}
+    .modal .form-control,.modal .form-select{padding:.55rem .75rem}
+    .form-text-hint{font-size:.8rem;color:var(--ui-muted)}
+    .field-error{color:#dc3545;font-size:.85rem;margin-top:.35rem}
+    .name-grid{display:grid;grid-template-columns:1fr 1fr 1fr minmax(130px,180px);gap:12px}
+    @media (max-width: 768px){ .name-grid{grid-template-columns:1fr 1fr} }
+
+    .btn-loading{position:relative;pointer-events:none;opacity:.85}
+    .btn-loading .spinner-border{width:1rem;height:1rem;border-width:.2rem;margin-left:.5rem}
+
+    /* View modal (2-col sheet) */
+    .vu-head{display:flex;gap:16px;align-items:center}
+    .vu-avatar img{width:64px;height:64px;border-radius:50%}
+    .vu-name{font-weight:700;font-size:1.05rem}
+    .vu-sheet{margin-top:16px;border-top:1px solid #eee;border-radius:12px;overflow:hidden}
+    .vu-row{display:grid;grid-template-columns:220px 1fr;padding:.7rem .9rem;border-bottom:1px dashed #eee}
+    .vu-headrow{font-weight:600;background:var(--brand-black);color:#fff;border-bottom:none}
+  </style>
+</head>
+<body class="sb-body">
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <!-- Topbar -->
+    <nav class="sb-topbar navbar navbar-expand bg-white sticky-top">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+
+        <div class="fw-bold h5 mb-0">Students</div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <div class="dropdown">
+            <button class="btn btn-light border" data-bs-toggle="dropdown" aria-expanded="false" id="profileBtn">
+              <i class="bi bi-person-circle me-1"></i><span id="profileName">Account</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><h6 class="dropdown-header" id="profileHeader">Signed in</h6></li>
+              <li><a class="dropdown-item" href="admin-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item" href="settings.html"><i class="bi bi-gear me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="backend/logout.php"><i class="bi bi-box-arrow-right me-2"></i>Sign out</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Content -->
+    <main class="container-fluid py-3">
+      <section class="table-card card p-0 position-relative">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between gap-2">
+            <div class="d-flex align-items-center gap-3">
+              <span class="fw-semibold d-flex align-items-center gap-2">
+                <i class="bi bi-people-fill"></i>
+                <span>Students</span>
+                <span class="count-pill" id="acctCount">0</span>
+              </span>
+              <span class="text-muted small" id="schoolChip">—</span>
+            </div>
+
+            <div class="d-flex align-items-center toolbar-44 flex-nowrap">
+              <form role="search" class="me-2">
+                <div class="input-group search-group" style="width:460px;max-width:48vw">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input id="searchInput" class="form-control" type="search" placeholder="Search name, email, student no.…">
+                </div>
+              </form>
+
+              <button id="btnAdd" class="btn btn-dark d-flex align-items-center gap-2">
+                <i class="bi bi-person-plus"></i> Add Student
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-modern align-middle mb-0" id="usersTable">
+              <thead>
+                <tr>
+                  <th class="th-tight"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th class="d-none d-xl-table-cell">School</th>
+                  <th class="d-none d-lg-table-cell col-id">ID / Student No.</th>
+                  <th>Course / Year / Section</th>
+                  <th class="th-tight col-status">Status</th>
+                  <th class="th-tight text-end col-actions">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-footer">
+          <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+          <div class="page-info" id="pageInfo">Showing 0–0 of 0</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add/Edit Student Modal -->
+  <div class="modal fade" id="studentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <form id="studentForm" class="modal-content" novalidate>
+        <div class="modal-header modal-header-dark">
+          <h5 class="modal-title" id="studentModalTitle">Add Student</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label mb-1">Name</label>
+              <div class="name-grid">
+                <div>
+                  <input id="fFirst" type="text" class="form-control" placeholder="First name" required>
+                  <div class="field-error d-none" id="errFirst"></div>
+                </div>
+                <div>
+                  <input id="fMiddle" type="text" class="form-control" placeholder="Middle name">
+                  <div class="form-text-hint">Optional</div>
+                </div>
+                <div>
+                  <input id="fLast" type="text" class="form-control" placeholder="Last name" required>
+                  <div class="field-error d-none" id="errLast"></div>
+                </div>
+                <div>
+                  <select id="fSuffix" class="form-select" aria-label="Suffix">
+                    <option value="">No suffix</option>
+                    <option>Jr.</option><option>Sr.</option>
+                    <option>I</option><option>II</option><option>III</option><option>IV</option>
+                    <option>V</option><option>VI</option><option>VII</option><option>VIII</option>
+                    <option>IX</option><option>X</option>
+                  </select>
+                  <div class="form-text-hint">Optional</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">Email</label>
+              <input id="fEmail" type="email" class="form-control" required>
+              <div class="field-error d-none" id="errEmail"></div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">Status</label>
+              <select id="fStatus" class="form-select" required>
+                <option value="active">Active</option>
+                <option value="disabled">Disabled</option>
+              </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">School</label>
+              <input id="fSchoolName" type="text" class="form-control" disabled>
+              <div class="form-text-hint">Automatically based on librarian’s school</div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">School ID / Student No.</label>
+              <input id="fStudNo" type="text" class="form-control" required>
+              <div class="field-error d-none" id="errStudNo"></div>
+            </div>
+
+            <div class="col-12 col-md-4">
+              <label class="form-label">Course</label>
+              <input id="fCourse" type="text" class="form-control" required>
+              <div class="field-error d-none" id="errCourse"></div>
+            </div>
+            <div class="col-6 col-md-4">
+              <label class="form-label">Year Level</label>
+              <input id="fYear" type="text" class="form-control" required placeholder="e.g., 1 / 2nd / IV">
+              <div class="field-error d-none" id="errYear"></div>
+            </div>
+            <div class="col-6 col-md-4">
+              <label class="form-label">Section</label>
+              <input id="fSection" type="text" class="form-control" required>
+              <div class="field-error d-none" id="errSection"></div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <label class="form-label">Password</label>
+              <div class="pw-wrap">
+                <input id="fPassword" type="password" class="form-control" placeholder="≥8 chars, 1 uppercase, 1 special">
+                <button type="button" class="pw-toggle" id="pwToggle1" aria-label="Show password">
+                  <i class="bi bi-eye" id="pwIcon1"></i>
+                </button>
+              </div>
+              <div class="form-text-hint" id="pwHint">Required when creating. Leave blank to keep current password.</div>
+              <div class="field-error d-none" id="errPassword"></div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Confirm Password</label>
+              <div class="pw-wrap">
+                <input id="fConfirm" type="password" class="form-control" placeholder="Repeat password">
+                <button type="button" class="pw-toggle" id="pwToggle2" aria-label="Show password">
+                  <i class="bi bi-eye" id="pwIcon2"></i>
+                </button>
+              </div>
+              <div class="field-error d-none" id="errConfirm"></div>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Notes</label>
+              <input id="fNotes" type="text" class="form-control" placeholder="Optional notes…">
+            </div>
+
+            <input id="fId" type="hidden">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+          <button id="btnSaveStudent" class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Student Modal -->
+  <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-dark">
+          <h5 class="modal-title">Student Details</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="vu-head">
+            <div class="vu-avatar"><img src="assets/img/default-avatar.png" alt=""></div>
+            <div>
+              <div class="vu-name" id="vuName">—</div>
+              <div class="text-muted small" id="vuEmail">—</div>
+            </div>
+            <div class="ms-auto">
+              <button class="btn btn-outline-primary btn-sm me-2" id="vuEdit"><i class="bi bi-pencil-square me-1"></i>Edit</button>
+              <button class="btn btn-outline-danger btn-sm" id="vuDelete"><i class="bi bi-trash me-1"></i>Delete</button>
+            </div>
+          </div>
+
+          <div class="vu-sheet mt-3">
+            <div class="vu-row vu-headrow">
+              <div><i class="bi bi-info-circle me-2"></i>Field</div>
+              <div><i class="bi bi-clipboard-check me-2"></i>Details</div>
+            </div>
+            <div class="vu-row"><div>Full Name</div><div id="vFullName">—</div></div>
+            <div class="vu-row"><div>School</div><div id="vSchool">—</div></div>
+            <div class="vu-row"><div>Student No.</div><div id="vStudNo">—</div></div>
+            <div class="vu-row"><div>Course / Year / Section</div><div id="vCYS">—</div></div>
+            <div class="vu-row"><div>Status</div><div id="vStatus">—</div></div>
+            <div class="vu-row"><div>Notes</div><div id="vNotes">—</div></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Delete -->
+  <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header modal-header-dark">
+          <h5 class="modal-title">Delete Student</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-1">You’re about to delete:</p>
+          <div class="fw-semibold" id="delWho">—</div>
+          <div class="text-muted small" id="delEmail">—</div>
+          <div class="alert alert-warning mt-3 mb-0">This action can’t be undone.</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-danger" id="confirmDeleteBtn"><i class="bi bi-trash me-1"></i>Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    // ---------- Robust JSON fetch helper ----------
+    async function getJson(url, opts = {}) {
+      const res = await fetch(url, { credentials: 'include', ...opts });
+      const ct = (res.headers.get('content-type') || '').toLowerCase();
+      if (!ct.includes('application/json')) {
+        const text = await res.text();
+        throw new Error(`Expected JSON, got: ${res.status} ${res.statusText}\n` + text.slice(0, 300));
+      }
+      const data = await res.json();
+      if (!res.ok || (data && data.success === false)) {
+        const err = new Error(data?.error || data?.message || `HTTP ${res.status}`);
+        err.field = data?.field; // Store field info for better error handling
+        throw err;
+      }
+      return data;
+    }
+
+    // ---------- Auth ----------
+    async function getMe() {
+      try {
+        const data = await getJson('backend/check-auth.php');
+        return data.user;
+      } catch {
+        location.href = 'login.html';
+        return null;
+      }
+    }
+
+    // ---------- State ----------
+    let me = null;          // current librarian
+    let schoolId = null;
+    let schoolName = "";
+    let students = [];
+    const pageSize = 10;
+    let currentPage = 1;
+
+    // ---------- Elements ----------
+    const tbody     = document.getElementById('usersBody');
+    const pager     = document.getElementById('pager');
+    const pageInfo  = document.getElementById('pageInfo');
+    const acctCount = document.getElementById('acctCount');
+    const search    = document.getElementById('searchInput');
+    const btnAdd    = document.getElementById('btnAdd');
+    const checkAll  = document.getElementById('checkAll');
+
+    // Modals
+    const studentModal = new bootstrap.Modal('#studentModal');
+    const viewModal    = new bootstrap.Modal('#viewModal');
+    const confirmModal = new bootstrap.Modal('#confirmDeleteModal');
+
+    const studentForm  = document.getElementById('studentForm');
+    const studentModalTitle = document.getElementById('studentModalTitle');
+
+    // Form refs
+    const fId = document.getElementById('fId');
+    const fFirst = document.getElementById('fFirst');
+    const fMiddle = document.getElementById('fMiddle');
+    const fLast = document.getElementById('fLast');
+    const fSuffix = document.getElementById('fSuffix');
+    const fEmail = document.getElementById('fEmail');
+    const fStatus = document.getElementById('fStatus');
+    const fStudNo = document.getElementById('fStudNo');
+    const fCourse = document.getElementById('fCourse');
+    const fYear = document.getElementById('fYear');
+    const fSection = document.getElementById('fSection');
+    const fPassword = document.getElementById('fPassword');
+    const fConfirm = document.getElementById('fConfirm');
+    const fNotes = document.getElementById('fNotes');
+    const fSchoolName = document.getElementById('fSchoolName');
+
+    const errFirst = document.getElementById('errFirst');
+    const errLast  = document.getElementById('errLast');
+    const errEmail = document.getElementById('errEmail');
+    const errStudNo= document.getElementById('errStudNo');
+    const errCourse= document.getElementById('errCourse');
+    const errYear  = document.getElementById('errYear');
+    const errSection=document.getElementById('errSection');
+    const errPassword = document.getElementById('errPassword');
+    const errConfirm  = document.getElementById('errConfirm');
+
+    // Password toggles
+    function setupPwToggle(inputEl, btnId, iconId){
+      const btn  = document.getElementById(btnId);
+      const icon = document.getElementById(iconId);
+      if(!inputEl || !btn || !icon) return;
+      btn.addEventListener('click', () => {
+        const showing = inputEl.type === 'text';
+        inputEl.type = showing ? 'password' : 'text';
+        icon.classList.toggle('bi-eye',  showing);
+        icon.classList.toggle('bi-eye-slash', !showing);
+        btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+      });
+    }
+    setupPwToggle(fPassword, 'pwToggle1', 'pwIcon1');
+    setupPwToggle(fConfirm,  'pwToggle2', 'pwIcon2');
+
+    // View refs
+    const vuName   = document.getElementById('vuName');
+    const vuEmail  = document.getElementById('vuEmail');
+    const vFullName= document.getElementById('vFullName');
+    const vSchool  = document.getElementById('vSchool');
+    const vStudNo  = document.getElementById('vStudNo');
+    const vCYS     = document.getElementById('vCYS');
+    const vStatus  = document.getElementById('vStatus');
+    const vNotes   = document.getElementById('vNotes');
+    const vuEdit   = document.getElementById('vuEdit');
+    const vuDelete = document.getElementById('vuDelete');
+
+    // Delete refs
+    const delWho  = document.getElementById('delWho');
+    const delEmail = document.getElementById('delEmail');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    let deleteId = null;
+
+    // ---------- Helpers ----------
+    function renderSidebarAndHeader() {
+      renderSidebar('librarian-users', me.role);
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        if (typeof toggleSidebar === 'function') toggleSidebar();
+        else document.body.classList.toggle('sb-collapsed');
+      });
+
+      const displayName =
+        me.full_name ||
+        [me.first_name, me.middle_name, me.last_name].filter(Boolean).join(' ') ||
+        me.name || me.email || 'Account';
+      const profileNameEl   = document.getElementById('profileName');
+      const profileHeaderEl = document.getElementById('profileHeader');
+      if (profileNameEl)   profileNameEl.textContent   = displayName;
+      if (profileHeaderEl) profileHeaderEl.textContent = 'Signed in as ' + displayName;
+
+      document.getElementById('schoolChip').textContent = 'School: ' + (schoolName || '—');
+      fSchoolName.value = schoolName || '';
+    }
+
+    function fullName(u){
+      const parts = [u.first_name, u.middle_name, u.last_name].map(v => (v||'').trim()).filter(Boolean);
+      const base = parts.join(' ');
+      return base + (u.suffix ? ', ' + u.suffix : '');
+    }
+    const escapeHtml = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+    function comboCYS(u){
+      const a = [u.course, u.year_level, u.section].map(v => (v||'').trim()).filter(Boolean);
+      return a.length ? a.join(' / ') : '—';
+    }
+    function statusBadge(u){
+      const active = (u.status||'').toLowerCase() === 'active';
+      return active
+        ? '<span class="badge text-bg-success-soft">Active</span>'
+        : '<span class="badge text-bg-danger-soft">Disabled</span>';
+    }
+    function rowHtml(u){
+      return `
+        <tr>
+          <td><input class="form-check-input row-check" type="checkbox" value="${u.id}"></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <img class="avatar" src="assets/img/default-avatar.png" alt="">
+              <div><div class="fw-semibold">${escapeHtml(fullName(u))}</div></div>
+            </div>
+          </td>
+          <td>${escapeHtml(u.email || '')}</td>
+          <td class="d-none d-xl-table-cell">${escapeHtml(u.school_name || schoolName || '—')}</td>
+          <td class="d-none d-lg-table-cell col-id">${escapeHtml(u.student_no || '—')}</td>
+          <td>${escapeHtml(comboCYS(u))}</td>
+          <td class="col-status">${statusBadge(u)}</td>
+          <td class="text-end col-actions">
+            <div class="dropdown text-end">
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><button class="dropdown-item" data-action="view" data-id="${u.id}"><i class="bi bi-person-badge"></i> View</button></li>
+                <li><button class="dropdown-item" data-action="edit" data-id="${u.id}"><i class="bi bi-pencil-square"></i> Edit</button></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><button class="dropdown-item text-danger" data-action="delete" data-id="${u.id}"><i class="bi bi-trash"></i> Delete</button></li>
+              </ul>
+            </div>
+          </td>
+        </tr>`;
+    }
+
+    function buildPager(total){
+      const pages = Math.max(1, Math.ceil(total / pageSize));
+      if (currentPage > pages) currentPage = pages;
+
+      pager.innerHTML = '';
+      const add = (label, page, disabled=false, active=false) => {
+        const li = document.createElement('li');
+        li.className = `page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#">${label}</a>`;
+        li.onclick = e => { e.preventDefault(); if(!disabled){ currentPage = page; render(); } };
+        pager.appendChild(li);
+      };
+      add('‹', Math.max(1, currentPage-1), currentPage===1);
+      for (let p=1; p<=pages; p++) add(p, p, false, p===currentPage);
+      add('›', Math.min(pages, currentPage+1), currentPage===pages);
+    }
+
+    function applyFilters(){
+      const q = (search.value || '').toLowerCase().trim();
+      return students.filter(u => (
+        (fullName(u) + ' ' + (u.email||'') + ' ' + (u.student_no||'') + ' ' + comboCYS(u))
+          .toLowerCase().includes(q)
+      ));
+    }
+
+    function render(){
+      const list = applyFilters();
+      const total = list.length;
+      const start = (currentPage - 1) * pageSize;
+      const end   = Math.min(start + pageSize, total);
+
+      acctCount.textContent = String(students.length);
+      tbody.innerHTML = total
+        ? list.slice(start, end).map(rowHtml).join('')
+        : `<tr class="empty-row"><td colspan="8">No students found.</td></tr>`;
+      pageInfo.textContent = total ? `Showing ${start+1}–${end} of ${total}` : '—';
+      buildPager(total);
+
+      tbody.querySelectorAll('.dropdown-item').forEach(btn=>{
+        const id = Number(btn.dataset.id);
+        const action = btn.dataset.action;
+        btn.onclick = () => {
+          if (action==='view') return viewStudent(id);
+          if (action==='edit') return editStudent(id);
+          if (action==='delete') return askDelete(id);
+        };
+      });
+    }
+
+    // ---------- Load students (resilient) ----------
+    async function loadStudents(){
+      try{
+        // uses backend/list-students.php (scoped server-side by librarian's session)
+        const data = await getJson('backend/list-users.php?role=student');
+        students = (data.students || []).map(s => ({
+          id: Number(s.id),
+          first_name: s.first_name,
+          middle_name: s.middle_name,
+          last_name: s.last_name,
+          suffix: s.suffix,
+          email: s.email,
+          student_no: s.student_no,
+          course: s.course,
+          year_level: s.year_level,
+          section: s.section,
+          status: s.status || 'active',
+          notes: s.notes || '',
+          school_id: s.school_id ? Number(s.school_id) : schoolId,
+          school_name: s.school_name || schoolName
+        }));
+
+        // If backend returns school_id/name, keep local cache in sync
+        if (data.school_id) schoolId = data.school_id;
+        if (students.length && students[0].school_name) {
+          schoolName = students[0].school_name;
+          document.getElementById('schoolChip').textContent = 'School: ' + schoolName;
+          fSchoolName.value = schoolName;
+        }
+
+        currentPage = 1;
+        render();
+      }catch(err){
+        console.error(err);
+        students = [];
+        render();
+        alert(err.message || 'Network error while loading students.');
+      }
+    }
+
+    // ---------- Validation ----------
+    const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||'');
+    const strongEnough = pw => /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{}|\\:;'"<>,.?/~`]).{8,}$/.test(pw||'');
+
+    function clearErr(input, errEl){ input?.classList.remove('is-invalid'); if(errEl){ errEl.textContent=''; errEl.classList.add('d-none'); } }
+    function setErr(input, errEl, msg){ input?.classList.add('is-invalid'); if(errEl){ errEl.textContent=msg; errEl.classList.remove('d-none'); } }
+    function beginLoading(btn){ btn.classList.add('btn-loading'); btn.disabled = true; btn.insertAdjacentHTML('beforeend', ' <span class="spinner-border" role="status" aria-hidden="true"></span>'); }
+    function endLoading(btn){ btn.classList.remove('btn-loading'); btn.disabled = false; const sp = btn.querySelector('.spinner-border'); if (sp) sp.remove(); }
+
+    // ---------- View ----------
+    function viewStudent(id){
+      const u = students.find(x=>x.id===id);
+      if (!u) return;
+
+      vuName.textContent   = fullName(u);
+      vuEmail.textContent  = u.email || '—';
+      vFullName.textContent= fullName(u);
+      vSchool.textContent  = u.school_name || schoolName || '—';
+      vStudNo.textContent  = u.student_no || '—';
+      vCYS.textContent     = comboCYS(u);
+      vStatus.textContent  = (u.status || '—').replace(/^\w/, c=>c.toUpperCase());
+      vNotes.textContent   = u.notes || '—';
+
+      vuEdit.onclick   = () => { viewModal.hide(); editStudent(u.id); };
+      vuDelete.onclick = () => { viewModal.hide(); askDelete(u.id); };
+
+      viewModal.show();
+    }
+
+    // ---------- Add / Edit ----------
+    function openCreate(){
+      studentModalTitle.textContent = 'Add Student';
+      studentForm.reset();
+      fId.value = '';
+      fStatus.value = 'active';
+      fSchoolName.value = schoolName || '';
+      [ [fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fStudNo,errStudNo],[fCourse,errCourse],
+        [fYear,errYear],[fSection,errSection],[fPassword,errPassword],[fConfirm,errConfirm] ]
+        .forEach(([i,e])=>clearErr(i,e));
+      document.getElementById('pwHint').textContent = 'Required when creating. Leave blank to keep current password.';
+      studentModal.show();
+    }
+
+    function editStudent(id){
+      const u = students.find(x=>x.id===id);
+      if (!u) return;
+      studentModalTitle.textContent = 'Edit Student';
+      fId.value = String(u.id);
+      fFirst.value = u.first_name || '';
+      fMiddle.value= u.middle_name || '';
+      fLast.value  = u.last_name  || '';
+      fSuffix.value= u.suffix || '';
+      fEmail.value = u.email || '';
+      fStatus.value= u.status || 'active';
+      fStudNo.value= u.student_no || '';
+      fCourse.value= u.course || '';
+      fYear.value  = u.year_level || '';
+      fSection.value = u.section || '';
+      fNotes.value = u.notes || '';
+      fSchoolName.value = u.school_name || schoolName || '';
+      fPassword.value = '';
+      fConfirm.value  = '';
+      [ [fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fStudNo,errStudNo],[fCourse,errCourse],
+        [fYear,errYear],[fSection,errSection],[fPassword,errPassword],[fConfirm,errConfirm] ]
+        .forEach(([i,e])=>clearErr(i,e));
+      document.getElementById('pwHint').textContent = 'Leave blank to keep current password.';
+      studentModal.show();
+    }
+
+    btnAdd.addEventListener('click', openCreate);
+
+    // Submit (create or update)
+    studentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      [ [fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fStudNo,errStudNo],[fCourse,errCourse],
+        [fYear,errYear],[fSection,errSection],[fPassword,errPassword],[fConfirm,errConfirm] ]
+        .forEach(([i,e])=>clearErr(i,e));
+
+      let ok = true;
+      if(!(fFirst.value||'').trim()){ setErr(fFirst,errFirst,'First name is required.'); ok=false; }
+      if(!(fLast.value||'').trim()){  setErr(fLast,errLast,'Last name is required.');   ok=false; }
+      if(!validEmail(fEmail.value)){  setErr(fEmail,errEmail,'Enter a valid email.');   ok=false; }
+      if(!(fStudNo.value||'').trim()){ setErr(fStudNo,errStudNo,'Student number is required.'); ok=false; }
+      if(!(fCourse.value||'').trim()){ setErr(fCourse,errCourse,'Course is required.'); ok=false; }
+      if(!(fYear.value||'').trim()){   setErr(fYear,errYear,'Year level is required.'); ok=false; }
+      if(!(fSection.value||'').trim()){setErr(fSection,errSection,'Section is required.'); ok=false; }
+
+      const isCreate = !(fId.value||'').trim();
+      const pw = fPassword.value || '';
+      const cf = fConfirm.value || '';
+
+      if (isCreate) {
+        if(!pw){ setErr(fPassword,errPassword,'Password is required.'); ok=false; }
+        if(!cf){ setErr(fConfirm,errConfirm,'Please confirm the password.'); ok=false; }
+      }
+      if (pw){
+        if (!strongEnough(pw)){ setErr(fPassword,errPassword,'Use ≥8 chars with 1 uppercase & 1 special character.'); ok=false; }
+        if (pw !== cf){ setErr(fConfirm,errConfirm,'Passwords do not match.'); ok=false; }
+      }
+      if(!ok) return;
+
+      const model = {
+        id: (fId.value||'').trim() ? Number(fId.value) : undefined,
+        first_name: (fFirst.value||'').trim(),
+        middle_name: (fMiddle.value||'').trim(),
+        last_name:  (fLast.value||'').trim(),
+        suffix:     (fSuffix.value||'').trim(),
+        email:      (fEmail.value||'').trim(),
+        status:     fStatus.value,
+        student_no: (fStudNo.value||'').trim(),
+        course:     (fCourse.value||'').trim(),
+        year_level: (fYear.value||'').trim(),
+        section:    (fSection.value||'').trim(),
+        notes:      (fNotes.value||'').trim()
+      };
+      if (pw) model.password = pw;
+
+      const submitBtn = document.getElementById('btnSaveStudent');
+
+      try{
+        beginLoading(submitBtn);
+
+        const url = isCreate
+          ? '/libratrack/backend/create-student.php'
+          : '/libratrack/backend/update-student.php';
+
+
+
+        const data = await getJson(url, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(model)
+        });
+
+        // Refresh from DB to stay canonical
+        await loadStudents();
+        studentModal.hide();
+        studentForm.reset();
+      }catch(err){
+        console.error(err);
+        const msg = err.message || 'Network/Server error. Please try again.';
+        // Use field info if provided by backend, otherwise fallback to pattern matching
+        if (err.field === 'email') {
+          setErr(fEmail, errEmail, msg);
+        } else if (err.field === 'student_no') {
+          setErr(fStudNo, errStudNo, msg);
+        } else if (/email/i.test(msg)) {
+          setErr(fEmail, errEmail, msg);
+        } else if (/student/i.test(msg)) {
+          setErr(fStudNo, errStudNo, msg);
+        } else {
+          setErr(fPassword, errPassword, msg);
+        }
+      }finally{
+        endLoading(submitBtn);
+      }
+    });
+
+    // ---------- Delete ----------
+    function askDelete(id){
+      const u = students.find(x=>x.id===id);
+      if(!u) return;
+      deleteId = id;
+      delWho.textContent = fullName(u) || '(no name)';
+      delEmail.textContent = u.email || '';
+      confirmModal.show();
+    }
+
+    async function performDelete(){
+      if(!deleteId) return;
+      try{
+        await getJson('/libratrack/backend/delete-user.php', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ id: deleteId })
+        });
+        students = students.filter(u => u.id !== deleteId);
+        render();
+        confirmModal.hide();
+      }catch(err){
+        alert('Network/Server error while deleting: ' + (err?.message || err));
+      }finally{
+        deleteId = null;
+      }
+    }
+    confirmDeleteBtn.addEventListener('click', performDelete);
+
+    // ---------- Init ----------
+    (async () => {
+      me = await getMe();
+      if (!me) return;
+
+      if (me.role !== 'librarian') { location.href = 'dashboard.html'; return; }
+
+      schoolId = me.school_id || me.schoolId || null;
+      schoolName = me.school_name || me.schoolName || '';
+      renderSidebarAndHeader();
+
+      search.addEventListener('input', () => { currentPage = 1; render(); });
+      checkAll.addEventListener('change', () => {
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = checkAll.checked);
+      });
+
+      await loadStudents();
+    })();
+  </script>
+</body>
+</html>
