@@ -16,7 +16,7 @@
   <link href="assets/css/books.css" rel="stylesheet">
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
 
-  <script src="assets/js/sidebar.js" defer></script>
+  <script src="assets/js/sidebar.js?v=2025-10-29-1"></script>
 
   <!-- Small inline overrides -->
   <style>
@@ -365,6 +365,17 @@ function initBooks(role){
     if (canManage()) bindManageButtons(items);
   }
 
+  function setFavStateForId(bookId, favorited){
+    document.querySelectorAll(`.btn-fav[data-id="${bookId}"]`).forEach(b=>{
+      const icon = b.querySelector('i');
+      if (!icon) return;
+      icon.classList.toggle('bi-heart-fill', favorited);
+      icon.classList.toggle('bi-heart', !favorited);
+      icon.classList.toggle('text-danger', favorited);
+      b.title = favorited ? 'Remove from favorites' : 'Add to favorites';
+    });
+  }
+
   function bindFavoriteButtons(){
     if (role!=='student') return;
     document.querySelectorAll('.btn-fav').forEach(btn=>{
@@ -379,11 +390,7 @@ function initBooks(role){
           });
           const data = await res.json().catch(()=>null);
           if (data?.ok){
-            const icon = btn.querySelector('i');
-            icon.classList.toggle('bi-heart-fill', data.favorited);
-            icon.classList.toggle('bi-heart', !data.favorited);
-            icon.classList.toggle('text-danger', data.favorited);
-            btn.title = data.favorited ? 'Remove from favorites' : 'Add to favorites';
+            setFavStateForId(id, data.favorited);
           }else{
             alert(data?.error || 'Failed to update favorites.');
           }

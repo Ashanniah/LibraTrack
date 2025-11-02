@@ -12,7 +12,7 @@ if ($role !== 'student') json_response(['ok'=>false,'error'=>'Only students have
 
 $sql = "SELECT b.id, b.title, b.author, b.category, b.publisher, b.isbn,
                b.quantity, DATE_FORMAT(b.date_published,'%Y-%m-%d') AS published_at,
-               b.cover_url
+               b.cover
         FROM favorites f
         JOIN books b ON b.id = f.book_id
         WHERE f.user_id = ?
@@ -22,7 +22,10 @@ $stmt->bind_param('i', $uid);
 $stmt->execute();
 $res = $stmt->get_result();
 $items = [];
-while ($row = $res->fetch_assoc()) $items[] = $row;
+while ($row = $res->fetch_assoc()) {
+  $row['cover_url'] = $row['cover'] ? ("/libratrack/uploads/covers/".$row['cover']) : null;
+  $items[] = $row;
+}
 $stmt->close();
 
 json_response(['ok'=>true, 'items'=>$items]);

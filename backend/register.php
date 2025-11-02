@@ -38,7 +38,7 @@ $reqRole = strtolower(trim((string)($req['role'] ?? '')));
 // ---- Minimal email normalization (handles invisible chars & IDN safely on PHP 8.1+) ----
 $email = trim($email);
 // strip zero-width/invisible spaces and normal whitespace
-$email = preg_replace('/[\x{200B}\x{200C}\x{200D}\x{FEFF}\u00A0\s]+/u', '', $email);
+$email = preg_replace('/[\x{200B}\x{200C}\x{200D}\x{FEFF}\x{00A0}\s]+/u', '', $email);
 if (strpos($email, '@') !== false) {
   [$local, $domain] = explode('@', $email, 2);
   if ($domain !== '' && function_exists('idn_to_ascii')) {

@@ -228,6 +228,7 @@
                   <th>Name</th>
                   <th>Email</th>
                   <th class="col-role">Role</th>
+                  <th class="d-none d-xl-table-cell">School</th>
                   <th class="d-none d-lg-table-cell col-id">ID / Student No.</th>
                   <th class="th-tight col-status">Status</th>
                   <th class="th-tight text-end col-actions">Actions</th>
@@ -322,7 +323,15 @@
               <div class="field-error d-none" id="errConfirm"></div>
             </div>
 
-            <!-- ID / Student No. removed from dialog -->
+            <!-- STEP 4: School field -->
+            <div class="col-12 col-md-6">
+              <label class="form-label">School</label>
+              <select id="fSchool" class="form-select">
+                <option value="">— Select school —</option>
+              </select>
+              <div class="form-text-hint">Required for librarians</div>
+              <div class="field-error d-none" id="errSchool"></div>
+            </div>
 
             <div class="col-12">
               <label class="form-label">Notes</label>
@@ -379,6 +388,7 @@
 
             <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-envelope-fill"></i> Email</div><div class="vu-col vu-value" id="fldEmail">—</div></div>
             <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-shield-lock-fill"></i> Role</div><div class="vu-col vu-value" id="fldRole">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-building"></i> School</div><div class="vu-col vu-value" id="fldSchool">—</div></div>
             <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-clock-fill"></i> Status</div><div class="vu-col vu-value" id="fldStatus">—</div></div>
             <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-person-vcard-fill"></i> Student No.</div><div class="vu-col vu-value" id="fldStudentNo">—</div></div>
 
@@ -454,6 +464,7 @@
       });
 
       loadUsers();
+      loadSchoolOptions(); // STEP 4: load dropdown options
     })();
 
     // ---- Elements ----
@@ -494,6 +505,10 @@
     const fNotes     = document.getElementById('fNotes');
     const fPassword  = document.getElementById('fPassword');
     const fConfirm   = document.getElementById('fConfirm');
+
+    // STEP 4: refs for school select
+    const fSchool    = document.getElementById('fSchool');
+    const errSchool  = document.getElementById('errSchool');
 
     const errFirst   = document.getElementById('errFirst');
     const errLast    = document.getElementById('errLast');
@@ -589,6 +604,7 @@
           </td>
           <td>${escapeHtml(u.email)}</td>
           <td class="col-role">${roleBadge}</td>
+          <td class="d-none d-xl-table-cell">${escapeHtml(u.schoolName || "—")}</td>
           <td class="d-none d-lg-table-cell col-id">${escapeHtml(u.studentNo || "—")}</td>
           <td class="col-status">${statusBadge}</td>
           <td class="text-end col-actions">${actionsMenuHtml(u.id)}</td>
@@ -673,11 +689,29 @@
           studentNo: u.student_no || "",
           lastActive: u.last_active || null,
           joined: u.joined || null,
-          notes: u.notes || ""
+          notes: u.notes || "",
+          schoolId: u.school_id ? Number(u.school_id) : null,
+          schoolName: u.school_name || ""
         }));
         render();
       } catch (err) {
         alert('Network error while loading users: ' + (err?.message || err));
+      }
+    }
+
+    // ---- STEP 4: Load schools for dropdown ----
+    async function loadSchoolOptions(){
+      try{
+        const res  = await fetch('backend/list-schools.php');
+        const data = await res.json();
+        if(!res.ok || !data.success) throw new Error(data?.error || 'Failed to load schools');
+
+        fSchool.innerHTML =
+          '<option value="">— Select school —</option>' +
+          data.schools.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+      }catch(err){
+        console.error(err);
+        fSchool.innerHTML = '<option value="">(Failed to load schools)</option>';
       }
     }
 
@@ -690,6 +724,10 @@
       fStatus.value = 'active';
       fPassword.value = fConfirm.value = '';
       fNotes.value = '';
+      // STEP 4: reset school + clear its error
+      fSchool.value = '';
+      clearError(fSchool, errSchool);
+
       [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]]
         .forEach(([a,b])=>clearError(a,b));
       userModal.show();
@@ -700,13 +738,21 @@
       e.preventDefault();
       [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]]
         .forEach(([a,b])=>clearError(a,b));
+      clearError(fSchool, errSchool); // STEP 4
 
       let ok = true;
       if(!(fFirst.value||'').trim()){ setError(fFirst,errFirst,'First name is required.'); ok=false; }
       if(!(fLast.value||'').trim()){  setError(fLast,errLast,'Last name is required.');   ok=false; }
       if(!validEmail(fEmail.value)){  setError(fEmail,errEmail,'Enter a valid email.');   ok=false; }
 
+      // STEP 4: require school for librarians
+      if(!(fSchool.value||'').trim()){
+        setError(fSchool, errSchool, 'Please select a school.');
+        ok = false;
+      }
+
       const isCreate = !(fId.value||'').trim();
+      const endpoint = isCreate ? 'backend/create-librarian.php' : 'backend/update-user.php';
       const pw = fPassword.value || '';
       const cf = fConfirm.value || '';
       if (isCreate){
@@ -726,11 +772,13 @@
         suffix: (fSuffix.value || "").trim(),
         email: (fEmail.value || "").trim(),
         password: pw,
-        status: fStatus.value
+        status: fStatus.value,
+        // STEP 4: include school_id in payload
+        school_id: fSchool.value ? Number(fSchool.value) : null
       };
 
       try {
-        const res = await fetch('backend/create-librarian.php', {
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(model)
@@ -744,6 +792,7 @@
         if (!res.ok || !data || !data.success) {
           const msg = (data && (data.message || data.error)) || `Failed (${res.status}).`;
           if (/email/i.test(msg)) setError(fEmail, errEmail, msg);
+          else if (/school/i.test(msg)) setError(fSchool, errSchool, msg);
           else setError(fPassword, errPassword, msg);
           return;
         }
@@ -803,6 +852,7 @@
       setTxt('fldSuffix', u.suffix || '—');
       setTxt('fldEmail', u.email);
       setTxt('fldRole', roleChip.textContent);
+      setTxt('fldSchool', u.schoolName || '—');
       setTxt('fldStatus', stChip.textContent);
       setTxt('fldStudentNo', u.studentNo || '—');
       setTxt('fldLastActive', viewFmt(u.lastActive));
@@ -830,6 +880,8 @@
       fConfirm.value  = '';
       [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]]
         .forEach(([a,b])=>clearError(a,b));
+      fSchool.value = u.schoolId ? String(u.schoolId) : '';
+      clearError(fSchool, errSchool);
       userModal.show();
     };
 
