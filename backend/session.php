@@ -13,6 +13,9 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
   ]);
   session_start();
 }
+if (!isset($_SESSION['user_id']) && isset($_SESSION['uid'])) {
+  $_SESSION['user_id'] = $_SESSION['uid'];
+}
 
 /* Optional guard — enable if you want auth required for edits
 if (empty($_SESSION['uid'])) {
