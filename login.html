@@ -5,11 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LibraTrack - Login</title>
 
-  <!-- Favicons -->
+  <!-- Favicons (kept commented if files are missing)
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
+  -->
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -134,6 +135,7 @@
       const passwordError = document.getElementById('passwordError');
       const togglePassword = document.getElementById('togglePassword');
       const eyeIcon = document.getElementById('eyeIcon');
+      const submitBtn = form.querySelector('button[type="submit"]');
 
       // Show/hide password
       togglePassword.addEventListener('click', function () {
@@ -152,9 +154,14 @@
         });
       });
 
-      // Submit
+      // Prevent double-submit
+      let submitting = false;
+
       form.addEventListener('submit', async function (e) {
         e.preventDefault();
+        if (submitting) return;
+        submitting = true;
+        submitBtn.disabled = true;
 
         let valid = true;
         const emailVal = email.value.trim();
@@ -178,10 +185,15 @@
           valid = false;
         }
 
-        if (!valid) return;
+        if (!valid) {
+          submitting = false;
+          submitBtn.disabled = false;
+          return;
+        }
 
-        // Send to backend
-        const ENDPOINT = new URL('backend/login.php', window.location.href).href;
+        // Use absolute endpoint to avoid base-path issues
+        const ENDPOINT = '/libratrack/backend/login.php';
+        console.log('Attempting login to:', ENDPOINT);
 
         try {
           const res = await fetch(ENDPOINT, {
@@ -191,10 +203,17 @@
             body: JSON.stringify({ email: emailVal, password: pwd })
           });
 
-          const data = await res.json().catch(() => ({}));
+          const text = await res.text();
+          console.log('Login response status:', res.status);
+          console.log('Login response text:', text);
+
+          let data = {};
+          try { data = JSON.parse(text); } catch { /* if backend returns HTML, parsing will fail */ }
+
           const msg = data.message || data.error || 'Login failed';
 
           if (!res.ok || !data.success) {
+            console.error('Login failed:', msg, data);
             if (data.field === 'email') {
               email.classList.add('is-invalid');
               emailError.textContent = msg;
@@ -202,14 +221,25 @@
               password.classList.add('is-invalid');
               passwordError.textContent = msg;
             }
+            submitting = false;
+            submitBtn.disabled = false;
             return;
           }
 
-          // Success -> redirect
-          sessionStorage.setItem('role', data.role || '');
-          window.location.href = data.redirect || 'dashboard.html';
+          // Success -> redirect. Small delay helps ensure cookie is set.
+          const dest = data.redirect || '/libratrack/dashboard.html';
+          console.log('Login successful, redirecting to:', dest, 'session:', data.session_id);
+          setTimeout(() => { window.location.assign(dest); }, 150);
+
         } catch (err) {
+          // If navigation races and aborts the fetch, ignore the noise
+          if (err?.name === 'AbortError' || String(err?.message).includes('Failed to fetch')) {
+            return;
+          }
+          console.error('Login network error:', err);
           alert('Network error. Please try again.');
+          submitting = false;
+          submitBtn.disabled = false;
         }
       });
 
@@ -219,3 +249,4 @@
   </script>
 </body>
 </html>
+  

@@ -5,7 +5,7 @@ declare(strict_types=1);
 if (session_status() !== PHP_SESSION_ACTIVE) {
   session_set_cookie_params([
     'lifetime' => 0,
-    'path'     => '/',
+    'path'     => '/',  // Match db.php - use root path for all subdirectories
     'domain'   => '',
     'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
     'httponly' => true,

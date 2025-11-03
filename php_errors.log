@@ -1,0 +1,25 @@
+[02-Nov-2025 22:51:07 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'student_no' in 'where clause' in C:\xampp\htdocs\LibraTrack\backend\create-student.php:112
+Stack trace:
+#0 C:\xampp\htdocs\LibraTrack\backend\create-student.php(112): mysqli->prepare('SELECT id FROM ...')
+#1 {main}
+  thrown in C:\xampp\htdocs\LibraTrack\backend\create-student.php on line 112
+[02-Nov-2025 22:51:13 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'student_no' in 'where clause' in C:\xampp\htdocs\LibraTrack\backend\create-student.php:112
+Stack trace:
+#0 C:\xampp\htdocs\LibraTrack\backend\create-student.php(112): mysqli->prepare('SELECT id FROM ...')
+#1 {main}
+  thrown in C:\xampp\htdocs\LibraTrack\backend\create-student.php on line 112
+[02-Nov-2025 22:51:37 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'student_no' in 'where clause' in C:\xampp\htdocs\LibraTrack\backend\create-student.php:112
+Stack trace:
+#0 C:\xampp\htdocs\LibraTrack\backend\create-student.php(112): mysqli->prepare('SELECT id FROM ...')
+#1 {main}
+  thrown in C:\xampp\htdocs\LibraTrack\backend\create-student.php on line 112
+[02-Nov-2025 22:51:40 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'student_no' in 'where clause' in C:\xampp\htdocs\LibraTrack\backend\create-student.php:112
+Stack trace:
+#0 C:\xampp\htdocs\LibraTrack\backend\create-student.php(112): mysqli->prepare('SELECT id FROM ...')
+#1 {main}
+  thrown in C:\xampp\htdocs\LibraTrack\backend\create-student.php on line 112
+[02-Nov-2025 22:51:54 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'student_no' in 'where clause' in C:\xampp\htdocs\LibraTrack\backend\create-student.php:112
+Stack trace:
+#0 C:\xampp\htdocs\LibraTrack\backend\create-student.php(112): mysqli->prepare('SELECT id FROM ...')
+#1 {main}
+  thrown in C:\xampp\htdocs\LibraTrack\backend\create-student.php on line 112

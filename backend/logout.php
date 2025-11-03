@@ -1,28 +1,27 @@
 <?php
 declare(strict_types=1);
+session_start();
 
-require_once __DIR__ . '/db.php';
-if (session_status() !== PHP_SESSION_ACTIVE) session_start(); // just in case
-
-// Clear session
+// Log out
 $_SESSION = [];
 if (ini_get('session.use_cookies')) {
   $p = session_get_cookie_params();
-  setcookie(session_name(), '', time() - 42000, $p['path'], $p['domain'] ?? '', $p['secure'], $p['httponly']);
+  setcookie(session_name(), '', time()-42000, $p['path'], $p['domain'], $p['secure'], $p['httponly']);
 }
 session_destroy();
 
-$loginUrl = '/libratrack/login.html';
+$redirectUrl = '/libratrack/login.html';
 
-// If the request looks like AJAX/JSON -> return JSON
-$accept  = $_SERVER['HTTP_ACCEPT'] ?? '';
-$isAjax  = strtolower($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') === 'xmlhttprequest';
-if (str_contains($accept, 'application/json') || $isAjax) {
-  header('Content-Type: application/json');
-  echo json_encode(['success' => true, 'redirect' => $loginUrl]);
+// If the client asked for JSON (AJAX/fetch), return JSON; else redirect.
+$acceptsJson = (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'],'application/json') !== false)
+               || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+               || (isset($_GET['json']) && $_GET['json'] === '1');
+
+if ($acceptsJson) {
+  header('Content-Type: application/json; charset=utf-8');
+  echo json_encode(['success' => true, 'redirect' => $redirectUrl]);
   exit;
 }
 
-// Otherwise, perform a real redirect (works for <a href="backend/logout.php">)
-header('Location: ' . $loginUrl, true, 302);
+header('Location: ' . $redirectUrl, true, 302);
 exit;

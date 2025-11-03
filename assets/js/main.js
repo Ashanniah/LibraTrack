@@ -36,7 +36,11 @@
       header.classList.contains("sticky-top") ||
       header.classList.contains("fixed-top");
     if (!sticky) return;
-    (window.scrollY > 100 ? body.classList.add : body.classList.remove)("scrolled");
+    if (window.scrollY > 100) {
+      body.classList.add("scrolled");
+    } else {
+      body.classList.remove("scrolled");
+    }
   }, 100);
 
   on(document, "scroll", toggleScrolled, { passive: true });
@@ -95,7 +99,11 @@
   const scrollTop = $(".scroll-top");
   const toggleScrollTop = throttle(() => {
     if (!scrollTop) return;
-    (window.scrollY > 100 ? scrollTop.classList.add : scrollTop.classList.remove)("active");
+    if (window.scrollY > 100) {
+      scrollTop.classList.add("active");
+    } else {
+      scrollTop.classList.remove("active");
+    }
   }, 100);
 
   if (scrollTop) {

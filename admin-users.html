@@ -5,12 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>LibraTrack - Users Management</title>
 
-  <!-- Fonts & Vendor CSS -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
-  <!-- Your app CSS -->
   <link href="assets/css/sidebar.css" rel="stylesheet">
   <link href="assets/css/admin-users.css" rel="stylesheet">
 
@@ -139,13 +137,15 @@
     }
     .btn-profile .avatar-28 { width:28px;height:28px;border-radius:50%;object-fit:cover; }
     .btn-profile .name { max-width:22ch; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    #schoolDropdownWrap .dropdown-menu { border-radius:12px; }
+    #schoolDropdownWrap .dropdown-item { white-space:normal; }
   </style>
 </head>
 <body class="sb-body">
   <div id="sidebar-root"></div>
 
   <div class="sb-wrapper">
-    <!-- Topbar -->
     <nav class="sb-topbar navbar navbar-expand bg-white sticky-top">
       <div class="container-fluid">
         <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
@@ -171,7 +171,6 @@
       </div>
     </nav>
 
-    <!-- Content -->
     <main class="container-fluid">
       <section class="table-card card p-0 position-relative">
         <div class="card-header">
@@ -247,7 +246,6 @@
     </main>
   </div>
 
-  <!-- Add/Edit User Modal -->
   <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <form id="userForm" class="modal-content" novalidate>
@@ -274,7 +272,7 @@
                 </div>
                 <div>
                   <select id="fSuffix" class="form-select" aria-label="Suffix">
-                    <option value="">No suffix</option>
+                    <option value="">N/A</option>
                     <option>Jr.</option><option>Sr.</option>
                     <option>I</option><option>II</option><option>III</option><option>IV</option>
                     <option>V</option><option>VI</option><option>VII</option><option>VIII</option>
@@ -290,8 +288,6 @@
               <input id="fEmail" type="email" class="form-control" required>
               <div class="field-error d-none" id="errEmail"></div>
             </div>
-
-            <!-- Role removed from dialog -->
 
             <div class="col-12 col-md-6">
               <label class="form-label">Status</label>
@@ -323,12 +319,22 @@
               <div class="field-error d-none" id="errConfirm"></div>
             </div>
 
-            <!-- STEP 4: School field -->
             <div class="col-12 col-md-6">
               <label class="form-label">School</label>
-              <select id="fSchool" class="form-select">
-                <option value="">— Select school —</option>
-              </select>
+              <div class="dropdown w-100" id="schoolDropdownWrap">
+                <button
+                  id="schoolBtn"
+                  class="btn btn-light border w-100 d-flex justify-content-between align-items-center"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  data-bs-auto-close="outside"
+                  data-bs-display="static">
+                  <span id="schoolLabel">— Select school —</span>
+                  <i class="bi bi-chevron-down ms-2"></i>
+                </button>
+                <ul class="dropdown-menu w-100" id="schoolMenu" style="max-height:240px;overflow:auto;"></ul>
+              </div>
+              <input type="hidden" id="fSchool" value="">
               <div class="form-text-hint">Required for librarians</div>
               <div class="field-error d-none" id="errSchool"></div>
             </div>
@@ -349,7 +355,24 @@
     </div>
   </div>
 
-  <!-- View User Modal -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title w-100 text-success fw-semibold">
+            <i class="bi bi-check-circle-fill me-2"></i> Success!
+          </h5>
+        </div>
+        <div class="modal-body pt-2">
+          <p id="successMessage" class="mb-0">Librarian account created successfully!</p>
+        </div>
+        <div class="modal-footer border-0">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content userview-2col">
@@ -404,7 +427,6 @@
     </div>
   </div>
 
-  <!-- Confirm Delete Modal -->
   <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -420,22 +442,20 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-          <button class="btn btn-danger" id="confirmDeleteBtn"><i class="bi bi-trash me-1"></i>Delete</button>
+          <button class="btn btn-danger" id="confirmDeleteBtn"><i class="bi bi-trash"></i> Delete</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- JS -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script>
-    // ---- Auth helper ----
     async function getMe() {
       const res = await fetch('backend/check-auth.php', { credentials: 'include' });
       if (res.status === 401) { location.href = 'login.html'; return null; }
       const data = await res.json();
-      if (!data.success) { location.href = 'login.html'; return null; }
+      if (!data || !data.success) { location.href = 'login.html'; return null; }
       return data.user;
     }
 
@@ -444,30 +464,26 @@
       if (!me) return;
       if (me.role !== 'admin') { location.href = 'dashboard.html'; return; }
 
-      // set profile name (optional UI nicety)
-      {
-        const profileNameEl   = document.getElementById('profileName');
-        const profileHeaderEl = document.getElementById('profileHeader');
-        const displayName =
-          me.full_name ||
-          [me.first_name, me.middle_name, me.last_name].filter(Boolean).join(' ') ||
-          me.name || me.email || 'Account';
-
-        if (profileNameEl)   profileNameEl.textContent   = displayName;
-        if (profileHeaderEl) profileHeaderEl.textContent = 'Signed in as ' + displayName;
-      }
+      var profileNameEl = document.getElementById('profileName');
+      var profileHeaderEl = document.getElementById('profileHeader');
+      var displayName =
+        (me.full_name) ||
+        [me.first_name, me.middle_name, me.last_name].filter(Boolean).join(' ') ||
+        me.name || me.email || 'Account';
+      if (profileNameEl)   profileNameEl.textContent   = displayName;
+      if (profileHeaderEl) profileHeaderEl.textContent = 'Signed in as ' + displayName;
 
       renderSidebar('users', me.role);
-      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+      var sb = document.getElementById('sidebarToggle');
+      if (sb) sb.addEventListener('click', function(){
         if (typeof toggleSidebar === 'function') toggleSidebar();
         else document.body.classList.toggle('sb-collapsed');
       });
 
       loadUsers();
-      loadSchoolOptions(); // STEP 4: load dropdown options
+      loadSchoolOptions();
     })();
 
-    // ---- Elements ----
     const search       = document.getElementById('searchInput');
     const tbody        = document.getElementById('usersBody');
     const pageInfo     = document.getElementById('pageInfo');
@@ -476,21 +492,26 @@
     const acctCount    = document.getElementById('acctCount');
     const btnPrimary   = document.getElementById('btnPrimary');
 
-    // Filters
     let roleFilter   = "";
     let statusFilter = "";
 
-    document.querySelectorAll('#filterRole input[name="role"]').forEach(r=>{
-      r.addEventListener('change', () => { roleFilter = document.querySelector('#filterRole input:checked').value; render(); });
+    Array.prototype.forEach.call(document.querySelectorAll('#filterRole input[name="role"]'), function(r){
+      r.addEventListener('change', function(){
+        roleFilter = document.querySelector('#filterRole input:checked').value;
+        render();
+      });
     });
-    document.querySelectorAll('#filterStatus input[name="status"]').forEach(r=>{
-      r.addEventListener('change', () => { statusFilter = document.querySelector('#filterStatus input:checked').value; render(); });
+    Array.prototype.forEach.call(document.querySelectorAll('#filterStatus input[name="status"]'), function(r){
+      r.addEventListener('change', function(){
+        statusFilter = document.querySelector('#filterStatus input:checked').value;
+        render();
+      });
     });
 
-    // Modals + form refs
     const userModal = new bootstrap.Modal('#userModal');
     const viewModal = new bootstrap.Modal('#viewUserModal');
     const confirmModal = new bootstrap.Modal('#confirmDeleteModal');
+    const successModal = new bootstrap.Modal('#successModal');
 
     const form            = document.getElementById('userForm');
     const userModalTitle  = document.getElementById('userModalTitle');
@@ -506,9 +527,11 @@
     const fPassword  = document.getElementById('fPassword');
     const fConfirm   = document.getElementById('fConfirm');
 
-    // STEP 4: refs for school select
     const fSchool    = document.getElementById('fSchool');
     const errSchool  = document.getElementById('errSchool');
+    const schoolBtn   = document.getElementById('schoolBtn');
+    const schoolLabel = document.getElementById('schoolLabel');
+    const schoolMenu  = document.getElementById('schoolMenu');
 
     const errFirst   = document.getElementById('errFirst');
     const errLast    = document.getElementById('errLast');
@@ -516,23 +539,20 @@
     const errPassword= document.getElementById('errPassword');
     const errConfirm = document.getElementById('errConfirm');
 
-    // Delete modal refs
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     const delWho = document.getElementById('delWho');
     const delEmail = document.getElementById('delEmail');
     let deleteId = null;
 
-    // ---- State ----
     let users = [];
     const pageSize = 10;
     let currentPage = 1;
 
-    // Password toggles
     function setupPwToggle(inputEl, btnId, iconId){
       const btn  = document.getElementById(btnId);
       const icon = document.getElementById(iconId);
       if(!inputEl || !btn || !icon) return;
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', function(){
         const showing = inputEl.type === 'text';
         inputEl.type = showing ? 'password' : 'text';
         icon.classList.toggle('bi-eye',  showing);
@@ -544,19 +564,29 @@
     setupPwToggle(fConfirm,  'pwToggle2', 'pwIcon2');
 
     function fullName(u){
-      const parts = [u.firstName, u.middleName, u.lastName].map(v => (v||'').trim()).filter(Boolean);
+      const parts = [u.firstName, u.middleName, u.lastName].map(function(v){return (v||'').trim();}).filter(Boolean);
       const base = parts.join(' ');
       return base + (u.suffix ? ', ' + u.suffix : '');
     }
-    const validEmail   = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||'');
-    const strongEnough = pw => /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{}|\\:;'"<>,.?/~`]).{8,}$/.test(pw||'');
-    const escapeHtml   = s => String(s ?? "").replace(/[&<>"']/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
-    function clearError(inputEl, errEl){ inputEl?.classList.remove('is-invalid'); if (errEl){ errEl.textContent=''; errEl.classList.add('d-none'); } }
-    function setError(inputEl, errEl, msg){ inputEl?.classList.add('is-invalid'); if (errEl){ errEl.textContent=msg; errEl.classList.remove('d-none'); } }
+    const validEmail   = function(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||''); };
+    const strongEnough = function(pw){ return /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{}|\\:;'"<>,.?/~`]).{8,}$/.test(pw||''); };
+    const escapeHtml   = function(s){
+      return String(s == null ? "" : s).replace(/[&<>"']/g, function(m){
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "\"": "&quot;",
+          "'": "&#039;"
+        }[m];
+      });
+    };
+    function clearError(inputEl, errEl){ if(inputEl) inputEl.classList.remove('is-invalid'); if (errEl){ errEl.textContent=''; errEl.classList.add('d-none'); } }
+    function setError(inputEl, errEl, msg){ if(inputEl) inputEl.classList.add('is-invalid'); if (errEl){ errEl.textContent=msg; errEl.classList.remove('d-none'); } }
 
     function applyFilters(){
       const q = (search.value || "").toLowerCase().trim();
-      return users.filter(u => {
+      return users.filter(function(u){
         const hit = (fullName(u) + " " + (u.email||'') + " " + (u.studentNo || "")).toLowerCase().includes(q);
         const roleOk = roleFilter ? u.role === roleFilter : true;
         const stOk   = statusFilter ? (u.status === statusFilter) : true;
@@ -565,65 +595,63 @@
     }
 
     function actionsMenuHtml(id){
-      return `
-        <div class="dropdown text-end">
-          <button class="kebab-btn" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-auto-close="outside" aria-expanded="false" aria-label="Open actions">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end kebab">
-            <li><button class="dropdown-item" data-action="view" data-id="${id}"><i class="bi bi-person-badge"></i> View profile</button></li>
-            <li><button class="dropdown-item" data-action="edit" data-id="${id}"><i class="bi bi-pencil-square"></i> Edit details</button></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><button class="dropdown-item text-danger" data-action="delete" data-id="${id}"><i class="bi bi-trash"></i> Delete user</button></li>
-          </ul>
-        </div>`;
+      return '<div class="dropdown text-end">'+
+          '<button class="kebab-btn" data-bs-toggle="dropdown" data-bs-boundary="viewport" data-bs-auto-close="outside" aria-expanded="false" aria-label="Open actions">'+
+            '<i class="bi bi-three-dots-vertical"></i>'+
+          '</button>'+
+          '<ul class="dropdown-menu dropdown-menu-end kebab">'+
+            '<li><button class="dropdown-item" data-action="view" data-id="'+id+'"><i class="bi bi-person-badge"></i> View profile</button></li>'+
+            '<li><button class="dropdown-item" data-action="edit" data-id="'+id+'"><i class="bi bi-pencil-square"></i> Edit details</button></li>'+
+            '<li><hr class="dropdown-divider"></li>'+
+            '<li><button class="dropdown-item text-danger" data-action="delete" data-id="'+id+'"><i class="bi bi-trash"></i> Delete user</button></li>'+
+          '</ul>'+
+        '</div>';
     }
 
     function rowHtml(u){
       const statusBadge = u.status === "active"
-        ? `<span class="badge text-bg-success-soft">Active</span>`
-        : `<span class="badge text-bg-danger-soft">Disabled</span>`;
+        ? '<span class="badge text-bg-success-soft">Active</span>'
+        : '<span class="badge text-bg-danger-soft">Disabled</span>';
 
       const roleBadge = u.role === "admin"
-        ? `<span class="role-badge admin">Admin</span>`
-        : u.role === "librarian"
-          ? `<span class="role-badge librarian">Librarian</span>`
-          : `<span class="role-badge student">Student</span>`;
+        ? '<span class="role-badge admin">Admin</span>'
+        : (u.role === "librarian"
+          ? '<span class="role-badge librarian">Librarian</span>'
+          : '<span class="role-badge student">Student</span>');
 
-      return `
-        <tr>
-          <td><input class="form-check-input row-check" type="checkbox" value="${u.id}"></td>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <img class="avatar" src="assets/img/default-avatar.png" alt="">
-              <div>
-                <div class="fw-semibold">${escapeHtml(fullName(u))}</div>
-                <div class="small text-muted d-lg-none">${escapeHtml(u.studentNo || "—")}</div>
-              </div>
-            </div>
-          </td>
-          <td>${escapeHtml(u.email)}</td>
-          <td class="col-role">${roleBadge}</td>
-          <td class="d-none d-xl-table-cell">${escapeHtml(u.schoolName || "—")}</td>
-          <td class="d-none d-lg-table-cell col-id">${escapeHtml(u.studentNo || "—")}</td>
-          <td class="col-status">${statusBadge}</td>
-          <td class="text-end col-actions">${actionsMenuHtml(u.id)}</td>
-        </tr>`;
+      return '<tr>'+
+          '<td><input class="form-check-input row-check" type="checkbox" value="'+u.id+'"></td>'+
+          '<td>'+
+            '<div class="d-flex align-items-center gap-2">'+
+              '<img class="avatar" src="assets/img/default-avatar.png" alt="">'+
+              '<div>'+
+                '<div class="fw-semibold">'+escapeHtml(fullName(u))+'</div>'+
+                '<div class="small text-muted d-lg-none">'+escapeHtml(u.studentNo || "—")+'</div>'+
+              '</div>'+
+            '</div>'+
+          '</td>'+
+          '<td>'+escapeHtml(u.email)+'</td>'+
+          '<td class="col-role">'+roleBadge+'</td>'+
+          '<td class="d-none d-xl-table-cell">'+escapeHtml(u.schoolName || "—")+'</td>'+
+          '<td class="d-none d-lg-table-cell col-id">'+escapeHtml(u.studentNo || "—")+'</td>'+
+          '<td class="col-status">'+statusBadge+'</td>'+
+          '<td class="text-end col-actions">'+actionsMenuHtml(u.id)+'</td>'+
+        '</tr>';
     }
 
     function buildPager(pages){
       pager.innerHTML = '';
-      const add = (label, page, disabled=false, active=false) => {
-        const li = document.createElement('li');
-        li.className = `page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}`;
-        li.innerHTML = `<a class="page-link" href="#">${label}</a>`;
-        li.onclick = e => { e.preventDefault(); if(!disabled){ currentPage = page; render(); }};
+      function add(label, page, disabled, active){
+        var li = document.createElement('li');
+        li.className = 'page-item ' + (disabled ? 'disabled' : '') + ' ' + (active ? 'active' : '');
+        li.innerHTML = '<a class="page-link" href="#">'+label+'</a>';
+        li.onclick = function(e){ e.preventDefault(); if(!disabled){ currentPage = page; render(); }};
         pager.appendChild(li);
-      };
+      }
       const lastPage = Math.max(1, pages);
-      add('‹', Math.max(1, currentPage-1), currentPage===1);
-      for (let p = 1; p <= lastPage; p++) add(p, p, false, p===currentPage);
-      add('›', Math.min(lastPage, currentPage+1), currentPage===lastPage);
+      add('‹', Math.max(1, currentPage-1), currentPage===1, false);
+      for (var p = 1; p <= lastPage; p++) add(p, p, false, p===currentPage);
+      add('›', Math.min(lastPage, currentPage+1), currentPage===lastPage, false);
     }
 
     function render(){
@@ -640,27 +668,20 @@
 
       tbody.innerHTML = slice.length
         ? slice.map(rowHtml).join('')
-        : `
-          <tr class="empty-row">
-            <td colspan="7">
-              No users found.
-              <div class="mt-2">
-                <button class="btn btn-sm btn-dark" id="emptyCta">Add Librarian</button>
-              </div>
-            </td>
-          </tr>`;
+        : '<tr class="empty-row"><td colspan="7">No users found.<div class="mt-2"><button class="btn btn-sm btn-dark" id="emptyCta">Add Librarian</button></div></td></tr>';
 
-      document.getElementById('emptyCta')?.addEventListener('click',()=>btnPrimary.click());
+      var emptyBtn = document.getElementById('emptyCta');
+      if (emptyBtn) emptyBtn.addEventListener('click', function(){ btnPrimary.click(); });
 
-      pageInfo.textContent = total ? `Showing ${start + 1}–${end} of ${total}` : '—';
+      pageInfo.textContent = total ? ('Showing ' + (start + 1) + '–' + end + ' of ' + total) : '—';
 
       buildPager(pages);
       checkAll.checked = false;
 
-      tbody.querySelectorAll('.dropdown-item').forEach(btn=>{
+      Array.prototype.forEach.call(tbody.querySelectorAll('.dropdown-item'), function(btn){
         const id = Number(btn.dataset.id);
         const action = btn.dataset.action;
-        btn.onclick = () => {
+        btn.onclick = function(){
           if (action==='view')      viewUser(id);
           else if (action==='edit') editUser(id);
           else if (action==='delete') askDelete(id);
@@ -668,88 +689,114 @@
       });
     }
 
-    // ---- Load users ----
     async function loadUsers(){
       try {
         const res = await fetch('backend/list-users.php');
         const data = await res.json();
-        if (!res.ok || !data.success) {
+        if (!res.ok || !(data && data.success)) {
           alert((data && (data.message || data.error)) || 'Failed to load users.');
           return;
         }
-        users = (data.users || []).map(u => ({
-          id: Number(u.id),
-          firstName: u.first_name,
-          middleName: u.middle_name,
-          lastName: u.last_name,
-          suffix: u.suffix,
-          email: u.email,
-          role: u.role,
-          status: u.status,
-          studentNo: u.student_no || "",
-          lastActive: u.last_active || null,
-          joined: u.joined || null,
-          notes: u.notes || "",
-          schoolId: u.school_id ? Number(u.school_id) : null,
-          schoolName: u.school_name || ""
-        }));
+        users = (data.users || []).map(function(u){
+          return {
+            id: Number(u.id),
+            firstName: u.first_name,
+            middleName: u.middle_name,
+            lastName: u.last_name,
+            suffix: u.suffix,
+            email: u.email,
+            role: u.role,
+            status: u.status,
+            studentNo: u.student_no || "",
+            lastActive: u.last_active || null,
+            joined: u.joined || null,
+            notes: u.notes || "",
+            schoolId: u.school_id ? Number(u.school_id) : null,
+            schoolName: u.school_name || ""
+          };
+        });
         render();
       } catch (err) {
-        alert('Network error while loading users: ' + (err?.message || err));
+        alert('Network error while loading users: ' + (err && err.message ? err.message : err));
       }
     }
 
-    // ---- STEP 4: Load schools for dropdown ----
+    let schoolDd;
+    function ensureSchoolDropdown(){
+      if (schoolDd) return schoolDd;
+      schoolDd = new bootstrap.Dropdown(schoolBtn, {
+        popperConfig: function(defaultCfg){
+          return {
+            placement: 'bottom-start',
+            modifiers: [
+              { name: 'flip', options: { fallbackPlacements: [] } },
+              { name: 'preventOverflow', options: { boundary: 'viewport' } }
+            ]
+          };
+        }
+      });
+      return schoolDd;
+    }
+
     async function loadSchoolOptions(){
       try{
         const res  = await fetch('backend/list-schools.php');
         const data = await res.json();
-        if(!res.ok || !data.success) throw new Error(data?.error || 'Failed to load schools');
+        if(!res.ok || !(data && data.success)) throw new Error((data && data.error) || 'Failed to load schools');
 
-        fSchool.innerHTML =
-          '<option value="">— Select school —</option>' +
-          data.schools.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+        schoolMenu.innerHTML = data.schools.map(function(s){
+          return '<li><button type="button" class="dropdown-item" data-id="'+s.id+'">'+escapeHtml(s.name)+'</button></li>';
+        }).join('');
+
+        Array.prototype.forEach.call(schoolMenu.querySelectorAll('.dropdown-item'), function(btn){
+          btn.addEventListener('click', function(){
+            const id = String(btn.getAttribute('data-id'));
+            const label = btn.textContent.trim();
+            fSchool.value = id;
+            schoolLabel.textContent = label;
+            clearError(fSchool, errSchool);
+            ensureSchoolDropdown().hide();
+          });
+        });
+
+        ensureSchoolDropdown();
       }catch(err){
         console.error(err);
-        fSchool.innerHTML = '<option value="">(Failed to load schools)</option>';
+        schoolMenu.innerHTML = '<li><span class="dropdown-item disabled">(Failed to load schools)</span></li>';
       }
     }
 
-    // ---- Primary button – Add Librarian ----
-    btnPrimary.addEventListener('click', () => {
+    btnPrimary.addEventListener('click', function(){
       userModalTitle.textContent = "Add Librarian";
       fId.value = '';
-      fFirst.value = fMiddle.value = fLast.value = fSuffix.value = '';
+      fFirst.value = ''; fMiddle.value = ''; fLast.value = ''; fSuffix.value = '';
       fEmail.value = '';
       fStatus.value = 'active';
-      fPassword.value = fConfirm.value = '';
+      fPassword.value = ''; fConfirm.value = '';
       fNotes.value = '';
-      // STEP 4: reset school + clear its error
       fSchool.value = '';
+      schoolLabel.textContent = '— Select school —';
       clearError(fSchool, errSchool);
 
-      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]]
-        .forEach(([a,b])=>clearError(a,b));
+      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]].forEach(function(pair){
+        clearError(pair[0], pair[1]);
+      });
       userModal.show();
+      ensureSchoolDropdown();
     });
 
-    // ---- Create librarian ----
-    form.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async function(e){
       e.preventDefault();
-      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]]
-        .forEach(([a,b])=>clearError(a,b));
-      clearError(fSchool, errSchool); // STEP 4
+      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]].forEach(function(pair){
+        clearError(pair[0], pair[1]);
+      });
+      clearError(fSchool, errSchool);
 
       let ok = true;
       if(!(fFirst.value||'').trim()){ setError(fFirst,errFirst,'First name is required.'); ok=false; }
       if(!(fLast.value||'').trim()){  setError(fLast,errLast,'Last name is required.');   ok=false; }
       if(!validEmail(fEmail.value)){  setError(fEmail,errEmail,'Enter a valid email.');   ok=false; }
-
-      // STEP 4: require school for librarians
-      if(!(fSchool.value||'').trim()){
-        setError(fSchool, errSchool, 'Please select a school.');
-        ok = false;
-      }
+      if(!(fSchool.value||'').trim()){ setError(fSchool, errSchool, 'Please select a school.'); ok=false; }
 
       const isCreate = !(fId.value||'').trim();
       const endpoint = isCreate ? 'backend/create-librarian.php' : 'backend/update-user.php';
@@ -773,7 +820,6 @@
         email: (fEmail.value || "").trim(),
         password: pw,
         status: fStatus.value,
-        // STEP 4: include school_id in payload
         school_id: fSchool.value ? Number(fSchool.value) : null
       };
 
@@ -787,10 +833,10 @@
         const raw = await res.text();
         let data;
         try { data = JSON.parse(raw); }
-        catch { throw new Error(`Bad response ${res.status}: ${raw.slice(0,400)}`); }
+        catch (e) { throw new Error('Bad response '+res.status+': '+raw.slice(0,400)); }
 
-        if (!res.ok || !data || !data.success) {
-          const msg = (data && (data.message || data.error)) || `Failed (${res.status}).`;
+        if (!res.ok || !(data && data.success)) {
+          const msg = (data && (data.message || data.error)) || ('Failed ('+res.status+').');
           if (/email/i.test(msg)) setError(fEmail, errEmail, msg);
           else if (/school/i.test(msg)) setError(fSchool, errSchool, msg);
           else setError(fPassword, errPassword, msg);
@@ -808,36 +854,40 @@
           role: 'librarian',
           status: model.status,
           studentNo: '',
-          notes: ''
+          notes: '',
+          schoolId: model.school_id,
+          schoolName: schoolLabel.textContent
         });
 
         userModal.hide();
         form.reset();
         render();
-        loadUsers(); // refresh from DB
+        loadUsers();
+
+        var sm = document.getElementById('successMessage');
+        if (sm) sm.textContent = (data.message || 'Librarian account created successfully!');
+        successModal.show();
       } catch (err) {
-        alert(err.message || 'Network/Server error. Please try again.');
+        alert((err && err.message) ? err.message : 'Network/Server error. Please try again.');
       }
     });
 
-    // Search + select-all
-    search.addEventListener('input', () => { currentPage = 1; render(); });
-    checkAll.addEventListener('change', () => {
-      document.querySelectorAll('.row-check').forEach(cb => cb.checked = checkAll.checked);
+    search.addEventListener('input', function(){ currentPage = 1; render(); });
+    checkAll.addEventListener('change', function(){
+      Array.prototype.forEach.call(document.querySelectorAll('.row-check'), function(cb){ cb.checked = checkAll.checked; });
     });
 
-    // View/Edit/Delete wiring
-    const viewFmt = d => d ? new Date(d).toLocaleString() : '—';
-    function setTxt(id, val){ const el=document.getElementById(id); if (el) el.textContent = val ?? '—'; }
+    const viewFmt = function(d){ return d ? new Date(d).toLocaleString() : '—'; };
+    function setTxt(id, val){ var el=document.getElementById(id); if (el) el.textContent = val == null ? '—' : val; }
 
     window.viewUser = function(id){
-      const u = users.find(x=>x.id===id); if (!u) return;
+      const u = users.find(function(x){return x.id===id;}); if (!u) return;
       document.getElementById('vuAvatar').src = 'assets/img/default-avatar.png';
       document.getElementById('vuName').textContent  = fullName(u);
       document.getElementById('vuEmail').textContent = u.email || '—';
 
       const roleChip = document.getElementById('vuRole');
-      roleChip.textContent = (u.role || '—').replace(/^\w/, c=>c.toUpperCase());
+      roleChip.textContent = (u.role || '—').replace(/^\w/, function(c){return c.toUpperCase();});
       roleChip.className = 'chip chip-role ' + (u.role || '');
 
       const stChip = document.getElementById('vuStatus');
@@ -859,14 +909,14 @@
       setTxt('fldJoined', viewFmt(u.joined));
       setTxt('fldNotes', u.notes || '—');
 
-      document.getElementById('vuEditBtn').onclick   = () => { viewModal.hide(); editUser(u.id); };
-      document.getElementById('vuDeleteBtn').onclick = () => { viewModal.hide(); askDelete(u.id); };
+      document.getElementById('vuEditBtn').onclick   = function(){ viewModal.hide(); editUser(u.id); };
+      document.getElementById('vuDeleteBtn').onclick = function(){ viewModal.hide(); askDelete(u.id); };
 
       viewModal.show();
     };
 
     window.editUser = function(id){
-      const u = users.find(x=>x.id===id); if (!u) return;
+      const u = users.find(function(x){return x.id===id;}); if (!u) return;
       userModalTitle.textContent = "Edit User";
       fId.value = u.id;
       fFirst.value = u.firstName || "";
@@ -878,16 +928,20 @@
       fNotes.value  = u.notes || "";
       fPassword.value = '';
       fConfirm.value  = '';
-      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]]
-        .forEach(([a,b])=>clearError(a,b));
+      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fPassword,errPassword],[fConfirm,errConfirm]].forEach(function(pair){
+        clearError(pair[0], pair[1]);
+      });
+
       fSchool.value = u.schoolId ? String(u.schoolId) : '';
+      schoolLabel.textContent = u.schoolName ? u.schoolName : '— Select school —';
       clearError(fSchool, errSchool);
+
       userModal.show();
+      ensureSchoolDropdown();
     };
 
-    // --- Delete flow ---
     function askDelete(id){
-      const u = users.find(x=>x.id===id);
+      const u = users.find(function(x){return x.id===id;});
       if(!u) return;
       deleteId = id;
       delWho.textContent = fullName(u) || '(no name)';
@@ -904,15 +958,15 @@
           body: JSON.stringify({ id: deleteId })
         });
         const data = await res.json();
-        if(!res.ok || !data?.success){
-          alert(data?.message || 'Failed to delete user.');
+        if(!res.ok || !(data && data.success)){
+          alert((data && data.message) || 'Failed to delete user.');
           return;
         }
-        users = users.filter(u => u.id !== deleteId);
+        users = users.filter(function(u){ return u.id !== deleteId; });
         render();
         confirmModal.hide();
       }catch(err){
-        alert('Network/Server error while deleting: ' + (err?.message || err));
+        alert('Network/Server error while deleting: ' + (err && err.message ? err.message : err));
       }finally{
         deleteId = null;
       }

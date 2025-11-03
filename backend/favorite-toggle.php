@@ -10,7 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
   json_response(['ok' => false, 'error' => 'Invalid method'], 405);
 }
 
-$userId = $_SESSION['user_id'] ?? null;
+// accept both uid or user_id
+$userId = $_SESSION['user_id'] ?? ($_SESSION['uid'] ?? null);
 
 // Accept either FormData or JSON body
 $bookId = $_POST['book_id'] ?? null;

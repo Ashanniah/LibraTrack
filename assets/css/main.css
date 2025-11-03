@@ -2719,6 +2719,7 @@ section,
 /*//////////////////////////////////////////////////////////////////
 [ FONT ]*/
 
+/* Fonts commented out - missing font files
 @font-face {
   font-family: Raleway-Regular;
   src: url('../fonts/raleway/Raleway-Regular.ttf'); 
@@ -2738,6 +2739,7 @@ section,
   font-family: Raleway-Bold;
   src: url('../fonts/raleway/Raleway-Bold.ttf'); 
 }
+*/
 
 /*//////////////////////////////////////////////////////////////////
 [ RESTYLE TAG ]*/

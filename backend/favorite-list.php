@@ -15,7 +15,9 @@ if (!$userId) {
 
 try {
   $stmt = $pdo->prepare("
-    SELECT b.id, b.title, b.author, b.cover_url, b.category, b.isbn, b.quantity, b.publisher, b.date_published AS published_at
+    SELECT b.id, b.title, b.author, b.cover, 
+           b.category, b.isbn, b.quantity, b.publisher, 
+           DATE_FORMAT(b.date_published, '%Y-%m-%d') AS published_at
     FROM favorites f
     JOIN books b ON b.id = f.book_id
     WHERE f.user_id = ?
@@ -23,24 +25,13 @@ try {
   ");
   $stmt->execute([$userId]);
   $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-$sql = "SELECT b.id, b.title, b.author, b.category, b.publisher, b.isbn,
-               b.quantity, DATE_FORMAT(b.date_published,'%Y-%m-%d') AS published_at,
-               b.cover
-        FROM favorites f
-        JOIN books b ON b.id = f.book_id
-        WHERE f.user_id = ?
-        ORDER BY f.created_at DESC";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param('i', $uid);
-$stmt->execute();
-$res = $stmt->get_result();
-$items = [];
-while ($row = $res->fetch_assoc()) {
-  $row['cover_url'] = $row['cover'] ? ("/libratrack/uploads/covers/".$row['cover']) : null;
-  $items[] = $row;
-}
-$stmt->close();
-
+  
+  // Add cover_url with proper path
+  foreach ($items as &$item) {
+    $item['cover_url'] = $item['cover'] ? "/libratrack/uploads/covers/" . $item['cover'] : null;
+  }
+  unset($item); // Important: unset reference after loop
+  
   echo json_encode(['ok' => true, 'items' => $items]);
 } catch (Throwable $e) {
   echo json_encode(['ok' => false, 'error' => $e->getMessage()]);
