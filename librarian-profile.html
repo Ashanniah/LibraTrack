@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -11,147 +11,622 @@
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
   <!-- Shared + Page CSS -->
-  <link href="assets/css/sidebar.css" rel="stylesheet">
-  <link href="assets/css/librarian-profile.css" rel="stylesheet">
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+  <link href="assets/css/admin-profile.css" rel="stylesheet">
 
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
+
+  <style>
+    :root{
+      --gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --card-bg:#fff;
+      --card-border:#e5e7eb;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --text-muted:#9ca3af;
+      --header-bg:#fff;
+      --table-header-bg:#f8f9fa;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --ui-border:#eef0f3;
+      --ui-muted:#6b7280;
+    }
+    body.loading main, body.loading #sidebarToggle { visibility:hidden }
+    
+    /* Consistent Card Design */
+    .card{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      overflow:hidden;
+      background:#fff;
+    }
+    .card-header{
+      background:var(--sidebar-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:16px 20px;
+      font-weight:600;
+      font-size:0.9375rem;
+    }
+    .card-body{
+      padding:24px;
+      background:#fff;
+    }
+    
+    /* Profile Card Specific */
+    .profile-card{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      overflow:hidden;
+    }
+    .profile-card .card-body{
+      padding:32px 24px;
+    }
+    
+    /* Role Pill */
+    .role-pill{
+      display:inline-block;
+      padding:.25rem .75rem;
+      border-radius:999px;
+      background:#4a4a4a;
+      color:#fff;
+      font-weight:600;
+      font-size:.75rem;
+      letter-spacing:0.02em;
+    }
+    
+    /* Avatar Styling */
+    .avatar-wrap{
+      position:relative;
+      width:120px;
+      height:120px;
+      margin:0 auto;
+    }
+    .avatar-img{
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      object-fit:cover;
+      border:3px solid var(--gold);
+      box-shadow:var(--shadow-md);
+    }
+    .avatar-edit{
+      position:absolute;
+      right:0;
+      bottom:0;
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      background:var(--gold);
+      color:#fff;
+      border:3px solid #fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      box-shadow:var(--shadow-sm);
+    }
+    .avatar-edit:hover{
+      background:var(--gold-dark);
+      transform:scale(1.05);
+    }
+    .avatar-edit i{
+      font-size:0.875rem;
+    }
+    
+    /* Stats */
+    .stat{
+      text-align:center;
+    }
+    .stat-num{
+      font-weight:700;
+      font-size:1.5rem;
+      color:var(--text-primary);
+      margin-bottom:4px;
+    }
+    .stat-label{
+      font-size:0.8125rem;
+      color:var(--text-secondary);
+      font-weight:500;
+    }
+    
+    /* Form Controls */
+    .form-label{
+      font-weight:600;
+      font-size:0.875rem;
+      color:var(--text-primary);
+      margin-bottom:8px;
+    }
+    .form-control{
+      padding:10px 14px;
+      font-size:0.9375rem;
+      border:1.5px solid var(--card-border);
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .form-control:focus{
+      border-color:var(--gold);
+      box-shadow:0 0 0 3px rgba(166,134,4,0.1);
+      outline:none;
+    }
+    .form-control::placeholder{
+      color:var(--text-muted);
+    }
+    
+    /* Buttons */
+    .btn-primary{
+      background:var(--gold);
+      border-color:var(--gold);
+      color:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-primary:hover{
+      background:var(--gold-dark);
+      border-color:var(--gold-dark);
+      transform:translateY(-1px);
+      box-shadow:var(--shadow-sm);
+    }
+    .btn-outline-primary{
+      border:2px solid var(--gold);
+      color:var(--gold);
+      background:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-outline-primary:hover{
+      background:var(--gold);
+      border-color:var(--gold);
+      color:#fff;
+      transform:translateY(-1px);
+      box-shadow:var(--shadow-sm);
+    }
+    .btn-outline-secondary{
+      border:2px solid var(--card-border);
+      color:var(--text-primary);
+      background:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-outline-secondary:hover{
+      background:var(--table-header-bg);
+      border-color:var(--card-border);
+      color:var(--text-primary);
+    }
+    .btn-light{
+      border:2px solid var(--card-border);
+      color:var(--text-primary);
+      background:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-light:hover{
+      background:var(--table-header-bg);
+      border-color:var(--card-border);
+    }
+    
+    /* Section Headers */
+    h5{
+      font-weight:700;
+      font-size:1.125rem;
+      color:var(--text-primary);
+      margin-bottom:20px;
+    }
+    h6{
+      font-weight:600;
+      font-size:1rem;
+      color:var(--text-primary);
+      margin-bottom:16px;
+    }
+    
+    /* Dividers */
+    hr{
+      border-color:var(--card-border);
+      opacity:1;
+      margin:24px 0;
+    }
+    
+    /* Quick Actions */
+    .quick-actions .btn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    
+    /* Main Content */
+    main.container-fluid{
+      padding:24px;
+    }
+    
+    /* Name and Email */
+    #libName{
+      font-weight:700;
+      font-size:1.25rem;
+      color:var(--text-primary);
+      margin-bottom:4px;
+    }
+    #libEmail{
+      font-size:0.875rem;
+      color:var(--text-secondary);
+      margin-bottom:16px;
+    }
+    
+    /* Status Pill */
+    .status-pill{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:0.8125rem;
+      font-weight:600;
+      background:#d1fae5;
+      color:#059669;
+      border:1px solid rgba(5,150,105,0.2);
+      box-shadow:0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    /* Date Pill */
+    .date-pill{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:0.8125rem;
+      font-weight:600;
+      background:#dbeafe;
+      color:#2563eb;
+      border:1px solid rgba(37,99,235,0.2);
+      box-shadow:0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    /* Avatar Dropdown */
+    .avatar-dropdown{
+      min-width:260px;
+      border-radius:var(--border-radius-sm);
+      box-shadow:var(--shadow-lg);
+      border:1px solid var(--ui-border);
+      padding:8px;
+    }
+    .avatar-dropdown-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      cursor:pointer;
+      transition:all 0.2s ease;
+      color:var(--text-primary);
+      text-decoration:none;
+      font-size:0.875rem;
+      white-space:nowrap;
+    }
+    .avatar-dropdown-item:hover{
+      background:var(--table-header-bg);
+      color:var(--text-primary);
+    }
+    .avatar-dropdown-item i{
+      font-size:0.9375rem;
+      color:var(--gold);
+      width:18px;
+      text-align:center;
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    
+    /* Avatar Click Animation */
+    .avatar-img{
+      transition:all 0.2s ease;
+    }
+    .avatar-img:active{
+      transform:scale(0.95);
+      opacity:0.8;
+    }
+    .avatar-img.click-effect{
+      animation:avatarClick 0.3s ease;
+    }
+    @keyframes avatarClick{
+      0%{
+        transform:scale(1);
+      }
+      50%{
+        transform:scale(0.95);
+      }
+      100%{
+        transform:scale(1);
+      }
+    }
+    
+    /* Consistent Header Design - Matching Dashboard */
+    .admin-header-gold {
+      background: #fff !important;
+      color: var(--text-primary) !important;
+      border-bottom:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      padding:12px 0;
+    }
+    .admin-header-gold .fw-bold,
+    .admin-header-gold .h5,
+    .admin-header-gold #pageTitle {
+      color: var(--text-primary) !important;
+      font-weight:700;
+      font-size:1.25rem;
+      letter-spacing:0.01em;
+    }
+    .admin-header-gold .btn-link {
+      color: var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .admin-header-gold .btn-link:hover {
+      color: var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    
+    /* Search Bar - Matching Dashboard */
+    .search-bar-custom {
+      height: 42px;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+    }
+    .search-bar-custom .input-group-text {
+      border-top-left-radius: var(--border-radius-sm);
+      border-bottom-left-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--ui-border);
+      border-right: none !important;
+      outline: none !important;
+      color:var(--text-secondary);
+    }
+    .search-bar-custom .form-control {
+      border-top-right-radius: var(--border-radius-sm);
+      border-bottom-right-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--ui-border);
+      border-left: none !important;
+      color: var(--text-primary);
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15);
+      border-radius: var(--border-radius-sm);
+    }
+    .search-bar-custom:focus-within .input-group-text,
+    .search-bar-custom:focus-within .form-control {
+      border-color: var(--gold);
+      background: #fff !important;
+    }
+    
+    /* Notification Button */
+    .notification-btn{
+      color:var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .notification-btn:hover{
+      color:var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    .notification-badge{
+      font-size:0.6875rem;
+      padding:3px 7px;
+      font-weight:600;
+      background:var(--gold) !important;
+      color:#fff !important;
+    }
+    .notification-dropdown{
+      border-radius:12px;
+      box-shadow:var(--shadow-lg);
+      border:1px solid var(--ui-border);
+      margin-top:8px;
+    }
+    
+    /* Admin Button - Avatar */
+    .admin-btn-custom {
+      padding: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--ui-border);
+      background: #fff;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .admin-btn-custom:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(166, 134, 4, 0.1);
+    }
+    .admin-btn-custom:focus,
+    .admin-btn-custom:active,
+    .admin-btn-custom.show {
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 0 0.2rem rgba(166, 134, 4, 0.25) !important;
+    }
+    .admin-btn-custom img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  </style>
 </head>
-<body class="sb-body">
+<body class="sb-body loading">
   <!-- Shared Sidebar -->
   <div id="sidebar-root"></div>
 
-  <!-- Main -->
   <div class="sb-wrapper">
-    <!-- Topbar (Dashboard-style) -->
-    <nav class="sb-topbar navbar navbar-expand bg-white sticky-top">
+    <!-- Topbar -->
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
       <div class="container-fluid">
         <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
           <i class="bi bi-list fs-4"></i>
         </button>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Librarian Profile</div>
 
-        <!-- Page title -->
-        <div class="fw-bold h5 mb-0">Librarian Profile</div>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group input-group-sm search-bar-custom">
+              <span class="input-group-text bg-light border-0 search-icon-wrapper"><i class="bi bi-search"></i></span>
+              <input class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search">
+            </div>
+          </form>
 
-        <!-- Account dropdown -->
-        <div class="dropdown ms-auto">
-          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown">
-            <i class="bi bi-person-gear me-2"></i>Librarian
+          <div class="dropdown me-2">
+            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
+              <i class="bi bi-bell fs-5"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
+              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">Notifications</h6></li>
+              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userMenuBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
+              <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i>Settings</a></li>
-            <li><a class="dropdown-item" href="#"><i class="bi bi-bell me-2"></i>Notifications</a></li>
+            <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
+            <li><a class="dropdown-item" href="dashboard.html"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="login.html"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
           </ul>
+          </div>
         </div>
       </div>
     </nav>
 
     <!-- Content -->
-    <main class="container-fluid py-4">
+    <main class="sb-content container-fluid">
       <div class="row g-4">
-        <!-- Left: Profile summary -->
+        <!-- Left: Profile Summary -->
         <div class="col-12 col-lg-4">
-          <section class="card profile-card p-4">
-            <div class="text-center">
-              <div class="avatar-wrap mx-auto mb-3">
-                <!-- Default circular avatar -->
-                <img id="avatarPreview" src="assets/img/default-avatar.png" alt="Avatar" class="avatar-img">
-                <label for="avatarInput" class="avatar-edit btn btn-light btn-sm" title="Change photo">
+          <section class="card profile-card">
+            <div class="card-header">
+              <h5 class="mb-0" style="color:#fff;"><i class="bi bi-person-circle me-2"></i>Profile Summary</h5>
+            </div>
+            <div class="card-body">
+              <div class="text-center mb-4">
+                <div class="avatar-wrap mb-3 position-relative" style="display:inline-block;">
+                  <div class="dropdown">
+                    <img id="avatarPreview" src="assets/img/default-avatar.png" alt="Avatar" class="avatar-img" style="cursor:pointer;" data-bs-toggle="dropdown" aria-expanded="false">
+                    <ul class="dropdown-menu dropdown-menu-end avatar-dropdown">
+                      <li><a class="avatar-dropdown-item" href="#" id="viewProfilePicture"><i class="bi bi-eye"></i>See profile picture</a></li>
+                      <li><a class="avatar-dropdown-item" href="#" id="chooseProfilePicture"><i class="bi bi-image"></i>Choose profile picture</a></li>
+                    </ul>
+                  </div>
+                  <label for="avatarInput" class="avatar-edit" title="Change photo" id="avatarEditLabel">
                   <i class="bi bi-camera"></i>
                 </label>
                 <input id="avatarInput" type="file" accept="image/*" class="d-none">
               </div>
-              <h5 class="mb-1" id="libName">Librarian Name</h5>
-              <div class="text-muted small mb-3">librarian@library.edu</div>
-              <span class="role-pill">Librarian</span>
+                <h5 id="libName">—</h5>
+                <div id="libEmail" class="mb-3">—</div>
+                <span class="role-pill">Librarian</span>
             </div>
 
-            <hr class="my-4">
+              <hr>
 
-            <div class="row text-center g-3">
-              <div class="col-4">
-                <div class="stat">
-                  <div class="stat-num">152</div>
-                  <div class="stat-label">Books</div>
+              <div class="account-info">
+                <div class="mb-3">
+                  <div class="text-muted small mb-1 fw-bold" style="font-size:0.875rem; color:var(--text-secondary);"><i class="bi bi-check-circle-fill me-1"></i>Account Status</div>
+                  <span class="status-pill" id="accountStatus">Active</span>
+                </div>
+                <div>
+                  <div class="text-muted small mb-1 fw-bold" style="font-size:0.875rem; color:var(--text-secondary);"><i class="bi bi-calendar3 me-1"></i>Joined</div>
+                  <span class="date-pill" id="joinedDate">—</span>
                 </div>
               </div>
-              <div class="col-4">
-                <div class="stat">
-                  <div class="stat-num">38</div>
-                  <div class="stat-label">Borrowed</div>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="stat">
-                  <div class="stat-num">6</div>
-                  <div class="stat-label">Overdue</div>
-                </div>
-              </div>
-            </div>
-
-            <hr class="my-4">
-
-            <div class="quick-actions d-grid gap-2">
-              <a href="librarian-books.html" class="btn btn-outline-primary">
-                <i class="bi bi-journal-richtext me-2"></i>Manage Books
-              </a>
-              <a href="librarian-dashboard.html" class="btn btn-outline-secondary">
-                <i class="bi bi-speedometer2 me-2"></i>Dashboard
-              </a>
             </div>
           </section>
         </div>
 
-        <!-- Right: Editable form (UI-only) -->
+        <!-- Right: Editable Form -->
         <div class="col-12 col-lg-8">
-          <section class="card p-4">
-            <h5 class="mb-3">Personal Information</h5>
-
-            <form class="row g-3">
+          <section class="card">
+            <div class="card-header">
+              <h5 class="mb-0" style="color:#fff;"><i class="bi bi-person-vcard me-2"></i>Personal Information</h5>
+            </div>
+            <div class="card-body">
+              <form id="profileForm" class="row g-4" novalidate>
               <div class="col-12 col-md-6">
                 <label class="form-label">Full Name</label>
-                <input type="text" class="form-control" placeholder="e.g., Khimo Gumatay">
+                <input id="fName" type="text" class="form-control" required>
+                <div class="invalid-feedback">Name is required.</div>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Email</label>
-                <input type="email" class="form-control" placeholder="name@example.com">
+                <input id="fEmail" type="email" class="form-control" required>
+                <div class="invalid-feedback">Valid email is required.</div>
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Phone</label>
-                <input type="text" class="form-control" placeholder="09xx xxx xxxx">
+                <input id="fPhone" type="text" class="form-control" placeholder="09xx xxx xxxx">
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Address</label>
-                <input type="text" class="form-control" placeholder="City, Country">
+                <input id="fAddress" type="text" class="form-control" placeholder="City, Country">
               </div>
 
               <div class="col-12">
-                <hr class="my-2">
-                <h6 class="mb-2">Security</h6>
+                  <hr>
+                  <h6 class="mb-3" style="margin-top:8px;"><i class="bi bi-shield-lock me-2"></i>Security</h6>
               </div>
 
               <div class="col-12 col-md-6">
                 <label class="form-label">New Password</label>
-                <input type="password" class="form-control" placeholder="********">
+                  <input id="fPw" type="password" class="form-control" placeholder="Leave blank to keep current">
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Confirm Password</label>
-                <input type="password" class="form-control" placeholder="********">
+                  <input id="fPw2" type="password" class="form-control" placeholder="Confirm new password">
               </div>
 
               <div class="col-12 d-flex gap-2 justify-content-end pt-2">
                 <button type="reset" class="btn btn-light">Reset</button>
-                <button type="button" class="btn btn-primary">Save Changes</button>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
               </div>
             </form>
+            </div>
           </section>
 
-          <section class="card p-4 mt-4">
-            <h5 class="mb-3">About</h5>
-            <p class="mb-0 text-muted">
-              Update and manage your profile details.
-            </p>
+          <section class="card mt-4">
+            <div class="card-header">
+              <h5 class="mb-0" style="color:#fff;"><i class="bi bi-info-circle me-2"></i>About</h5>
+            </div>
+            <div class="card-body">
+              <p class="mb-0" style="color:var(--text-secondary);">
+                Update and manage your librarian profile details. Changes to your profile information will be reflected across the system.
+              </p>
+            </div>
           </section>
         </div>
       </div>
@@ -160,21 +635,159 @@
 
   <!-- Scripts -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-LOANS-COMBINED-V4"></script>
   <script>
-    renderSidebar('profile');
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+    // --- Auth helper ---
+    async function getMe() {
+      const res = await fetch('/api/check-auth', { credentials:'include' });
+      if (res.status === 401) { location.href = 'login.html'; return null; }
+      const data = await res.json();
+      if (!data.success) { location.href = 'login.html'; return null; }
+      return data.user;
+    }
 
-    // UI-only avatar preview
+    // --- Page bootstrap ---
+    (async () => {
+      try {
+        const me = await getMe();
+        if (!me) return;
+
+        const role = (me.role || '').toLowerCase();
+        
+        // Gate to librarians only
+        if (role !== 'librarian') { location.href = 'dashboard.html'; return; }
+
+        // Cache role for sidebar
+        if (['admin', 'librarian', 'student'].includes(role)) {
+          localStorage.setItem('userRole', role);
+        }
+
+        // Build sidebar for this page (active: profile) - prevent flicker
+        renderSidebar('profile', role, false);
+        
+        // Load avatar in header if available
+        const headerAvatar = document.querySelector('#userMenuBtn img.avatar-32');
+        if (headerAvatar && me.avatar && me.avatar.trim() !== '') {
+          headerAvatar.src = me.avatar;
+        }
+        
+        // Update profile info
+        document.getElementById('libName').textContent = `${me.first_name || ''} ${me.last_name || ''}`.trim() || 'Librarian Name';
+        document.getElementById('libEmail').textContent = me.email || 'librarian@library.edu';
+        document.getElementById('whoChip').textContent = `${me.first_name || ''} ${me.last_name || ''}`.trim() || 'Librarian';
+        
+        // Update joined date if available
+        if (me.created_at) {
+          const joinedDate = new Date(me.created_at);
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          document.getElementById('joinedDate').textContent = joinedDate.toLocaleDateString('en-US', options);
+        }
+        
+        // Populate form fields
+        document.getElementById('fName').value = `${me.first_name || ''} ${me.middle_name || ''} ${me.last_name || ''} ${me.suffix || ''}`.trim();
+        document.getElementById('fEmail').value = me.email || '';
+        document.getElementById('fPhone').value = me.phone || '';
+        document.getElementById('fAddress').value = me.address || '';
+        
+        // Load avatar preview
+        const avatarPreview = document.getElementById('avatarPreview');
+        if (me.avatar && me.avatar.trim() !== '') {
+          avatarPreview.src = me.avatar;
+        }
+        
+        // Logout handler
+        document.getElementById('logoutLink')?.addEventListener('click', async function(e) {
+          e.preventDefault();
+          try {
+            await fetch('/api/logout', {method:'POST', credentials:'include'});
+            localStorage.removeItem('userRole');
+            location.href = 'login.html';
+          } catch(e) {
+            location.href = 'login.html';
+          }
+        });
+        
+        // Sidebar toggle
+        const sidebarToggleBtn = document.getElementById('sidebarToggle');
+        if (sidebarToggleBtn) {
+          sidebarToggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (typeof window.toggleSidebar === 'function') {
+              window.toggleSidebar();
+            } else {
+              const isDesktop = window.innerWidth >= 992;
+              const cls = isDesktop ? 'sb-expanded' : 'sb-toggled';
+              document.body.classList.toggle(cls);
+              if (isDesktop) document.body.classList.remove('sb-toggled');
+            }
+          });
+        }
+        
+        // Remove loading class
+        document.body.classList.remove('loading');
+      } catch (e) {
+        console.error(e);
+        location.href = 'login.html';
+      }
+    })();
+
+    // Avatar preview functionality
     const avatarInput = document.getElementById('avatarInput');
     const avatarPreview = document.getElementById('avatarPreview');
-    avatarInput.addEventListener('change', () => {
-      const f = avatarInput.files?.[0];
-      if (!f) return;
-      const reader = new FileReader();
-      reader.onload = e => avatarPreview.src = e.target.result;
-      reader.readAsDataURL(f);
-    });
+    const chooseProfilePicture = document.getElementById('chooseProfilePicture');
+    
+    if (chooseProfilePicture) {
+      chooseProfilePicture.addEventListener('click', function(e) {
+        e.preventDefault();
+        avatarInput.click();
+      });
+    }
+    
+    if (avatarInput) {
+      avatarInput.addEventListener('change', () => {
+        const f = avatarInput.files?.[0];
+        if (!f) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+          avatarPreview.src = e.target.result;
+          // Add click effect animation
+          avatarPreview.classList.add('click-effect');
+          setTimeout(() => avatarPreview.classList.remove('click-effect'), 300);
+        };
+        reader.readAsDataURL(f);
+      });
+    }
+    
+    // View profile picture functionality
+    const viewProfilePicture = document.getElementById('viewProfilePicture');
+    if (viewProfilePicture) {
+      viewProfilePicture.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Create a modal to view full-size avatar
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.id = 'avatarViewModal';
+        modal.innerHTML = `
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header" style="background:#111; color:#fff;">
+                <h5 class="modal-title">Profile Picture</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+              </div>
+              <div class="modal-body text-center">
+                <img src="${avatarPreview.src}" alt="Profile Picture" style="max-width:100%; max-height:400px; border-radius:12px;">
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+        modal.addEventListener('hidden.bs.modal', function() {
+          document.body.removeChild(modal);
+        });
+      });
+    }
   </script>
 </body>
 </html>

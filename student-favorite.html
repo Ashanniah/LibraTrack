@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -11,9 +11,10 @@
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
   <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
   <link href="assets/css/student-pages.css" rel="stylesheet">
 </head>
-<body class="sb-body">
+<body class="sb-body sb-expanded">
   <div id="sidebar-root"></div>
   <div class="sb-wrapper">
     <div class="page-head">
@@ -59,9 +60,23 @@
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
   <script>
-    /* paste the same renderStudentSidebar + toggleSidebar from student-search.html */
-    renderStudentSidebar('favorites');
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+    (async () => {
+      try {
+        const res = await fetch('/api/check-auth', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+        const data = await res.ok ? await res.json() : null;
+        const role = (data?.user?.role || 'student').toLowerCase();
+        if (['admin', 'librarian', 'student'].includes(role)) {
+          renderSidebar('favorites', role);
+        }
+      } catch {
+        renderSidebar('favorites', 'student');
+      }
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        if (typeof toggleSidebar === 'function') toggleSidebar();
+        else document.body.classList.toggle('sb-expanded');
+      });
+    })();
   </script>
 </body>

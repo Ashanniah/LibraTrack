@@ -1,47 +1,449 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>LibraTrack - History</title>
 
+  <!-- Fonts / Icons / Bootstrap -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
-  <link href="assets/css/sidebar.css" rel="stylesheet">
-  <link href="assets/css/librarian-history.css" rel="stylesheet">
+  <!-- Shared + page styles -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+  <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
+
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <style>
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --header-bg:#fff;
+      --table-header-bg:#111;
+      --card-border:#e5e7eb;
+    }
+    html{font-size:14px;}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+    main.container-fluid{padding:24px!important}
+
+    /* Header Styling */
+    .admin-header-gold{
+      background:#fff!important;
+      border-bottom:1px solid var(--card-border);
+      padding:12px 24px;
+    }
+    .search-bar-custom {
+      height: 42px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-sm);
+      background: #fff;
+      overflow: hidden;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+      border: none !important;
+      background: transparent !important;
+    }
+    .search-bar-custom .input-group-text {
+      color: var(--text-secondary);
+      padding-left: 16px;
+      padding-right: 8px;
+    }
+    .search-bar-custom .form-control {
+      color: var(--text-primary);
+      padding-left: 8px;
+      padding-right: 16px;
+    }
+    .search-bar-custom .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166,134,4,0.15);
+      border-color: var(--brand-gold);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      color: var(--text-primary);
+    }
+    .notification-btn{
+      width:44px;
+      height:44px;
+      border-radius:var(--border-radius-sm);
+      border:none;
+      background:transparent;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+      color:var(--text-primary);
+      padding:0;
+      position:relative;
+    }
+    .notification-btn:hover{
+      background:#f8f9fa;
+      color:var(--text-primary);
+    }
+    .notification-btn i{
+      font-size:1.25rem;
+    }
+    .admin-btn-custom{
+      padding:0;
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:1px solid var(--card-border);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+      overflow:hidden;
+    }
+    .admin-btn-custom:hover{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 2px rgba(166,134,4,0.1);
+    }
+    .admin-btn-custom img{
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    /* Table Styling */
+    .table-modern{
+      margin-bottom:0;
+    }
+    .table-modern thead th{
+      background:#fff;
+      color:var(--text-secondary);
+      font-weight:700;
+      font-size:0.8125rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      padding:16px var(--cell-pad-x);
+      border-bottom:2px solid var(--ui-border);
+      vertical-align:middle;
+    }
+    .table-modern tbody td{
+      padding:var(--cell-pad-y) var(--cell-pad-x);
+      vertical-align:middle;
+      border-bottom:1px solid var(--ui-border);
+      color:var(--text-primary);
+    }
+    .table-modern tbody tr:hover{
+      background:#f8f9fa;
+    }
+
+    /* Card Styling */
+    .card{
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--ui-border);
+      background:#fff;
+    }
+    .card-header{
+      background:var(--table-header-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:20px var(--card-pad);
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+
+    /* Pagination */
+    .pagination .page-item.active .page-link{
+      background:var(--brand-gold)!important;
+      color:#fff!important;
+      border-color:var(--brand-gold)!important;
+    }
+
+    /* Filter Section */
+    .filter-section{
+      background:#fff;
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--ui-border);
+      padding:20px var(--card-pad);
+      margin-bottom:24px;
+    }
+    .filter-section .form-label{
+      font-weight:600;
+      font-size:0.875rem;
+      color:var(--text-primary);
+      margin-bottom:8px;
+    }
+    .filter-section .form-control,
+    .filter-section .form-select{
+      border:1.5px solid var(--ui-border);
+      border-radius:var(--border-radius-sm);
+      padding:10px 14px;
+      font-size:0.9375rem;
+    }
+    .filter-section .form-control:focus,
+    .filter-section .form-select:focus{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 3px rgba(166,134,4,0.1);
+    }
+
+    /* Empty State */
+    .empty{
+      text-align:center;
+      padding:48px 24px;
+      color:var(--text-secondary);
+    }
+    .empty i{
+      color:var(--text-secondary);
+      opacity:0.5;
+    }
+
+    /* User View Modal - 2 Column Layout */
+    .userview-2col .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--ui-border);
+      box-shadow:var(--shadow-lg);
+    }
+    .userview-2col .modal-header,
+    .userview-2col .modal-header.modal-header-dark{
+      background:var(--sidebar-bg) !important;
+      color:#fff !important;
+      border-bottom:0 !important;
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
+      padding:24px 24px !important;
+      min-height:60px !important;
+    }
+    .userview-2col .modal-header .modal-title{
+      color:#fff;
+      font-weight:700;
+      font-size:1.125rem;
+    }
+    .userview-2col .modal-header .btn-close{
+      filter:invert(1) grayscale(1);
+      opacity:0.8;
+    }
+    .userview-2col .modal-header .btn-close:hover{
+      opacity:1;
+    }
+    .userview-2col .modal-body{
+      padding:24px !important;
+      background:#fff;
+    }
+    .userview-2col .vu-head{
+      display:flex;
+      gap:20px;
+      align-items:center;
+      margin-bottom:24px;
+      padding-bottom:20px;
+      border-bottom:1px solid var(--ui-border);
+    }
+    .userview-2col .vu-id{
+      flex:1;
+    }
+    .userview-2col .vu-name{
+      font-weight:700;
+      font-size:1.25rem;
+      color:var(--text-primary);
+      margin-bottom:4px;
+    }
+    .userview-2col .vu-email{
+      font-size:0.875rem;
+      color:var(--text-secondary);
+      margin-bottom:12px;
+    }
+    .userview-2col .vu-chips{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .userview-2col .vu-sheet{
+      margin-top:0;
+      border:1px solid var(--ui-border);
+      border-radius:var(--border-radius);
+      overflow:hidden;
+      background:#fff;
+    }
+    .userview-2col .vu-row{
+      display:grid !important;
+      grid-template-columns:160px 1fr !important;
+      gap:16px;
+      padding:14px 20px;
+      border-bottom:1px solid #f0f0f0;
+      align-items:center;
+    }
+    .userview-2col .vu-row:last-child{
+      border-bottom:none;
+    }
+    .userview-2col .vu-row:hover{
+      background-color:#f8f9fa;
+    }
+    .userview-2col .vu-col{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .userview-2col .vu-field{
+      font-weight:700;
+      color:var(--text-secondary);
+      font-size:0.875rem;
+    }
+    .userview-2col .vu-field i{
+      color:var(--text-secondary);
+      font-size:0.875rem;
+      width:18px;
+      text-align:center;
+    }
+    .userview-2col .vu-value{
+      font-weight:500;
+      color:var(--text-primary);
+      font-size:0.875rem;
+    }
+    .userview-2col .vu-headrow{
+      font-weight:700;
+      background:#a68604 !important;
+      color:#fff !important;
+      border-bottom:none !important;
+      padding:16px 20px;
+    }
+    .userview-2col .vu-headrow .vu-col{
+      background:transparent !important;
+      border:none !important;
+    }
+    .userview-2col .vu-headrow .vu-field,
+    .userview-2col .vu-headrow .vu-value{
+      color:#fff !important;
+      font-size:0.8125rem;
+      font-weight:700 !important;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      background:transparent !important;
+      border:none !important;
+    }
+    .userview-2col .vu-headrow .vu-field i,
+    .userview-2col .vu-headrow .vu-value i{
+      color:#fff !important;
+      filter:none !important;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      padding:0.25rem 0.75rem;
+      border-radius:999px;
+      font-size:0.75rem;
+      font-weight:600;
+    }
+    .chip-role{
+      background:rgba(13,110,253,0.12);
+      color:#0d6efd;
+      border:1px solid rgba(13,110,253,0.2);
+    }
+    .chip-status{
+      background:rgba(25,135,84,0.12);
+      color:#198754;
+      border:1px solid rgba(25,135,84,0.2);
+    }
+    .chip-status.disabled,
+    .chip-status.overdue{
+      background:rgba(220,53,69,0.12);
+      color:#dc3545;
+      border:1px solid rgba(220,53,69,0.2);
+    }
+    .chip-status.returned{
+      background:rgba(25,135,84,0.12);
+      color:#198754;
+      border:1px solid rgba(25,135,84,0.2);
+    }
+    .userview-2col .modal-footer{
+      border-top:1px solid var(--ui-border);
+      padding:16px 24px;
+      background:#f8f9fa;
+      border-radius:0 0 var(--border-radius-lg) var(--border-radius-lg);
+    }
+    .userview-2col .modal-footer .btn{
+      border-radius:var(--border-radius-sm);
+      font-weight:500;
+      padding:8px 20px;
+      background:#4a4a4a !important;
+      border-color:#4a4a4a !important;
+      color:#fff !important;
+    }
+    .userview-2col .modal-footer .btn:hover{
+      background:#3a3a3a !important;
+      border-color:#3a3a3a !important;
+      color:#fff !important;
+    }
+  </style>
 </head>
 <body class="sb-body">
   <div id="sidebar-root"></div>
 
   <div class="sb-wrapper">
-    <div class="topbar">
-      <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-3">
-        <div class="d-flex align-items-center gap-2">
-          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
-            <i class="bi bi-list fs-4"></i>
-          </button>
-          <div class="page-title">History</div>
-        </div>
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <div class="fw-bold h5 mb-0" id="pageTitle">History</div>
 
-        <div class="d-flex align-items-center gap-2 tools-wrap">
-          <div class="search-wrap flex-grow-1">
-            <i class="bi bi-search"></i>
-            <input id="q" type="search" placeholder="Search member, title, ISBN…">
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group search-bar-custom">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="q" class="form-control" type="search" placeholder="Search member, title, ISBN…">
+            </div>
+          </form>
+
+          <div class="dropdown position-relative">
+            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
+              <i class="bi bi-bell"></i>
+              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
+              <li><h6 class="dropdown-header">Notifications</h6></li>
+              <li><hr class="dropdown-divider"></li>
+              <li id="notificationList">
+                <div class="px-3 py-2 text-center text-muted">
+                  <small>No notifications</small>
+                </div>
+              </li>
+            </ul>
           </div>
-          <button id="btnExport" class="btn btn-outline-secondary d-flex align-items-center gap-2">
-            <i class="bi bi-download"></i> Export CSV
-          </button>
+
+          <div class="dropdown">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
 
     <main class="container-fluid py-4">
       <!-- Filters -->
-      <section class="card p-3 mb-3">
-        <div class="row g-2">
+      <section class="filter-section">
+        <div class="row g-3">
           <div class="col-6 col-md-3">
             <label class="form-label">Status</label>
             <select id="fStatus" class="form-select">
@@ -68,8 +470,16 @@
 
       <!-- Table -->
       <section class="card p-0">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="fw-semibold">History</div>
+            <button id="btnExport" class="btn btn-sm" style="background:#fff; color:#111; border:1px solid rgba(255,255,255,0.3); padding:6px 16px; cursor:pointer; min-width:80px;">
+              <i class="bi bi-download me-2"></i>Export CSV
+            </button>
+          </div>
+        </div>
         <div class="table-responsive">
-          <table class="table align-middle mb-0">
+          <table class="table table-modern align-middle mb-0">
             <thead>
               <tr>
                 <th>Member</th>
@@ -91,9 +501,9 @@
           <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
         </div>
 
-        <div id="emptyState" class="empty d-none">
-          <i class="bi bi-clock-history fs-2 d-block mb-2"></i>
-          No records match your filters.
+        <div id="emptyState" class="empty d-none text-center py-5">
+          <i class="bi bi-clock-history fs-2 d-block mb-2 text-muted"></i>
+          <p class="text-muted mb-0">No records match your filters.</p>
         </div>
       </section>
     </main>
@@ -102,57 +512,78 @@
   <!-- View Detail Modal -->
   <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content hview">
-        <div class="modal-header border-0 pb-0">
+      <div class="modal-content userview-2col">
+        <div class="modal-header modal-header-dark">
           <h5 class="modal-title">Transaction Details</h5>
           <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body pt-0">
-          <div class="hv-head">
-            <div class="hv-icon"><i class="bi bi-journal-arrow-down"></i></div>
-            <div class="hv-main">
-              <div class="hv-title" id="vTitle">—</div>
-              <div class="text-muted small" id="vMeta">—</div>
-              <div class="hv-chips">
-                <span id="vStatus" class="chip chip-neutral">Status</span>
-                <span id="vLoan" class="chip chip-neutral">Loan #</span>
+        <div class="modal-body">
+          <div class="vu-head">
+            <div class="vu-id">
+              <div class="vu-name" id="vTitle">—</div>
+              <div class="vu-email" id="vMeta">—</div>
+              <div class="vu-chips">
+                <span id="vStatus" class="chip chip-status">Status</span>
+                <span id="vLoan" class="chip chip-role">Loan #</span>
               </div>
             </div>
           </div>
 
-          <div class="hv-sheet">
-            <div class="hv-row hv-headrow">
-              <div class="hv-col hv-field"><i class="bi bi-info-circle me-2"></i> Field</div>
-              <div class="hv-col hv-value"><i class="bi bi-clipboard-check me-2"></i> Details</div>
+          <div class="vu-sheet">
+            <div class="vu-row vu-headrow">
+              <div class="vu-col vu-field"><i class="bi bi-info-circle"></i> Field</div>
+              <div class="vu-col vu-value"><i class="bi bi-clipboard-check"></i> Details</div>
             </div>
-            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-person"></i> Member</div><div class="hv-col hv-value" id="vMember">—</div></div>
-            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-calendar-plus"></i> Borrowed</div><div class="hv-col hv-value" id="vBorrowed">—</div></div>
-            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-calendar-check"></i> Due</div><div class="hv-col hv-value" id="vDue">—</div></div>
-            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-calendar2-check"></i> Returned</div><div class="hv-col hv-value" id="vReturned">—</div></div>
-            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-stopwatch"></i> Days Late</div><div class="hv-col hv-value" id="vLate">—</div></div>
-            <div class="hv-row"><div class="hv-col hv-field"><i class="bi bi-card-text"></i> Notes</div><div class="hv-col hv-value" id="vNotes">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-person"></i> Member</div><div class="vu-col vu-value" id="vMember">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-calendar-plus"></i> Borrowed</div><div class="vu-col vu-value" id="vBorrowed">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-calendar-check"></i> Due</div><div class="vu-col vu-value" id="vDue">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-calendar2-check"></i> Returned</div><div class="vu-col vu-value" id="vReturned">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-stopwatch"></i> Days Late</div><div class="vu-col vu-value" id="vLate">—</div></div>
+            <div class="vu-row"><div class="vu-col vu-field"><i class="bi bi-card-text"></i> Notes</div><div class="vu-col vu-value" id="vNotes">—</div></div>
           </div>
         </div>
-        <div class="modal-footer border-0 pt-0">
-          <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        <div class="modal-footer">
+          <button class="btn btn-light" data-bs-dismiss="modal">Back to list</button>
         </div>
       </div>
     </div>
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-LOANS-COMBINED-V4"></script>
   <script>
-    renderSidebar('history');
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+    // Initialize with authentication check
+    (async () => {
+      const res = await fetch('/api/check-auth', {credentials:'include'});
+      if (!res.ok) { location.href = 'login.html'; return; }
+      const data = await res.json().catch(()=>null);
+      const role = (data?.user?.role || '').toLowerCase();
+      if (role !== 'librarian' && role !== 'admin') { location.href = 'dashboard.html'; return; }
 
-    // Demo data (replace with PHP later)
-    // model: {id, loanNo, member, studNo, book, isbn, borrowedAt, dueAt, returnedAt?, status, daysLate, notes}
-    let history = [
-      {id:1, loanNo:'10023', member:'Juan Dela Cruz', studNo:'2025-12345', book:'Clean Code', isbn:'978-0132350884', borrowedAt:'2025-09-01 09:00', dueAt:'2025-09-08', returnedAt:'2025-09-08 08:30', status:'returned', daysLate:0, notes:''},
-      {id:2, loanNo:'10045', member:'Lea Cruz', studNo:'2025-99877', book:'Computer Networks', isbn:'978-0132126959', borrowedAt:'2025-09-03 10:00', dueAt:'2025-09-10', returnedAt:null, status:'borrowed', daysLate:0, notes:'—'},
-      {id:3, loanNo:'10012', member:'Mark Reyes', studNo:'2024-88231', book:'Harry Potter 1', isbn:'978-1408855652', borrowedAt:'2025-08-25 14:00', dueAt:'2025-09-01', returnedAt:null, status:'overdue', daysLate:12, notes:'2 reminders sent'}
-    ];
+      renderSidebar('history', role, false);
+      localStorage.setItem('userRole', role);
+      
+      // Load avatar in header if available
+      const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+      if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') {
+        headerAvatar.src = data.user.avatar;
+      }
+      
+      document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+      
+      // Logout function
+      window.logout = async function() {
+        try {
+          await fetch('/api/logout', {method:'POST', credentials:'include'});
+          localStorage.removeItem('userRole');
+          location.href = 'login.html';
+        } catch(e) {
+          location.href = 'login.html';
+        }
+      };
+
+      // Data from backend
+      let allLoans = [];
 
     // Elements
     const q=document.getElementById('q'), fStatus=document.getElementById('fStatus'), fMember=document.getElementById('fMember'), fFrom=document.getElementById('fFrom'), fTo=document.getElementById('fTo');
@@ -162,14 +593,56 @@
     // Helpers
     const pageSize=10; let currentPage=1;
     const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+    const todayStr = () => new Date().toISOString().slice(0,10);
+    function isOverdue(loan){ 
+      // A loan is overdue only if it's not returned and due date has passed
+      if (loan.status === 'returned' || (loan.returned_at && loan.returned_at.trim() !== '')) return false;
+      const dueDate = loan.extended_due_at || loan.due_at;
+      if (!dueDate) return false;
+      return dueDate < todayStr();
+    }
+    function statusOf(loan){
+      // Check both status field and returned_at to determine if returned
+      if (loan.status === 'returned' || (loan.returned_at && loan.returned_at.trim() !== '')) {
+        return 'returned';
+      }
+      // For active loans, check if overdue
+      if (isOverdue(loan)) return 'overdue';
+      // Otherwise it's borrowed (active)
+      return 'borrowed';
+    }
+    
+    async function loadLoans() {
+      try {
+        const url = `/api/loans?page=1&pagesize=1000`;
+        const res = await fetch(url, {credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        if (!data.ok) { 
+          console.error('Failed to load loans:', data.error);
+          return;
+        }
+        allLoans = data.items || [];
+        render();
+      } catch(err) {
+        console.error('Error loading loans:', err);
+        alert('Error loading loans: ' + err.message);
+      }
+    }
+    
     function applyFilters(){
       const text=(q.value||'').toLowerCase().trim(), st=fStatus.value, mem=(fMember.value||'').toLowerCase().trim();
       const d1=fFrom.value? new Date(fFrom.value) : null, d2=fTo.value? new Date(fTo.value+'T23:59') : null;
-      return history.filter(h=>{
-        const hit=(h.member+' '+h.book+' '+h.isbn+' '+h.loanNo).toLowerCase().includes(text);
-        const stOk=st? h.status===st : true;
-        const memOk=mem? (h.member.toLowerCase().includes(mem) || (h.studNo||'').toLowerCase().includes(mem)) : true;
-        const dt=new Date(h.borrowedAt); const dateOk = (d1? dt>=d1:true) && (d2? dt<=d2:true);
+      return allLoans.filter(loan=>{
+        const studentName = (loan.student_name || '').toLowerCase();
+        const studentNo = (loan.student_no || '').toLowerCase();
+        const bookTitle = (loan.book_title || '').toLowerCase();
+        const isbn = (loan.isbn || '').toLowerCase();
+        const loanId = String(loan.loan_id || '');
+        const hit = (studentName + ' ' + bookTitle + ' ' + isbn + ' ' + loanId).includes(text);
+        const stOk = st ? statusOf(loan)===st : true;
+        const memOk = mem ? (studentName.includes(mem) || studentNo.includes(mem)) : true;
+        const borrowedDate = loan.borrowed_at ? new Date(loan.borrowed_at) : null;
+        const dateOk = borrowedDate ? ((d1? borrowedDate>=d1:true) && (d2? borrowedDate<=d2:true)) : true;
         return hit && stOk && memOk && dateOk;
       });
     }
@@ -189,35 +662,50 @@
       for(let p=1;p<=pages;p++) add(p,p,false,p===currentPage);
       add('›',Math.min(pages,currentPage+1),currentPage===pages); add('»',pages,currentPage===pages);
     }
-    function rowHtml(h){
-      const stChip = h.status==='returned' ? '<span class="badge text-bg-success-soft">Returned</span>'
-                  : h.status==='overdue' ? '<span class="badge text-bg-danger-soft">Overdue</span>'
+    function rowHtml(loan){
+      const st = statusOf(loan);
+      const stChip = st==='returned' ? '<span class="badge text-bg-success-soft">Returned</span>'
+                  : st==='overdue' ? '<span class="badge text-bg-danger-soft">Overdue</span>'
                   : '<span class="badge text-bg-primary-soft">Borrowed</span>';
+      const borrowedDate = loan.borrowed_at ? new Date(loan.borrowed_at).toLocaleString() : '—';
+      const dueDate = (loan.extended_due_at || loan.due_at) ? new Date(loan.extended_due_at || loan.due_at).toLocaleDateString() : '—';
+      const returnedDate = loan.returned_at ? new Date(loan.returned_at).toLocaleString() : '—';
+      const daysLate = loan.returned_at && loan.due_at ? Math.max(0, Math.floor((new Date(loan.returned_at) - new Date(loan.due_at)) / (1000*60*60*24))) : 
+                       (!loan.returned_at && loan.due_at && isOverdue(loan)) ? Math.floor((new Date() - new Date(loan.due_at)) / (1000*60*60*24)) : 0;
       return `
         <tr>
           <td>
-            <div class="fw-medium">${esc(h.member)}</div>
-            <div class="small text-muted">${esc(h.studNo)}</div>
+            <div class="fw-medium">${esc(loan.student_name)}</div>
+            <div class="small text-muted">${esc(loan.student_no || '—')}</div>
           </td>
           <td>
-            <div class="fw-medium">${esc(h.book)}</div>
-            <div class="small text-muted">${esc(h.isbn)}</div>
+            <div class="fw-medium">${esc(loan.book_title)}</div>
+            <div class="small text-muted">${esc(loan.isbn || '—')}</div>
           </td>
-          <td class="d-none d-lg-table-cell">${esc(h.loanNo)}</td>
-          <td>${esc(h.borrowedAt)}</td>
-          <td class="d-none d-lg-table-cell">${esc(h.dueAt)}</td>
-          <td>${h.returnedAt? esc(h.returnedAt): '—'}</td>
+          <td class="d-none d-lg-table-cell">${esc(String(loan.loan_id || '—'))}</td>
+          <td>${esc(borrowedDate)}</td>
+          <td class="d-none d-lg-table-cell">${esc(dueDate)}</td>
+          <td>${returnedDate === '—' ? '—' : esc(returnedDate)}</td>
           <td>${stChip}</td>
           <td class="text-end">
-            <button class="btn btn-outline-secondary btn-sm" onclick="view(${h.id})"><i class="bi bi-eye"></i></button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="view(${loan.loan_id})" title="View" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+              <i class="bi bi-eye"></i>
+            </button>
           </td>
         </tr>`;
     }
 
     // Export
     document.getElementById('btnExport').onclick=()=>{
-      const rows=applyFilters().map(h=>[h.loanNo,h.member,h.studNo,h.book,h.isbn,h.borrowedAt,h.dueAt,h.returnedAt||'',h.status,h.daysLate||0,h.notes||'']);
-      const csv=["loanNo,member,studentNo,book,isbn,borrowedAt,dueAt,returnedAt,status,daysLate,notes", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+      const rows=applyFilters().map(loan=>{
+        const borrowedDate = loan.borrowed_at || '';
+        const dueDate = (loan.extended_due_at || loan.due_at) || '';
+        const returnedDate = loan.returned_at || '';
+        const daysLate = loan.returned_at && loan.due_at ? Math.max(0, Math.floor((new Date(loan.returned_at) - new Date(loan.due_at)) / (1000*60*60*24))) : 
+                         (!loan.returned_at && loan.due_at && isOverdue(loan)) ? Math.floor((new Date() - new Date(loan.due_at)) / (1000*60*60*24)) : 0;
+        return [loan.loan_id,loan.student_name,loan.student_no||'',loan.book_title,loan.isbn||'',borrowedDate,dueDate,returnedDate,statusOf(loan),daysLate];
+      });
+      const csv=["loan_id,member,studentNo,book,isbn,borrowedAt,dueAt,returnedAt,status,daysLate", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
       const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download="history.csv"; a.click(); URL.revokeObjectURL(a.href);
     };
 
@@ -225,24 +713,29 @@
     [q,fStatus,fMember,fFrom,fTo].forEach(el=>el.addEventListener('input',()=>{currentPage=1;render();}));
 
     // View modal
-    window.view=function(id){
-      const h=history.find(x=>x.id===id); if(!h) return;
-      document.getElementById('vTitle').textContent=h.book;
-      document.getElementById('vMeta').textContent=`${h.member} • Loan #${h.loanNo}`;
-      const vs=document.getElementById('vStatus'); vs.textContent=h.status==='overdue'?'Overdue':h.status==='returned'?'Returned':'Borrowed';
-      vs.className='chip ' + (h.status==='overdue'?'chip-danger':h.status==='returned'?'chip-success':'chip-neutral');
-      document.getElementById('vLoan').textContent='Loan #'+h.loanNo;
-      document.getElementById('vMember').textContent=`${h.member} (${h.studNo})`;
-      document.getElementById('vBorrowed').textContent=h.borrowedAt;
-      document.getElementById('vDue').textContent=h.dueAt;
-      document.getElementById('vReturned').textContent=h.returnedAt||'—';
-      document.getElementById('vLate').textContent=String(h.daysLate||0);
-      document.getElementById('vNotes').textContent=h.notes||'—';
+    window.view=function(loanId){
+      const loan=allLoans.find(x=>x.loan_id===loanId); if(!loan) return;
+      document.getElementById('vTitle').textContent=loan.book_title;
+      document.getElementById('vMeta').textContent=`${loan.student_name} • Loan #${loan.loan_id}`;
+      const st = statusOf(loan);
+      const vs=document.getElementById('vStatus'); 
+      vs.textContent=st==='overdue'?'Overdue':st==='returned'?'Returned':'Borrowed';
+      vs.className='chip ' + (st==='overdue'?'chip-danger':st==='returned'?'chip-success':'chip-neutral');
+      document.getElementById('vLoan').textContent='Loan #'+loan.loan_id;
+      document.getElementById('vMember').textContent=`${loan.student_name} (${loan.student_no||'—'})`;
+      document.getElementById('vBorrowed').textContent=loan.borrowed_at ? new Date(loan.borrowed_at).toLocaleString() : '—';
+      document.getElementById('vDue').textContent=(loan.extended_due_at || loan.due_at) ? new Date(loan.extended_due_at || loan.due_at).toLocaleDateString() : '—';
+      document.getElementById('vReturned').textContent=loan.returned_at ? new Date(loan.returned_at).toLocaleString() : '—';
+      const daysLate = loan.returned_at && loan.due_at ? Math.max(0, Math.floor((new Date(loan.returned_at) - new Date(loan.due_at)) / (1000*60*60*24))) : 
+                       (!loan.returned_at && loan.due_at && isOverdue(loan)) ? Math.floor((new Date() - new Date(loan.due_at)) / (1000*60*60*24)) : 0;
+      document.getElementById('vLate').textContent=String(daysLate);
+      document.getElementById('vNotes').textContent='—';
       viewModal.show();
     };
 
     // Init
-    render();
+    loadLoans();
+    })();
   </script>
 </body>
 </html>

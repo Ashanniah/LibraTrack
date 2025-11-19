@@ -1,45 +1,71 @@
-// Role-aware shared sidebar
+// Role-aware shared sidebar - Unified for Admin, Librarian, and Student
+// Version: 2025-11-19-FINAL-LOANS-COMBINED-V4
+console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
 (function () {
   const APP_BASE = '/libratrack/';
 
   const ROUTES = {
     admin: {
       dashboard: 'dashboard.html',
-      books: 'books.html',
       users: 'admin-users.html',
+      categories: 'admin-categories.html',
+      settings: 'admin-settings.html',
+      logs: 'admin-logs.html',
       profile: 'admin-profile.html',
-      // settings/reports/audit reserved
+      logout: 'login.html',
     },
-    // librarian members now points to librarian-users.html
     librarian: {
       dashboard:'dashboard.html',
       books:'books.html',
-      users:'librarian-users.html', 
+      users:'librarian-users.html',
       borrow:'borrow-return.html',
-      overdue:'overdue.html',
-      lowstock:'lowstock.html',
-      history:'history.html',
-      emails:'emails.html',
-      regMember:'registered-members.html'
+      borrowrequests:'librarian-borrow-requests.html',
+      loans:'librarian-active-loans.html',
+      lowstock:'librarian-lowstock.html',
+      history:'librarian-history.html',
+      profile:'librarian-profile.html',
+      logout:'login.html'
     },
 
     student: {
       dashboard: 'dashboard.html',
       books: 'books.html',
-      search: 'search.html',
-      history: 'history.html',
+      history: 'student-history.html',
       favorites: 'favorites.html',
-      overdue: 'overdue.html',
-      notifications: 'notifications.html',
-      profile: 'profile.html',
+      profile: 'student-profile.html',
       logout: 'login.html'
     }
   };
 
-  // Allow pages to pass either "members" or "librarian-users" as the active key
+  // Map filename to page identifier
+  const PAGE_MAP = {
+    'dashboard.html': 'dashboard',
+    'admin-users.html': 'users',
+    'admin-categories.html': 'categories',
+    'admin-settings.html': 'settings',
+    'admin-logs.html': 'logs',
+    'admin-profile.html': 'profile',
+    'books.html': 'books',
+    'librarian-users.html': 'users',
+    'borrow-return.html': 'borrow',
+    'librarian-borrow-requests.html': 'borrowrequests',
+    'librarian-active-loans.html': 'loans',
+    'librarian-lowstock.html': 'lowstock',
+    'librarian-history.html': 'history',
+    'librarian-profile.html': 'profile',
+    'student-history.html': 'history',
+    'student-favorite.html': 'favorites',
+    'student-favorites.html': 'favorites',
+    'favorites.html': 'favorites',
+    'student-profile.html': 'profile',
+    'profile.html': 'profile'
+  };
+
   const ACTIVE_ALIASES = {
-    'members': 'users',            // ✅ old key points to new one
-    'librarian-users': 'users'
+    'members': 'users',
+    'librarian-users': 'users',
+    'borrowreturn': 'borrow',
+    'borrow-return': 'borrow'
   };
 
   const url  = (page) => APP_BASE + page;
@@ -55,25 +81,30 @@
         ${link(ROUTES.admin.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
         ${link(ROUTES.admin.users,'bi-people','Users',current==='users')}
 
+        <div class="sb-label mt-3">Management</div>
+        ${link(ROUTES.admin.categories,'bi-tags','Categories',current==='categories')}
+
+        <div class="sb-label mt-3">System</div>
+        ${link(ROUTES.admin.settings,'bi-gear','System Settings',current==='settings')}
+        ${link(ROUTES.admin.logs,'bi-card-checklist','Logs',current==='logs')}
+
         <div class="sb-label mt-3">Account</div>
         ${link(ROUTES.admin.profile,'bi-person-gear','Profile',current==='profile')}
+        ${link(ROUTES.admin.logout,'bi-box-arrow-right','Logout',false)}
       `;
     }
 
     if (role === 'student') {
       return `
-        <div class="sb-label">Main</div>
-        ${link(ROUTES.student.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
-        ${link(ROUTES.student.books,'bi-journal-text','Books',current==='books')}
-        ${link(ROUTES.student.search,'bi-search','Search Books',current==='search')}
-        ${link(ROUTES.student.history,'bi-clock-history','History',current==='history')}
-        ${link(ROUTES.student.favorites,'bi-heart','Favorites',current==='favorites')}
-        ${link(ROUTES.student.overdue,'bi-exclamation-triangle','Overdue',current==='overdue')}
-        ${link(ROUTES.student.notifications,'bi-envelope-open','Notifications',current==='notifications')}
-        <div class="sb-label mt-3">Account</div>
-        ${link(ROUTES.student.profile,'bi-person','Profile',current==='profile')}
-        ${link(ROUTES.student.logout,'bi-box-arrow-right','Logout',false)}
-      `;
+            <div class="sb-label">Main</div>
+            ${link(ROUTES.student.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
+            ${link(ROUTES.student.books,'bi-journal-text','Books',current==='books')}
+            ${link(ROUTES.student.history,'bi-clock-history','History',current==='history')}
+            ${link(ROUTES.student.favorites,'bi-heart','Favorites',current==='favorites')}
+            <div class="sb-label mt-3">Account</div>
+            ${link(ROUTES.student.profile,'bi-person','Profile',current==='profile')}
+            ${link(ROUTES.student.logout,'bi-box-arrow-right','Logout',false)}
+          `;
     }
 
     // librarian
@@ -81,14 +112,13 @@
       <div class="sb-label">Main</div>
       ${link(ROUTES.librarian.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
       ${link(ROUTES.librarian.books,'bi-journal-text','Books',current==='books')}
-      ${link(ROUTES.librarian.users,'bi-people','Users',current==='users')}   <!-- ✅ label -->
-      ${link(ROUTES.librarian.borrow,'bi-arrow-left-right','Borrow/Return',current==='borrow')}
+      ${link(ROUTES.librarian.users,'bi-people','Users',current==='users')}
+      ${link(ROUTES.librarian.borrowrequests,'bi-inbox','Borrow Requests',current==='borrowrequests')}
+      ${link(ROUTES.librarian.loans,'bi-journal-arrow-up','Loans',current==='loans')}
 
-      <div class="sb-label mt-3">Monitoring</div>
-      ${link(ROUTES.librarian.overdue,'bi-exclamation-triangle','Overdue',current==='overdue')}
+      <div class="sb-label mt-3">Reports</div>
       ${link(ROUTES.librarian.lowstock,'bi-box-seam','Low Stock',current==='lowstock')}
       ${link(ROUTES.librarian.history,'bi-clock-history','History',current==='history')}
-      ${link(ROUTES.librarian.emails,'bi-envelope-paper-heart','Emails',current==='emails')}
 
       <div class="sb-label mt-3">Quick Actions</div>
       <button id="qaAddBook" class="btn btn-gold w-100 mb-2">
@@ -100,24 +130,34 @@
     `;
   }
 
-  // --- shim: patch any stale "members.html" links to "librarian-users.html"
-  function patchOldMembersLink() {
+  function patchLegacyLinks() {
     document.querySelectorAll('.sb-link').forEach(a => {
       const href = a.getAttribute('href') || '';
       if (href === APP_BASE + 'members.html') {
-        a.setAttribute('href', APP_BASE + 'librarian-users.html');
+        a.setAttribute('href', APP_BASE + ROUTES.librarian.users);
+      }
+      if (href === APP_BASE + 'borrow-return.html') {
+        a.setAttribute('href', APP_BASE + ROUTES.librarian.borrow);
       }
     });
   }
 
-  window.renderSidebar = function(current='dashboard', role='student'){
-    // normalize active key (so pages can use either alias)
+  // Auto-detect current page from filename
+  function detectCurrentPage() {
+    const pathname = window.location.pathname;
+    const filename = pathname.split('/').pop() || 'dashboard.html';
+    return PAGE_MAP[filename] || 'dashboard';
+  }
+
+  window.renderSidebar = function(current=null, role='student'){
+    // Auto-detect current page if not provided
+    if (!current) current = detectCurrentPage();
+    
     const normalized = ACTIVE_ALIASES[current] || current;
 
     const root = document.getElementById('sidebar-root');
     if (!root) return;
 
-    // harden role string
     role = String(role || '').toLowerCase();
     if (!['admin','librarian','student'].includes(role)) role = 'student';
 
@@ -132,13 +172,30 @@
       </nav>
     `;
 
-    // apply shim after DOM is inserted
-    patchOldMembersLink();
+    patchLegacyLinks();
 
-    // quick actions
+    // Librarian quick actions
     root.querySelector('#qaAddBook')?.addEventListener('click', () => location.href = url('books.html#add'));
-    root.querySelector('#qaRegMember')?.addEventListener('click', () => location.href = url('registered-members.html'));
-    root.querySelector('#year')?.append(new Date().getFullYear());
+    root.querySelector('#qaRegMember')?.addEventListener('click', () => location.href = url('librarian-users.html'));
+
+    // Logout handler
+    root.querySelectorAll('a[href*="login.html"]').forEach(link => {
+      if (link.textContent.trim().toLowerCase().includes('logout')) {
+        link.addEventListener('click', async (e) => {
+          e.preventDefault();
+          try {
+            await fetch(APP_BASE + 'backend/logout.php', { method: 'POST', credentials: 'include' });
+          } catch {}
+          location.href = url('login.html');
+        });
+      }
+    });
+
+    // Set copyright year
+    const yearEl = root.querySelector('#year');
+    if (yearEl && !yearEl.textContent) {
+      yearEl.textContent = new Date().getFullYear();
+    }
   };
 
   window.toggleSidebar = function(){
@@ -147,7 +204,53 @@
     document.body.classList.toggle(cls);
     if (isDesktop) document.body.classList.remove('sb-toggled');
   };
+  
   window.addEventListener('resize', () => {
     if (window.innerWidth >= 992) document.body.classList.remove('sb-toggled');
   });
+
+  // Auto-initialize sidebar if sidebar-root exists and no manual init
+  // This allows pages to just load sidebar.js and it will auto-detect
+  if (document.getElementById('sidebar-root') && typeof window.renderSidebar === 'function') {
+    // Wait for DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        // Check if auth endpoint exists and get role
+        fetch('/libratrack/backend/check-auth.php', { credentials: 'include', headers: { 'Accept': 'application/json' } })
+          .then(res => res.ok ? res.json() : null)
+          .then(data => {
+            const role = (data?.user?.role || 'student').toLowerCase();
+            if (['admin', 'librarian', 'student'].includes(role)) {
+              renderSidebar(null, role);
+            }
+          })
+          .catch(() => {
+            // Fallback: try to infer from URL or default to student
+            const path = window.location.pathname;
+            let inferredRole = 'student';
+            if (path.includes('admin-')) inferredRole = 'admin';
+            else if (path.includes('librarian-') || path === '/libratrack/borrow-return.html') inferredRole = 'librarian';
+            renderSidebar(null, inferredRole);
+          });
+      });
+    } else {
+      // Already loaded, try auth immediately
+      fetch('/libratrack/backend/check-auth.php', { credentials: 'include', headers: { 'Accept': 'application/json' } })
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          const role = (data?.user?.role || 'student').toLowerCase();
+          if (['admin', 'librarian', 'student'].includes(role)) {
+            renderSidebar(null, role);
+          }
+        })
+        .catch(() => {
+          const path = window.location.pathname;
+          let inferredRole = 'student';
+          if (path.includes('admin-')) inferredRole = 'admin';
+          else if (path.includes('librarian-') || path === '/libratrack/borrow-return.html') inferredRole = 'librarian';
+          renderSidebar(null, inferredRole);
+        });
+    }
+  }
 })();
+

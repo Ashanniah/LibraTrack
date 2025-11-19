@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -13,9 +13,133 @@
   <!-- Shared sidebar + page styles -->
   <link href="assets/css/sidebar.css" rel="stylesheet">
   <link href="assets/css/librarian-books.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
 
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
   <style>
+    :root{
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --card-border:#e5e7eb;
+      --table-header-bg:#f8f9fa;
+    }
+    
+    /* Consistent Header Design */
+    .admin-header-gold {
+      background: #fff !important;
+      color: var(--text-primary) !important;
+      border-bottom:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      padding:12px 0;
+    }
+    .admin-header-gold .fw-bold,
+    .admin-header-gold .h5,
+    .admin-header-gold #pageTitle {
+      color: var(--text-primary) !important;
+      font-weight:700;
+      font-size:1.25rem;
+      letter-spacing:0.01em;
+    }
+    
+    /* Consistent Search Bar Design */
+    .search-bar-custom {
+      height: 42px;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+    }
+    .search-bar-custom .input-group-text {
+      border-top-left-radius: var(--border-radius-sm);
+      border-bottom-left-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-right: none !important;
+      color:var(--text-secondary);
+    }
+    .search-bar-custom .form-control {
+      border-top-right-radius: var(--border-radius-sm);
+      border-bottom-right-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-left: none !important;
+      color: var(--text-primary);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15);
+      border-radius: var(--border-radius-sm);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      border-color: var(--brand-gold);
+      background: #fff !important;
+    }
+    .search-bar-custom:focus-within .form-control {
+      border-color: var(--brand-gold);
+      background: #fff !important;
+    }
+    
+    /* Table Card Design */
+    .table-card{
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--card-border);
+      overflow:hidden;
+    }
+    .table-card .card-header{
+      background:var(--sidebar-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:16px 20px;
+      font-weight:600;
+    }
+    .table-modern{
+      border-collapse:separate;
+      border-spacing:0;
+      width:100%;
+    }
+    .table-modern thead th{
+      background:var(--table-header-bg);
+      color:var(--text-secondary);
+      font-weight:600;
+      font-size:0.75rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      padding:14px 20px;
+      border-bottom:2px solid var(--card-border);
+    }
+    .table-modern tbody td{
+      padding:16px 20px;
+      border-bottom:1px solid #f0f0f0;
+      color:var(--text-primary);
+      font-size:0.875rem;
+    }
+    .table-modern tbody tr:hover{
+      background-color:#f8f9fa;
+    }
+    
+    /* Gold Star Ratings */
+    .rating-stars{
+      display:inline-flex;
+      gap:2px;
+      align-items:center;
+    }
+    .rating-stars .bi-star-fill,
+    .rating-stars .bi-star-half{
+      color:#a68604 !important;
+    }
+    .rating-stars .bi-star{
+      color:#d3d3d3 !important;
+    }
+    
     /* Tiny role-based accents */
     .role-badge{font-size:.75rem;font-weight:600;padding:.15rem .5rem;border-radius:999px}
     .role-admin{background:rgba(33,37,41,.08);color:#212529}
@@ -23,6 +147,274 @@
     .role-student{background:rgba(111,66,193,.12);color:#6f42c1}
     /* When student, we hide manage UI safely via class */
     .is-student .manage-only{display:none !important}
+    
+    /* Button styling */
+    .btn-primary{
+      background:var(--brand-gold);
+      border-color:var(--brand-gold);
+      color:#fff;
+    }
+    .btn-primary:hover{
+      background:var(--gold-dark);
+      border-color:var(--gold-dark);
+    }
+    
+    /* Image error handling */
+    img[src*="cover"], img[src*="uploads"]{
+      object-fit:cover;
+      background:#f0f0f0;
+    }
+    img[src*="cover"]:not([src*="default"]):not([src*="avatar"]):not([src*="book"]){
+      background:linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    }
+    
+    /* Notification button styling */
+    .notification-btn{
+      color:var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .notification-btn:hover{
+      color:var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    .notification-badge{
+      font-size:0.6875rem;
+      padding:3px 7px;
+      font-weight:600;
+      background:var(--brand-gold) !important;
+      color:#fff !important;
+    }
+    .notification-dropdown{
+      border-radius:var(--border-radius-sm);
+      box-shadow:var(--shadow-lg);
+      border:1px solid var(--card-border);
+    }
+    .admin-btn-custom {
+      padding: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: #fff;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .admin-btn-custom:hover {
+      border-color: var(--brand-gold);
+      box-shadow: 0 0 0 2px rgba(166, 134, 4, 0.1);
+    }
+    .admin-btn-custom:focus,
+    .admin-btn-custom:active,
+    .admin-btn-custom.show {
+      border-color: var(--brand-gold) !important;
+      box-shadow: 0 0 0 0.2rem rgba(166, 134, 4, 0.25) !important;
+    }
+    .avatar-32 {
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    /* Book Modal Styling - Matching Add Student Modal */
+    #bookModal .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:none;
+      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+      overflow:visible !important;
+    }
+    #bookModal .modal-header-dark{
+      background:var(--sidebar-bg) !important;
+      color:#fff !important;
+      border-bottom:none !important;
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
+      padding:24px 32px !important;
+      min-height:64px !important;
+    }
+    #bookModal .modal-header-dark .modal-title{
+      color:#fff !important;
+      font-weight:700 !important;
+      font-size:1.25rem;
+      letter-spacing:-0.01em;
+    }
+    #bookModal .modal-header-dark .btn-close{
+      filter:invert(1) grayscale(1);
+      opacity:0.7;
+      transition:opacity 0.2s ease;
+      padding:8px;
+    }
+    #bookModal .modal-header-dark .btn-close:hover{
+      opacity:1;
+    }
+
+    /* Modern Form Styling */
+    #bookModal .modal-body{
+      padding:32px !important;
+      background:#fff;
+      overflow:visible !important;
+    }
+    #bookModal .modal-content{
+      overflow:visible !important;
+    }
+    #bookModal .modal-dialog{
+      overflow:visible !important;
+    }
+    #bookModal .form-label{
+      font-weight:600;
+      font-size:0.875rem;
+      color:#374151;
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+    #bookModal .form-control,
+    #bookModal .form-select{
+      padding:10px 14px;
+      font-size:0.9375rem;
+      border:1.5px solid #e5e7eb;
+      border-radius:8px;
+      background:#fff;
+      color:#111827;
+      transition:all 0.2s ease;
+    }
+    #bookModal .form-control:focus,
+    #bookModal .form-select:focus{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 3px rgba(166,134,4,0.1);
+      outline:none;
+    }
+    #bookModal .form-control:hover:not(:focus),
+    #bookModal .form-select:hover:not(:focus){
+      border-color:#d1d5db;
+    }
+    #bookModal .form-control::placeholder{
+      color:#9ca3af;
+      font-size:0.875rem;
+    }
+    #bookModal .form-control.is-invalid,
+    #bookModal .form-select.is-invalid{
+      border-color:#dc3545;
+      background-color:#fef2f2;
+    }
+    #bookModal .form-control.is-invalid:focus,
+    #bookModal .form-select.is-invalid:focus{
+      border-color:#dc3545;
+      box-shadow:0 0 0 3px rgba(220,53,69,0.1);
+    }
+    #bookModal .modal-footer{
+      padding:20px 32px;
+      border-top:1px solid #e5e7eb;
+      background:#f9fafb;
+      border-radius:0 0 var(--border-radius-lg) var(--border-radius-lg);
+      display:flex;
+      justify-content:flex-end;
+      gap:12px;
+    }
+    #bookModal .modal-footer .btn{
+      border-radius:8px;
+      font-weight:600;
+      font-size:0.9375rem;
+      padding:10px 24px;
+      min-width:100px;
+      transition:all 0.2s ease;
+      border-width:1.5px;
+    }
+    #bookModal .modal-footer .btn-light{
+      background:#fff !important;
+      border-color:#d1d5db !important;
+      color:#374151 !important;
+    }
+    #bookModal .modal-footer .btn-light:hover{
+      background:#f9fafb !important;
+      border-color:#9ca3af !important;
+      color:#111827 !important;
+      transform:translateY(-1px);
+      box-shadow:0 2px 4px rgba(0,0,0,0.05);
+    }
+    #bookModal .modal-footer .btn-primary{
+      background:var(--brand-gold) !important;
+      border-color:var(--brand-gold) !important;
+      color:#fff !important;
+      box-shadow:0 2px 4px rgba(166,134,4,0.2);
+    }
+    #bookModal .modal-footer .btn-primary:hover{
+      background:var(--gold-dark) !important;
+      border-color:var(--gold-dark) !important;
+      color:#fff !important;
+      transform:translateY(-1px);
+      box-shadow:0 4px 8px rgba(166,134,4,0.3);
+    }
+    #bookModal .modal-footer .btn:active{
+      transform:translateY(0);
+    }
+
+    /* Cover Image Section Styling */
+    #bookModal .img-drop{
+      width:100%;
+      aspect-ratio:3/4;
+      background:#f3f4f6;
+      border:2px dashed #e5e7eb;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px;
+      cursor:pointer;
+      user-select:none;
+      transition:all 0.2s ease;
+    }
+    #bookModal .img-drop:hover{
+      border-color:var(--brand-gold);
+      background:#fef9e7;
+    }
+    #bookModal .img-drop:focus{
+      outline:3px solid rgba(166,134,4,0.2);
+    }
+    #bookModal .img-drop img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      border-radius:8px;
+    }
+    #bookModal .img-drop #dropHint{
+      color:#6b7280;
+    }
+    #bookModal #btnChangeImage,
+    #bookModal #btnRemoveImage{
+      border-radius:8px;
+      font-weight:600;
+      font-size:0.875rem;
+      padding:8px 16px;
+      border-width:1.5px;
+      transition:all 0.2s ease;
+    }
+    #bookModal #btnChangeImage{
+      border-color:#0d6efd;
+      color:#0d6efd;
+    }
+    #bookModal #btnChangeImage:hover{
+      background:#0d6efd;
+      color:#fff;
+      transform:translateY(-1px);
+      box-shadow:0 2px 4px rgba(13,110,253,0.2);
+    }
+    #bookModal #btnRemoveImage{
+      border-color:#d1d5db;
+      color:#374151;
+    }
+    #bookModal #btnRemoveImage:hover{
+      background:#f9fafb;
+      border-color:#9ca3af;
+      color:#111827;
+      transform:translateY(-1px);
+      box-shadow:0 2px 4px rgba(0,0,0,0.05);
+    }
   </style>
 </head>
 
@@ -32,75 +424,138 @@
 
   <!-- ============= MAIN WRAPPER ============= -->
   <div class="sb-wrapper">
-    <!-- Topbar -->
-    <div class="topbar">
-      <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-3">
-        <div class="d-flex align-items-center gap-2">
-          <!-- Hamburger toggler -->
-          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
-            <i class="bi bi-list fs-4"></i>
-          </button>
-          <div class="page-title d-flex align-items-center gap-2">
-            <span>Books</span>
-            <span id="rolePill" class="role-badge d-none"></span>
-          </div>
-        </div>
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Books</div>
 
-        <div class="d-flex align-items-center gap-2" style="min-width:320px;max-width:520px;flex:1">
-          <div class="search-wrap flex-grow-1">
-            <i class="bi bi-search"></i>
-            <input id="bookSearch" type="search" placeholder="Search by title, author, ISBN…">
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group input-group-sm search-bar-custom">
+              <span class="input-group-text bg-light border-0 search-icon-wrapper"><i class="bi bi-search"></i></span>
+              <input class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search title, author, ISBN…" id="bookSearch">
+            </div>
+          </form>
+
+          <div class="dropdown me-2">
+            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
+              <i class="bi bi-bell fs-5"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
+              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
+              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
+            </ul>
           </div>
-          <!-- Add button is hidden for students in JS and also has manage-only class -->
-          <button id="btnAddBook" class="add-btn manage-only" type="button" title="Add book" data-bs-toggle="modal" data-bs-target="#bookModal" aria-label="Add book">
-            <i class="bi bi-plus-lg"></i>
+
+          <div class="dropdown">
+            <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
+              <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
+              <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-gear me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+          
+          <button id="btnAddBook" class="btn btn-primary manage-only" type="button" title="Add book" data-bs-toggle="modal" data-bs-target="#bookModal" aria-label="Add book">
+            <i class="bi bi-plus-lg me-1"></i> Add Book
           </button>
         </div>
       </div>
-    </div>
+    </nav>
 
     <!-- Content -->
     <main class="container-fluid py-3">
-      <!-- Grid container (JS will populate) -->
-      <div id="booksGrid" class="grid" aria-live="polite"></div>
+      <!-- Filters -->
+      <div class="d-flex align-items-center gap-2 mb-3 manage-only">
+        <button id="filterAll" class="btn btn-sm btn-outline-primary active" data-filter="">All</button>
+        <button id="filterActive" class="btn btn-sm btn-outline-primary" data-filter="active">Active</button>
+        <button id="filterArchived" class="btn btn-sm btn-outline-primary" data-filter="archived">Archived</button>
+        <button id="filterLowStock" class="btn btn-sm btn-outline-warning" data-filter="lowstock">Low Stock</button>
+      </div>
+
+      <!-- Books Table -->
+      <div class="table-card card">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="fw-semibold"><i class="bi bi-journal-text me-2"></i>Books</span>
+            <span class="badge bg-light text-dark" id="bookCount">0</span>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-modern align-middle mb-0" id="booksTable">
+              <thead>
+                <tr>
+                  <th style="width:80px">Cover</th>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>ISBN</th>
+                  <th>Category</th>
+                  <th>Available Copies</th>
+                  <th>Status</th>
+                  <th style="width:200px" class="manage-only">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="booksTableBody">
+                <tr>
+                  <td colspan="8" class="text-center text-muted py-4">Loading books...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       <!-- Empty state -->
-      <div id="emptyState" class="empty d-none">
+      <div id="emptyState" class="empty d-none text-center py-5">
         <i class="bi bi-journal-richtext fs-2 d-block mb-2"></i>
-        No books yet. <span class="manage-only">Click the blue <b>＋</b> to add your first book.</span>
+        <p class="text-muted">No books found.</p>
+        <span class="manage-only">Click the <b>＋</b> button to add your first book.</span>
       </div>
     </main>
   </div>
 
-  <!-- ============= TEMPLATES (for JS rendering) ============= -->
-  <template id="bookCardTpl">
-    <article class="book">
-      <img class="cover" alt="">
-      <div class="meta">
-        <div class="title text-truncate"></div>
-        <div class="sub text-truncate"></div>
-        <div class="sub text-truncate small"></div>
+  <!-- ============= UPDATE QUANTITY MODAL ============= -->
+  <div class="modal fade" id="updateQuantityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Update Copies</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="updateQuantityForm">
+            <input type="hidden" id="updateQtyBookId">
+            <div class="mb-3">
+              <label for="updateQtyTitle" class="form-label">Book</label>
+              <input type="text" id="updateQtyTitle" class="form-control" readonly>
+            </div>
+            <div class="mb-3">
+              <label for="updateQtyQuantity" class="form-label">Total Copies <span class="text-danger">*</span></label>
+              <input type="number" id="updateQtyQuantity" class="form-control" min="0" step="1" required>
+              <small class="text-muted">Current available copies: <span id="updateQtyAvailable">0</span></small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="btnUpdateQuantity">Update</button>
+        </div>
       </div>
-      <div class="actions">
-        <button class="icon-btn" data-action="view" title="Details" aria-label="View details">
-          <i class="bi bi-info-circle"></i>
-        </button>
-        <!-- These two will be removed in JS for students -->
-        <button class="icon-btn manage-only" data-action="edit" title="Edit" aria-label="Edit">
-          <i class="bi bi-pencil-square"></i>
-        </button>
-        <button class="icon-btn danger manage-only" data-action="delete" title="Delete" aria-label="Delete">
-          <i class="bi bi-trash3"></i>
-        </button>
+    </div>
       </div>
-    </article>
-  </template>
 
   <!-- ============= ADD / EDIT MODAL ============= -->
   <div class="modal fade" id="bookModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <form id="bookForm" class="modal-content" method="post" enctype="multipart/form-data" novalidate>
-        <div class="modal-header">
+        <div class="modal-header modal-header-dark">
           <h5 class="modal-title" id="bookModalTitle">Add Book</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -128,25 +583,25 @@
             <div class="col-12 col-md-8">
               <div class="row g-3">
                 <div class="col-12">
-                  <label for="title" class="form-label">Book Title <span class="text-danger">*</span></label>
-                  <input id="title" name="title" type="text" class="form-control" required>
+                  <label for="title" class="form-label">Book Title</label>
+                  <input id="title" name="title" type="text" class="form-control" placeholder="Enter book title" required>
                   <div class="invalid-feedback">Title is required.</div>
                 </div>
 
                 <div class="col-12">
-                  <label for="isbn" class="form-label">ISBN <span class="text-danger">*</span></label>
-                  <input id="isbn" name="isbn" type="text" class="form-control" required>
+                  <label for="isbn" class="form-label">ISBN</label>
+                  <input id="isbn" name="isbn" type="text" class="form-control" placeholder="Enter ISBN" required>
                   <div class="invalid-feedback">ISBN is required.</div>
                 </div>
 
                 <div class="col-12">
-                  <label for="author" class="form-label">Author <span class="text-danger">*</span></label>
-                  <input id="author" name="author" type="text" class="form-control" required>
+                  <label for="author" class="form-label">Author</label>
+                  <input id="author" name="author" type="text" class="form-control" placeholder="Enter author name" required>
                   <div class="invalid-feedback">Author is required.</div>
                 </div>
 
                 <div class="col-8">
-                  <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
+                  <label for="category" class="form-label">Category</label>
                   <select id="category" name="category" class="form-select" required>
                     <option value="" selected disabled>Select category</option>
                     <option>Action and Adventure</option>
@@ -163,14 +618,14 @@
                 </div>
 
                 <div class="col-4">
-                  <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
-                  <input id="quantity" name="quantity" type="number" min="0" step="1" class="form-control" required>
+                  <label for="quantity" class="form-label">Quantity</label>
+                  <input id="quantity" name="quantity" type="number" min="0" step="1" class="form-control" placeholder="0" required>
                   <div class="invalid-feedback">Quantity is required.</div>
                 </div>
 
                 <div class="col-12">
-                  <label for="publisher" class="form-label">Publisher <span class="text-danger">*</span></label>
-                  <input id="publisher" name="publisher" type="text" class="form-control" required>
+                  <label for="publisher" class="form-label">Publisher</label>
+                  <input id="publisher" name="publisher" type="text" class="form-control" placeholder="Enter publisher name" required>
                   <div class="invalid-feedback">Publisher is required.</div>
                 </div>
 
@@ -193,29 +648,61 @@
     </div>
   </div>
 
-  <!-- ============= VIEW DETAILS OFFCANVAS ============= -->
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="bookDetails" aria-labelledby="bookDetailsLabel">
-    <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="bookDetailsLabel">Book Details</h5>
-      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  <!-- ============= VIEW DETAILS MODAL ============= -->
+  <div class="modal fade" id="bookDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="bookDetailsLabel">Book Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body">
-      <div class="d-flex gap-3">
-        <img id="detailsCover" src="" alt="" style="width:160px;aspect-ratio:3/4;object-fit:cover;border-radius:12px;background:#e5e7eb">
+        <div class="modal-body">
+          <div class="d-flex gap-3 mb-4">
+            <img id="detailsCover" src="" alt="" style="width:120px;aspect-ratio:3/4;object-fit:cover;border-radius:8px;background:#e5e7eb">
         <div class="flex-grow-1">
           <h5 id="detailsTitle" class="mb-1"></h5>
           <div class="text-muted small mb-3">
             <span id="detailsAuthor"></span> · <span id="detailsIsbn"></span>
           </div>
 
-          <dl class="row mb-0">
+              <dl class="row mb-0 small">
             <dt class="col-4 col-sm-3">Category</dt><dd id="detailsCategory" class="col-8 col-sm-9"></dd>
             <dt class="col-4 col-sm-3">Publisher</dt><dd id="detailsPublisher" class="col-8 col-sm-9"></dd>
             <dt class="col-4 col-sm-3">Published</dt><dd id="detailsPublishedAt" class="col-8 col-sm-9"></dd>
-            <dt class="col-4 col-sm-3">Quantity</dt><dd id="detailsQuantity" class="col-8 col-sm-9"></dd>
+                <dt class="col-4 col-sm-3">Total Copies</dt><dd id="detailsQuantity" class="col-8 col-sm-9"></dd>
+                <dt class="col-4 col-sm-3">Available</dt><dd id="detailsAvailable" class="col-8 col-sm-9"></dd>
+                <dt class="col-4 col-sm-3">Borrowed</dt><dd id="detailsBorrowed" class="col-8 col-sm-9"></dd>
             <dt class="col-4 col-sm-3">Status</dt>
-            <dd class="col-8 col-sm-9"><span id="detailsStatus" class="pill">Available</span></dd>
+                <dd class="col-8 col-sm-9"><span id="detailsStatus" class="badge bg-success">Active</span></dd>
           </dl>
+            </div>
+          </div>
+
+          <hr>
+
+          <h6 class="mb-3">Borrowing History</h6>
+          <div id="borrowingHistory" class="table-responsive">
+            <table class="table table-sm table-hover">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Student No</th>
+                  <th>Borrowed Date</th>
+                  <th>Due Date</th>
+                  <th>Returned Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="borrowingHistoryBody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-3">Loading history...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
@@ -225,7 +712,9 @@
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <!-- Shared sidebar (build-free) -->
-  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-17-restructured"></script>
+  <!-- Centralized Notifications -->
+  <script src="assets/js/notifications.js"></script>
 
   <script>
     // ---------- Role helpers ----------
@@ -241,8 +730,11 @@
     const IS_MANAGER = ROLE === 'admin' || ROLE === 'librarian';
 
     // Sidebar with correct role + current section
-    renderSidebar('books', ROLE);
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+    renderSidebar('books', ROLE, false);
+    document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+      if (typeof toggleSidebar === 'function') toggleSidebar();
+      else document.body.classList.toggle('sb-collapsed');
+    });
 
     // Body class to hide manage-only controls for students via CSS
     if (!IS_MANAGER) document.body.classList.add('is-student');
@@ -255,20 +747,57 @@
       ROLE === 'admin' ? 'role-admin' :
       ROLE === 'librarian' ? 'role-librarian' : 'role-student'
     );
+
+    // Notifications are handled by centralized notifications.js
+    
+    // Load user info and avatar
+    (async () => {
+      try {
+        const res = await fetch('/api/check-auth', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.success && data.user) {
+            const me = data.user;
+            const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
+            const whoChipEl = document.getElementById('whoChip');
+            if (whoChipEl) {
+              whoChipEl.innerHTML = `<span class="badge" style="background:#4a4a4a;color:#fff;font-weight:600;">${ROLE.toUpperCase()}</span> ${fullName || me.email}`;
+            }
+            
+            // Load avatar
+            const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+            if (headerAvatar && me.avatar && me.avatar.trim() !== '') {
+              headerAvatar.src = me.avatar;
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error loading user info:', e);
+      }
+    })();
+    
+    // Logout handler
+    document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      } catch {}
+      location.href = '/login';
+    });
+    
   </script>
 
   <script>
     (function () {
-      // Adjust to your install path:
-      const API_BASE = "/LibraTrack/api";
-
       // ---------- State ----------
       let books = [];
+      let currentFilter = '';
+      let currentSearch = '';
 
       // ---------- Elements ----------
-      const grid = document.getElementById('booksGrid');
+      const tableBody = document.getElementById('booksTableBody');
       const empty = document.getElementById('emptyState');
-      const tpl = document.getElementById('bookCardTpl');
+      const booksTable = document.getElementById('booksTable');
       const search = document.getElementById('bookSearch');
 
       const bookModalEl = document.getElementById('bookModal');
@@ -277,6 +806,17 @@
       const modalTitle = document.getElementById('bookModalTitle');
       const hiddenId = document.getElementById('bookId');
       const saveBtn = document.getElementById('btnSaveBook');
+
+      const updateQuantityModalEl = document.getElementById('updateQuantityModal');
+      const updateQuantityModal = new bootstrap.Modal(updateQuantityModalEl);
+      const updateQtyForm = document.getElementById('updateQuantityForm');
+      const updateQtyBookId = document.getElementById('updateQtyBookId');
+      const updateQtyTitle = document.getElementById('updateQtyTitle');
+      const updateQtyQuantity = document.getElementById('updateQtyQuantity');
+      const updateQtyAvailable = document.getElementById('updateQtyAvailable');
+
+      const bookDetailsModalEl = document.getElementById('bookDetailsModal');
+      const bookDetailsModal = new bootstrap.Modal(bookDetailsModalEl);
 
       // cover upload widgets
       const dropArea = document.getElementById('dropArea');
@@ -289,57 +829,61 @@
       dropArea.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); coverInput.click(); } };
       coverInput.onchange = handleCover;
 
-      // Details offcanvas
-      const detailsOff = new bootstrap.Offcanvas('#bookDetails');
-      const D = {
-        cover: document.getElementById('detailsCover'),
-        title: document.getElementById('detailsTitle'),
-        author: document.getElementById('detailsAuthor'),
-        isbn: document.getElementById('detailsIsbn'),
-        cat: document.getElementById('detailsCategory'),
-        pub: document.getElementById('detailsPublisher'),
-        date: document.getElementById('detailsPublishedAt'),
-        qty: document.getElementById('detailsQuantity'),
-        status: document.getElementById('detailsStatus'),
-      };
-
       // If student, hard-disable the modal form entirely
       if (!IS_MANAGER) {
-        // Remove data-bs attributes so clicking + can't open modal (even if visible)
         document.getElementById('btnAddBook')?.setAttribute('disabled','disabled');
-        // Prevent programmatic show
         ['show','hide'].forEach(name => { bookModal[name] = () => {}; });
-        // Also guard form
         form.addEventListener('submit', e => { e.preventDefault(); });
       }
 
       // ---------- API ----------
       async function loadBooks() {
-        grid.innerHTML = '<div class="text-center text-muted py-4">Loading…</div>';
+        tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Loading books...</td></tr>';
         try {
-          const res = await fetch(`${API_BASE}/list_books.php`, { cache: 'no-store' });
+          const res = await fetch(`/api/books?pagesize=1000`, { credentials: 'include', cache: 'no-store' });
           const json = await res.json();
           if (!json.ok) throw new Error(json.error || 'Failed to load');
-          books = json.data || [];
-          render(tokenSearch(search.value));
+          books = (json.items || []).map(b => ({
+            ...b,
+            coverUrl: b.cover_url || (b.cover ? (b.cover.startsWith('/') ? b.cover : `/uploads/covers/${b.cover}`) : 'assets/img/default-book.png'),
+            borrowed: b.borrowed || 0,
+            available: (b.quantity || 0) - (b.borrowed || 0),
+            isArchived: b.archived === 1 || b.archived === true || b.status === 'archived',
+            isLowStock: (b.quantity || 0) <= 5
+          }));
+          render();
         } catch (e) {
-          grid.innerHTML = `<div class="text-center text-danger py-4">Error: ${e.message}</div>`;
+          tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-4">Error: ${e.message}</td></tr>`;
         }
       }
+
 
       async function addBook(formEl) {
         const btn = saveBtn;
         btn.disabled = true; btn.textContent = 'Saving…';
         try {
-          const fd = new FormData(formEl); // includes file if selected
-          const res = await fetch(`${API_BASE}/add_book.php`, { method: 'POST', body: fd });
+          const fd = new FormData(formEl);
+          const bookId = hiddenId.value;
+          let endpoint = '/api/books';
+          let method = 'POST';
+          if (bookId) {
+            endpoint = `/api/books/${bookId}`;
+            method = 'PUT';
+            fd.append('_method', 'PUT');
+          }
+          const res = await fetch(endpoint, { method: method, body: fd, credentials: 'include' });
           const json = await res.json();
           if (!json.ok) throw new Error(json.error || 'Save failed');
           await loadBooks();
           formEl.reset();
+          // Re-enable ISBN field after reset (for next add operation)
+          formEl.isbn.disabled = false;
+          formEl.isbn.style.backgroundColor = '';
+          formEl.isbn.style.cursor = '';
+          formEl.isbn.title = '';
           removePreview();
           bookModal.hide();
-          alert('Book saved!');
+          alert('Book saved successfully!');
         } catch (err) {
           alert('Error: ' + err.message);
         } finally {
@@ -348,74 +892,148 @@
       }
 
       // ---------- Render ----------
-      function render(list = books) {
-        grid.innerHTML = '';
-        if (!list.length) { empty.classList.remove('d-none'); return; }
+      function render() {
+        let filtered = books;
+        
+        // Apply search filter
+        if (currentSearch) {
+          const q = currentSearch.toLowerCase();
+          filtered = filtered.filter(b =>
+            (b.title || '').toLowerCase().includes(q) ||
+            (b.author || '').toLowerCase().includes(q) ||
+            (b.isbn || '').toLowerCase().includes(q) ||
+            (b.category || '').toLowerCase().includes(q)
+          );
+        }
+
+        // Apply status filter
+        if (currentFilter === 'active') {
+          filtered = filtered.filter(b => !b.isArchived);
+        } else if (currentFilter === 'archived') {
+          filtered = filtered.filter(b => b.isArchived);
+        } else if (currentFilter === 'lowstock') {
+          filtered = filtered.filter(b => b.isLowStock && !b.isArchived);
+        }
+
+        if (!filtered.length) {
+          tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No books found.</td></tr>';
+          empty.classList.remove('d-none');
+          booksTable.classList.add('d-none');
+          return;
+        }
+
         empty.classList.add('d-none');
+        booksTable.classList.remove('d-none');
+        
+        // Update book count
+        const bookCountEl = document.getElementById('bookCount');
+        if (bookCountEl) bookCountEl.textContent = filtered.length;
 
-        list.forEach(b => {
-          const card = tpl.content.cloneNode(true);
-          const el = card.querySelector('.book');
+        tableBody.innerHTML = filtered.map(b => {
+          // Use coverUrl as-is (already fixed by backend)
+          const coverImg = b.coverUrl || 'assets/img/default-book.png';
+          const availableCount = b.available >= 0 ? b.available : b.quantity;
+          const statusBadge = b.isArchived 
+            ? '<span class="badge bg-secondary">Archived</span>'
+            : availableCount > 0 
+              ? '<span class="badge bg-success">Active</span>'
+              : '<span class="badge bg-danger">Out of Stock</span>';
+          
+          const titleEscaped = (b.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+          const actions = IS_MANAGER ? `
+            <div class="btn-group btn-group-sm" role="group">
+              <button type="button" class="btn btn-outline-primary" onclick="viewBookDetails(${b.id})" title="View Details">
+                <i class="bi bi-info-circle"></i>
+              </button>
+              <button type="button" class="btn btn-outline-secondary" onclick="editBook(${b.id})" title="Edit">
+                <i class="bi bi-pencil-square"></i>
+              </button>
+              <button type="button" class="btn btn-outline-info" onclick="updateQuantity(${b.id}, '${titleEscaped.replace(/'/g, "\\'")}', ${b.quantity}, ${availableCount})" title="Update Copies">
+                <i class="bi bi-box-arrow-up"></i>
+              </button>
+              <button type="button" class="btn btn-outline-warning" onclick="toggleArchive(${b.id}, ${b.isArchived ? 'true' : 'false'})" title="${b.isArchived ? 'Unarchive' : 'Archive'}">
+                <i class="bi bi-${b.isArchived ? 'archive' : 'archive-fill'}"></i>
+              </button>
+              <button type="button" class="btn btn-outline-danger" onclick="deleteBook(${b.id}, '${titleEscaped.replace(/'/g, "\\'")}', event); return false;" title="Delete">
+                <i class="bi bi-trash3"></i>
+              </button>
+            </div>
+          ` : `
+            <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewBookDetails(${b.id})" title="View Details">
+              <i class="bi bi-info-circle"></i> View
+            </button>
+          `;
 
-          const img = card.querySelector('.cover');
-          img.src = b.coverUrl || 'assets/img/sample/placeholder-cover.png';
-          img.alt = b.title;
+          // Generate star rating (if rating exists)
+          const rating = b.rating || 0;
+          const fullStars = Math.floor(rating);
+          const hasHalfStar = rating % 1 >= 0.5;
+          const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+          const starsHtml = `
+            <div class="rating-stars">
+              ${'<i class="bi bi-star-fill"></i>'.repeat(fullStars)}
+              ${hasHalfStar ? '<i class="bi bi-star-half"></i>' : ''}
+              ${'<i class="bi bi-star"></i>'.repeat(emptyStars)}
+            </div>
+          `;
+          
+          return `
+            <tr>
+              <td>
+                <img src="${coverImg}" alt="${titleEscaped}" 
+                     style="width:50px;height:65px;object-fit:cover;border-radius:4px;background:#f0f0f0;"
+                     onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
+              </td>
+              <td>
+                <div><strong>${escapeHtml(b.title || '—')}</strong></div>
+                ${rating > 0 ? `<div class="mt-1">${starsHtml}</div>` : ''}
+              </td>
+              <td>${escapeHtml(b.author || '—')}</td>
+              <td><code>${escapeHtml(b.isbn || '—')}</code></td>
+              <td><span class="badge bg-light text-dark">${escapeHtml(b.category || '—')}</span></td>
+              <td><strong>${availableCount}</strong> / <span class="text-muted">${b.quantity || 0}</span></td>
+              <td>${statusBadge}</td>
+              ${IS_MANAGER ? `<td>${actions}</td>` : '<td></td>'}
+            </tr>
+          `;
+        }).join('');
+      }
 
-          card.querySelector('.title').textContent = b.title || '—';
-          card.querySelector('.sub:nth-of-type(1)').textContent = b.author || '—';
-          card.querySelector('.sub:nth-of-type(2)').textContent = b.isbn || '—';
-
-          // Always allow view
-          el.querySelector('[data-action="view"]').onclick = () => openDetails(b);
-
-          // If student, strip manage buttons completely (extra safety besides CSS)
-          if (!IS_MANAGER) {
-            el.querySelector('[data-action="edit"]')?.remove();
-            el.querySelector('[data-action="delete"]')?.remove();
-          } else {
-            el.querySelector('[data-action="edit"]').onclick = () => editBook(b);
-            el.querySelector('[data-action="delete"]').onclick = () => deleteBook(b);
-          }
-
-          grid.appendChild(card);
-        });
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
       }
 
       // ---------- Search ----------
-      function tokenSearch(text) {
-        const q = (text || '').trim().toLowerCase();
-        if (!q) return books;
+      search.addEventListener('input', (e) => {
+        currentSearch = e.target.value;
+        render();
+      });
 
-        const tokens = q.split(/\s+/);
-        let filtered = books;
-
-        tokens.forEach(t => {
-          if (t.startsWith('author:')) {
-            const val = t.replace('author:', '').trim();
-            filtered = filtered.filter(b => (b.author || '').toLowerCase().includes(val));
-          } else if (t.startsWith('category:')) {
-            const val = t.replace('category:', '').trim();
-            filtered = filtered.filter(b => (b.category || '').toLowerCase().includes(val));
-          } else if (t.startsWith('isbn:')) {
-            const val = t.replace('isbn:', '').trim();
-            filtered = filtered.filter(b => (b.isbn || '').toLowerCase().includes(val));
-          } else {
-            filtered = filtered.filter(b =>
-              (`${b.title} ${b.author} ${b.isbn}`).toLowerCase().includes(t)
-            );
-          }
+      // ---------- Filters ----------
+      document.querySelectorAll('[data-filter]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.filter || '';
+          render();
         });
+      });
 
-        return filtered;
-      }
-      search.addEventListener('input', () => render(tokenSearch(search.value)));
-
-      // ---------- Add ----------
+      // ---------- Add/Edit ----------
       document.getElementById('btnAddBook').addEventListener('click', () => {
-        if (!IS_MANAGER) return; // guard
+        if (!IS_MANAGER) return;
         modalTitle.textContent = 'Add Book';
         form.reset();
         hiddenId.value = '';
+        
+        // Enable ISBN field when adding a new book (it should be editable)
+        form.isbn.disabled = false;
+        form.isbn.style.backgroundColor = '';
+        form.isbn.style.cursor = '';
+        form.isbn.title = '';
+        
         removePreview();
         form.classList.remove('was-validated');
       });
@@ -428,50 +1046,199 @@
         addBook(form);
       });
 
-      // ---------- Details ----------
-      function openDetails(b) {
-        D.cover.src = b.coverUrl || 'assets/img/sample/placeholder-cover.png';
-        D.title.textContent = b.title || '—';
-        D.author.textContent = b.author || '—';
-        D.isbn.textContent = b.isbn || '—';
-        D.cat.textContent = b.category || '—';
-        D.pub.textContent = b.publisher || '—';
-        D.date.textContent = b.date_published || '—';
-        D.qty.textContent = String(b.quantity ?? 0);
-        const available = (b.quantity ?? 0) > 0;
-        D.status.textContent = available ? 'Available' : 'Out of stock';
-        D.status.className = 'pill ' + (available ? '' : 'bg-danger text-white');
-        detailsOff.show();
-      }
+      // ---------- Update Quantity ----------
+      window.updateQuantity = function(bookId, title, currentQty, available) {
+        if (!IS_MANAGER) return;
+        updateQtyBookId.value = bookId;
+        updateQtyTitle.value = title;
+        updateQtyQuantity.value = currentQty;
+        updateQtyAvailable.textContent = available;
+        updateQuantityModal.show();
+      };
 
-      // ---------- Edit/Delete (manager only) ----------
-      function editBook(b) {
-        modalTitle.textContent = 'Edit Book';
-        hiddenId.value = b.id || '';
-        form.title.value = b.title || '';
-        form.isbn.value = b.isbn || '';
-        form.author.value = b.author || '';
-        form.category.value = b.category || '';
-        form.quantity.value = b.quantity ?? 0;
-        form.publisher.value = b.publisher || '';
-        form.date_published.value = (b.date_published || '').slice(0,10);
-        removePreview();
-        // Show existing cover
-        if (b.coverUrl) showPreview(b.coverUrl);
-        bookModal.show();
-      }
-
-      async function deleteBook(b) {
-        if (!confirm(`Delete "${b.title}"?`)) return;
+      document.getElementById('btnUpdateQuantity').addEventListener('click', async () => {
+        const bookId = updateQtyBookId.value;
+        const quantity = parseInt(updateQtyQuantity.value);
+        if (!bookId || quantity < 0) {
+          alert('Invalid quantity');
+          return;
+        }
+        
         try {
-          const res = await fetch(`${API_BASE}/delete_book.php?id=${encodeURIComponent(b.id)}`, { method: 'POST' });
+          const fd = new FormData();
+          fd.append('id', bookId);
+          fd.append('quantity', quantity);
+          const res = await fetch(`/api/books/${bookId}`, { method: 'PUT', body: fd, credentials: 'include' });
           const json = await res.json();
-          if (!json.ok) throw new Error(json.error || 'Delete failed');
+          if (!json.ok) throw new Error(json.error || 'Update failed');
           await loadBooks();
+          updateQuantityModal.hide();
+          alert('Quantity updated successfully!');
         } catch (err) {
           alert('Error: ' + err.message);
         }
-      }
+      });
+
+      // ---------- View Details ----------
+      window.viewBookDetails = async function(bookId) {
+        const book = books.find(b => b.id == bookId);
+        if (!book) return;
+
+        // Set basic details
+        const detailsCoverEl = document.getElementById('detailsCover');
+        if (detailsCoverEl) {
+          let coverUrl = book.coverUrl || 'assets/img/default-book.png';
+          // Fix cover URL path
+          if (coverUrl && !coverUrl.startsWith('http') && !coverUrl.startsWith('/libratrack') && coverUrl.includes('uploads')) {
+            coverUrl = '/libratrack' + (coverUrl.startsWith('/') ? '' : '/') + coverUrl;
+          }
+          detailsCoverEl.src = coverUrl;
+          detailsCoverEl.onerror = function() {
+            this.src = 'assets/img/default-book.png';
+            this.onerror = null;
+          };
+        }
+        document.getElementById('detailsTitle').textContent = book.title || '—';
+        document.getElementById('detailsAuthor').textContent = book.author || '—';
+        document.getElementById('detailsIsbn').textContent = book.isbn || '—';
+        document.getElementById('detailsCategory').textContent = book.category || '—';
+        document.getElementById('detailsPublisher').textContent = book.publisher || '—';
+        document.getElementById('detailsPublishedAt').textContent = book.date_published ? new Date(book.date_published).toLocaleDateString() : '—';
+        document.getElementById('detailsQuantity').textContent = book.quantity || 0;
+        document.getElementById('detailsAvailable').textContent = book.available >= 0 ? book.available : (book.quantity || 0);
+        document.getElementById('detailsBorrowed').textContent = book.borrowed || 0;
+        
+        const statusEl = document.getElementById('detailsStatus');
+        if (book.isArchived) {
+          statusEl.textContent = 'Archived';
+          statusEl.className = 'badge bg-secondary';
+        } else if (book.available > 0) {
+          statusEl.textContent = 'Active';
+          statusEl.className = 'badge bg-success';
+        } else {
+          statusEl.textContent = 'Out of Stock';
+          statusEl.className = 'badge bg-danger';
+        }
+
+        // Load borrowing history
+        const historyBody = document.getElementById('borrowingHistoryBody');
+        historyBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Loading history...</td></tr>';
+        
+        try {
+          const res = await fetch(`/api/books/borrowing-history?book_id=${bookId}`, { credentials: 'include' });
+          const json = await res.json();
+          if (json.ok && json.history && json.history.length > 0) {
+            historyBody.innerHTML = json.history.map(h => `
+              <tr>
+                <td>${escapeHtml((h.first_name || '') + ' ' + (h.last_name || ''))}</td>
+                <td><code>${escapeHtml(h.student_no || '—')}</code></td>
+                <td>${h.borrowed_at ? new Date(h.borrowed_at).toLocaleDateString() : '—'}</td>
+                <td>${h.due_at ? new Date(h.due_at).toLocaleDateString() : '—'}</td>
+                <td>${h.returned_at ? new Date(h.returned_at).toLocaleDateString() : '—'}</td>
+                <td><span class="badge ${h.status === 'returned' ? 'bg-success' : h.status === 'overdue' ? 'bg-danger' : 'bg-primary'}">${escapeHtml(h.status || '—')}</span></td>
+              </tr>
+            `).join('');
+          } else {
+            historyBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No borrowing history yet.</td></tr>';
+          }
+        } catch (err) {
+          historyBody.innerHTML = '<tr><td colspan="6" class="text-center text-danger py-3">Error loading history.</td></tr>';
+        }
+
+        bookDetailsModal.show();
+      };
+
+      // ---------- Edit Book ----------
+      window.editBook = function(bookId) {
+        if (!IS_MANAGER) return;
+        const book = books.find(b => b.id == bookId);
+        if (!book) return;
+
+        modalTitle.textContent = 'Edit Book';
+        hiddenId.value = book.id;
+        form.title.value = book.title || '';
+        form.isbn.value = book.isbn || '';
+        form.author.value = book.author || '';
+        form.category.value = book.category || '';
+        form.quantity.value = book.quantity || 0;
+        form.publisher.value = book.publisher || '';
+        form.date_published.value = book.date_published ? new Date(book.date_published).toISOString().split('T')[0] : '';
+        
+        // Make ISBN read-only when editing (ISBN shouldn't change once created)
+        form.isbn.disabled = true;
+        form.isbn.style.backgroundColor = '#f8f9fa';
+        form.isbn.style.cursor = 'not-allowed';
+        form.isbn.title = 'ISBN cannot be changed after creation';
+        
+        removePreview();
+        if (book.coverUrl) showPreview(book.coverUrl);
+        bookModal.show();
+      };
+
+      // ---------- Archive/Unarchive ----------
+      window.toggleArchive = async function(bookId, isArchived) {
+        if (!IS_MANAGER) return;
+        if (!confirm(`${isArchived ? 'Unarchive' : 'Archive'} this book?`)) return;
+        
+        try {
+          const fd = new FormData();
+          fd.append('id', bookId);
+          fd.append('archived', isArchived ? '0' : '1');
+          const res = await fetch(`/api/books/${bookId}`, { method: 'PUT', body: fd, credentials: 'include' });
+          const json = await res.json();
+          if (!json.ok) throw new Error(json.error || 'Operation failed');
+          await loadBooks();
+          alert(`Book ${isArchived ? 'unarchived' : 'archived'} successfully!`);
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      };
+
+      // ---------- Delete Book ----------
+      window.deleteBook = async function(bookId, title, event) {
+        if (!IS_MANAGER) return false;
+        
+        // Prevent any form submission or default button behavior
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        
+        if (!confirm(`Delete "${title}"? This action cannot be undone.`)) return false;
+        
+        try {
+          // Use DELETE method to the correct endpoint
+          const res = await fetch(`/api/books/${bookId}`, { 
+            method: 'DELETE', 
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          });
+          
+          // Check if response is ok
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => ({ error: 'Network error occurred' }));
+            throw new Error(errorData.error || `HTTP ${res.status}: Delete failed`);
+          }
+          
+          const json = await res.json();
+          if (!json.ok) {
+            throw new Error(json.error || 'Delete failed');
+          }
+          
+          await loadBooks();
+          alert('Book deleted successfully!');
+        } catch (err) {
+          // Show user-friendly error message
+          const errorMsg = err.message || 'An error occurred while deleting the book';
+          alert('Error: ' + errorMsg);
+          console.error('Delete book error:', err);
+        }
+        
+        return false; // Prevent any default behavior
+      };
 
       // ---------- Cover helpers ----------
       function handleCover() {
@@ -493,8 +1260,98 @@
         coverInput.value = '';
       }
 
+      // Default fallback categories (used if API fails or returns empty)
+      const DEFAULT_CATEGORIES = [
+        "Action and Adventure",
+        "Biography",
+        "Children's Books",
+        "Computer Science",
+        "Fantasy",
+        "History",
+        "Mystery",
+        "Romance",
+        "Science",
+        "Thriller"
+      ];
+
+      // ---------- Load Categories ----------
+      async function loadCategories() {
+        try {
+          const res = await fetch('/api/categories', { credentials: 'include' });
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
+          }
+          const data = await res.json();
+          if (data.success && data.categories && Array.isArray(data.categories)) {
+            const categorySelect = document.getElementById('category');
+            if (categorySelect) {
+              const currentValue = categorySelect.value;
+              
+              // Extract category names from API
+              const apiCategoryNames = data.categories.map(cat => cat.name || cat).filter(Boolean);
+              
+              // Merge API categories with defaults (API categories take priority, defaults fill gaps)
+              const categorySet = new Set();
+              const lowerToOriginal = new Map();
+              
+              // Add API categories first (these are admin-added, so they take priority)
+              apiCategoryNames.forEach(name => {
+                const lower = name.toLowerCase();
+                categorySet.add(lower);
+                lowerToOriginal.set(lower, name);
+              });
+              
+              // Add default categories that aren't already in the set
+              DEFAULT_CATEGORIES.forEach(name => {
+                const lower = name.toLowerCase();
+                if (!categorySet.has(lower)) {
+                  categorySet.add(lower);
+                  lowerToOriginal.set(lower, name);
+                }
+              });
+              
+              // Convert back to array of original names, sorted
+              const categoriesToUse = Array.from(categorySet)
+                .map(lower => lowerToOriginal.get(lower))
+                .sort();
+              
+              categorySelect.innerHTML = '<option value="" selected disabled>Select category</option>' +
+                categoriesToUse.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+              if (currentValue) {
+                categorySelect.value = currentValue;
+              }
+            }
+            return true;
+          } else {
+            console.warn('Categories API returned unexpected format:', data);
+            // Fallback to defaults
+            useDefaultCategories();
+            return false;
+          }
+        } catch (e) {
+          console.error('Failed to load categories:', e);
+          // Fallback to defaults on error
+          useDefaultCategories();
+          return false;
+        }
+      }
+
+      // Helper function to use default categories
+      function useDefaultCategories() {
+        const categorySelect = document.getElementById('category');
+        if (categorySelect) {
+          const currentValue = categorySelect.value;
+          categorySelect.innerHTML = '<option value="" selected disabled>Select category</option>' +
+            DEFAULT_CATEGORIES.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+          if (currentValue) {
+            categorySelect.value = currentValue;
+          }
+        }
+      }
+
       // ---------- Init ----------
       loadBooks();
+      loadCategories();
     })();
   </script>
 </body>

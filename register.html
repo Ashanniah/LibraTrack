@@ -25,6 +25,82 @@
 
   <!-- Site CSS -->
   <link rel="stylesheet" href="assets/css/main.css" />
+  <style>
+    :root {
+      --brand-gold: #a68604;
+      --gold-dark: #8d7003;
+      --border-radius-sm: 8px;
+    }
+    .register-card, .register-card .card-body {
+      background: #fff !important;
+    }
+    .register-card {
+      border-radius: 20px !important;
+      overflow: hidden;
+    }
+    .btn-primary, .form-button-label {
+      background: var(--brand-gold) !important;
+      border-color: var(--brand-gold) !important;
+      color: #fff !important;
+      font-weight: 600;
+      border-radius: var(--border-radius-sm);
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      background: var(--gold-dark) !important;
+      border-color: var(--gold-dark) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(166, 134, 4, 0.3);
+    }
+    .form-big-label {
+      color: #111 !important;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    .form-label-login-register {
+      color: #374151 !important;
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 8px;
+    }
+    .form-control, .form-select {
+      padding: 10px 14px !important;
+      font-size: 0.9375rem !important;
+      border: 1.5px solid #e5e7eb !important;
+      border-radius: var(--border-radius-sm) !important;
+      background: #fff !important;
+      color: #111827 !important;
+      transition: all 0.2s ease;
+    }
+    .form-control:focus, .form-select:focus {
+      border-color: var(--brand-gold) !important;
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.1) !important;
+      outline: none !important;
+    }
+    .form-control:hover:not(:focus), .form-select:hover:not(:focus) {
+      border-color: #d1d5db !important;
+    }
+    .form-control::placeholder {
+      color: #9ca3af !important;
+      font-size: 0.875rem !important;
+    }
+    .form-select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 16px 12px;
+      padding-right: 40px !important;
+    }
+    .form-label-create {
+      color: var(--brand-gold) !important;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .form-label-create:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 
 <body class="index-page d-flex flex-column min-vh-100">
@@ -73,8 +149,8 @@
   <!-- Main -->
   <main class="main flex-grow-1">
     <section class="page-bg d-flex align-items-center justify-content-center py-5">
-      <div class="card register-card border-0 shadow-sm mx-auto" style="max-width: 780px; width: 100%;">
-        <div class="card-body p-5">
+      <div class="card register-card border-0 shadow-sm mx-auto" style="max-width: 780px; width: 100%; background:#fff !important;">
+        <div class="card-body p-5" style="background:#fff !important;">
           <div class="text-center mb-4">
             <img src="assets/img/LibraTrack-logo.png" alt="LibraTrack Logo" width="88" height="88">
           </div>
@@ -350,14 +426,15 @@
         confirm_password: cpw
       };
 
-      const ENDPOINT = new URL('backend/register.php', window.location.href).href;
+      const ENDPOINT = '/api/register';
 
       toggleBtn(true);
       try {
         const res = await fetch(ENDPOINT, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
+          credentials: 'include'
         });
 
         let data;
@@ -376,7 +453,7 @@
         document.getElementById('successMsg').textContent = data.message || 'Your account has been created.';
         successModal.show();
       } catch (err) {
-        alert('Network error. Is Apache/MySQL running, and is backend/register.php reachable?');
+        alert('Network error. Please check your connection and try again.');
       } finally {
         toggleBtn(false);
       }

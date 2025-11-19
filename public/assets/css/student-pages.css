@@ -1,0 +1,58 @@
+/* ===== Student pages (shared) ===== */
+:root{
+  --st-head:#0f2c6c;
+  --st-muted:#718096;
+  --st-border:#e9eef6;
+  --st-bg:#f5f7fb;
+  --st-primary:#4e73df;
+  --st-success:#1cc88a;
+  --st-warning:#f6c23e;
+  --st-danger:#e74a3b;
+}
+
+html,body{background:var(--st-bg)}
+body.sb-body{font-family:"Poppins",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+.card{border:1px solid var(--st-border);border-radius:16px;background:#fff;box-shadow:0 6px 18px rgba(15,44,108,.06)}
+.card-header{background:#111;color:#fff;border:0;padding:14px 16px;border-top-left-radius:16px;border-top-right-radius:16px}
+.card-header .small{opacity:.8}
+
+.page-head{background:#fff;border-bottom:1px solid var(--st-border)}
+.page-title{font-weight:700;font-size:20px}
+
+/* Search input */
+.tools-wrap{min-width:280px;max-width:600px;flex:1}
+.search-wrap{position:relative}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af}
+.search-wrap input{width:100%;padding:10px 12px 10px 34px;border:1px solid var(--st-border);border-radius:12px;background:#fff;outline:0}
+
+/* Tables */
+.table thead th{font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.02em;border-bottom:1px solid var(--st-border)}
+.table tbody td{border-color:var(--st-border);font-weight:500}
+.table-modern tbody tr:nth-child(odd){background:#fbfcff}
+
+/* Soft badges */
+.badge{border-radius:999px;font-weight:700}
+.text-bg-primary-soft{background:rgba(78,115,223,.12);color:#2546a8}
+.text-bg-success-soft{background:rgba(28,200,138,.12);color:#148a63}
+.text-bg-warning-soft{background:rgba(246,194,62,.16);color:#9a6c00}
+.text-bg-danger-soft{background:rgba(231,74,59,.12);color:#a83a30}
+
+/* Pills for status */
+.pill{display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .6rem;border-radius:999px;font-size:.72rem;font-weight:700}
+.pill-info{background:rgba(78,115,223,.12);color:#2546a8}
+.pill-success{background:rgba(28,200,138,.12);color:#128a5e}
+.pill-warning{background:rgba(246,194,62,.16);color:#8e6a09}
+.pill-danger{background:rgba(231,74,59,.12);color:#a83a30}
+.dot{width:.45rem;height:.45rem;border-radius:50%;background:currentColor;display:inline-block}
+
+/* Tiny helpers */
+.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#f3f4f6;border:2px solid var(--st-border)}
+.kpi{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--st-border);border-radius:12px;background:#fff}
+.kpi .icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#eef2ff;color:#2546a8}
+.kpi .value{font-size:20px;font-weight:800}
+
+/* Empty */
+.empty{padding:18px;text-align:center;color:#9aa3b2;font-weight:600}
+
+/* Buttons */
+.btn{border-radius:12px}

@@ -1,0 +1,1024 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Loans</title>
+
+  <!-- Fonts / Icons / Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Shared + page styles -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+  <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <style>
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --header-bg:#fff;
+      --table-header-bg:#111;
+      --card-border:#e5e7eb;
+    }
+    html{font-size:14px;}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+    main.container-fluid{padding:24px!important}
+
+    /* Header Styling */
+    .admin-header-gold{
+      background:#fff!important;
+      border-bottom:1px solid var(--card-border);
+      padding:12px 24px;
+    }
+    .search-bar-custom {
+      height: 42px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-sm);
+      background: #fff;
+      overflow: hidden;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+      border: none !important;
+      background: transparent !important;
+    }
+    .search-bar-custom .input-group-text {
+      color: var(--text-secondary);
+      padding-left: 16px;
+      padding-right: 8px;
+    }
+    .search-bar-custom .form-control {
+      color: var(--text-primary);
+      padding-left: 8px;
+      padding-right: 16px;
+    }
+    .search-bar-custom .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166,134,4,0.15);
+      border-color: var(--brand-gold);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      color: var(--text-primary);
+    }
+    .notification-btn{
+      width:44px;
+      height:44px;
+      border-radius:var(--border-radius-sm);
+      border:none;
+      background:transparent;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+      color:var(--text-primary);
+      padding:0;
+      position:relative;
+    }
+    .notification-btn:hover{
+      background:#f8f9fa;
+      color:var(--text-primary);
+    }
+    .notification-btn i{
+      font-size:1.25rem;
+    }
+    .admin-btn-custom{
+      padding:0;
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:1px solid var(--card-border);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+      overflow:hidden;
+    }
+    .admin-btn-custom:hover{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 2px rgba(166,134,4,0.1);
+    }
+    .admin-btn-custom img{
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    /* Stat Cards - Dashboard Style */
+    .sb-card{
+      background:#fff;
+      border:1px solid var(--card-border);
+      border-radius:var(--border-radius);
+      padding:20px;
+      transition:all 0.2s ease;
+    }
+    .sb-card.elevated{
+      box-shadow:var(--shadow-sm);
+    }
+    .sb-card-title{
+      font-size:0.875rem;
+      font-weight:600;
+      color:var(--text-secondary);
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .sb-card-title i{
+      color:var(--text-secondary);
+      font-size:1rem;
+    }
+    .sb-card-value{
+      font-size:1.75rem;
+      font-weight:700;
+      color:var(--text-secondary);
+      line-height:1.2;
+    }
+
+    /* Table Styling */
+    .table-modern{
+      margin-bottom:0;
+    }
+    .table-modern thead th{
+      background:#fff;
+      color:var(--text-secondary);
+      font-weight:700;
+      font-size:0.8125rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      padding:16px var(--cell-pad-x);
+      border-bottom:2px solid var(--ui-border);
+      vertical-align:middle;
+    }
+    .table-modern tbody td{
+      padding:var(--cell-pad-y) var(--cell-pad-x);
+      vertical-align:middle;
+      border-bottom:1px solid var(--ui-border);
+      color:var(--text-primary);
+    }
+    .table-modern tbody tr:hover{
+      background:#f8f9fa;
+    }
+
+    /* Card Styling */
+    .card{
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--ui-border);
+      background:#fff;
+    }
+    .card-header{
+      background:var(--table-header-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:20px var(--card-pad);
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+
+    /* Pagination */
+    .pagination .page-item.active .page-link{
+      background:var(--brand-gold)!important;
+      color:#fff!important;
+      border-color:var(--brand-gold)!important;
+    }
+
+    /* Nav Tabs */
+    .nav-tabs{
+      border-bottom:2px solid var(--ui-border);
+      margin-bottom:24px;
+    }
+    .nav-tabs .nav-link{
+      border:none;
+      color:var(--text-secondary);
+      font-weight:600;
+      padding:12px 24px;
+      border-bottom:3px solid transparent;
+      transition:all 0.2s ease;
+    }
+    .nav-tabs .nav-link:hover{
+      border-bottom-color:var(--brand-gold);
+      color:var(--text-primary);
+    }
+    .nav-tabs .nav-link.active{
+      color:var(--text-primary);
+      border-bottom-color:var(--brand-gold);
+      background:transparent;
+    }
+
+    /* Loan Drawer */
+    .loan-drawer { width: 520px; max-width: 90vw; }
+    .loan-drawer .offcanvas-header {
+      background: var(--sidebar-bg);
+      color: #fff;
+      border-bottom: none;
+      padding: 24px;
+    }
+    .loan-drawer .offcanvas-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    .loan-drawer .offcanvas-header .btn-close {
+      filter: invert(1) grayscale(1);
+      opacity: 0.8;
+    }
+    .loan-drawer .offcanvas-body { 
+      padding: 24px;
+      background: #fff;
+    }
+    .book-cover-small { 
+      width: 100px; 
+      height: 140px; 
+      object-fit: cover; 
+      border-radius: var(--border-radius-sm);
+      background: #f3f4f6;
+      box-shadow: var(--shadow-sm);
+    }
+    .loan-section {
+      margin-bottom: 28px;
+    }
+    .loan-section:last-child {
+      margin-bottom: 0;
+    }
+    .loan-section-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--sidebar-bg);
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+    }
+    .loan-section-title i {
+      color: #fff;
+      font-size: 1rem;
+    }
+    .book-info-card {
+      background: #f8f9fa;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      border: 1px solid var(--ui-border);
+    }
+    .book-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .book-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .book-meta i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-row {
+      display: flex;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--ui-border);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .info-label i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-value {
+      color: var(--text-primary);
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+    .text-bg-success-soft {
+      background: #d1fae5 !important;
+      color: #065f46 !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-danger-soft {
+      background: #fee2e2 !important;
+      color: #991b1b !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-secondary-soft {
+      background: #e5e7eb !important;
+      color: #374151 !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    
+    /* Modal Styling */
+    #returnModal .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--ui-border);
+      box-shadow:var(--shadow-lg);
+    }
+    #returnModal .modal-body{
+      padding:32px 24px !important;
+    }
+    .return-confirm-icon{
+      width:64px;
+      height:64px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#d1fae5;
+      border-radius:50%;
+    }
+    .return-confirm-icon i{
+      font-size:2rem;
+      color:#059669;
+    }
+    #returnModal .modal-title{
+      font-size:1.25rem;
+      color:#1f2937;
+    }
+    #returnModal .btn-outline-secondary{
+      border-color:#d1d5db;
+      color:#374151;
+    }
+    #returnModal .btn-outline-secondary:hover{
+      background:#f3f4f6;
+      border-color:#9ca3af;
+    }
+    #extendModal .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--ui-border);
+      box-shadow:var(--shadow-lg);
+    }
+    #extendModal .modal-header{
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+    #extendModal .form-control:focus{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 3px rgba(166,134,4,0.1);
+      outline:none;
+    }
+    
+    /* Action buttons styling */
+    .table-modern .btn-link{
+      background:none !important;
+      border:none !important;
+      color:#000 !important;
+      padding:4px 8px;
+      text-decoration:none;
+      transition:all 0.2s ease;
+    }
+    .table-modern .btn-link:hover{
+      color:var(--brand-gold) !important;
+      transform:scale(1.1);
+    }
+    .table-modern .btn-link i{
+      color:inherit;
+    }
+  </style>
+</head>
+
+<body class="sb-body">
+  <!-- Shared Sidebar -->
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+            <i class="bi bi-list fs-4"></i>
+          </button>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Loans</div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group search-bar-custom">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="loanSearch" class="form-control" type="search" placeholder="Search">
+            </div>
+          </form>
+
+          <div class="dropdown position-relative">
+            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
+              <i class="bi bi-bell"></i>
+              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
+              <li><h6 class="dropdown-header">Notifications</h6></li>
+              <li><hr class="dropdown-divider"></li>
+              <li id="notificationList">
+                <div class="px-3 py-2 text-center text-muted">
+                  <small>No notifications</small>
+                </div>
+              </li>
+            </ul>
+        </div>
+
+          <div class="dropdown">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container-fluid py-4">
+      <!-- Tabs -->
+      <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active" id="tab-active" data-bs-toggle="tab" data-bs-target="#panel-active" type="button">Active</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tab-on-time" data-bs-toggle="tab" data-bs-target="#panel-on-time" type="button">On-Time</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tab-overdue" data-bs-toggle="tab" data-bs-target="#panel-overdue" type="button">Overdue</button>
+        </li>
+      </ul>
+
+      <!-- Quick Stats -->
+      <section class="row g-3 mb-3">
+        <div class="col-6 col-md-4">
+          <div class="sb-card elevated text-center">
+            <div class="sb-card-title"><i class="bi bi-journal-arrow-up"></i>Active</div>
+            <div class="sb-card-value" id="statActive">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="sb-card elevated text-center">
+            <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue</div>
+            <div class="sb-card-value" id="statOverdue">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-4">
+          <div class="sb-card elevated text-center">
+            <div class="sb-card-title"><i class="bi bi-check-circle"></i>On-Time</div>
+            <div class="sb-card-value" id="statOnTime">0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filters -->
+      <section class="card mb-3" style="margin-top:24px;">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="fw-semibold">Loans</div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="dropdown">
+                <button id="filterStatusBtn" class="btn btn-sm" data-bs-toggle="dropdown" style="background:#fff; color:#111; border:1px solid rgba(255,255,255,0.3); padding:6px 16px; cursor:pointer; min-width:80px;">
+                  <span id="filterStatusText">All</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus(''); return false;">All</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus('borrowed'); return false;">Borrowed</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus('returned'); return false;">Returned</a></li>
+                </ul>
+              </div>
+              <button id="btnRefresh" class="btn btn-sm" style="background:#fff; color:#111; border:1px solid rgba(255,255,255,0.3); padding:6px 16px; cursor:pointer; min-width:80px;"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</button>
+          </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Loans table -->
+      <section class="card">
+        <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-modern align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Book</th>
+                <th>Borrowed On</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th class="text-end" style="width:180px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="loanBody"><!-- JS --></tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+          <div class="text-muted small" id="pageInfo">Showing 1–10 of 0</div>
+          <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+        </div>
+
+          <div id="emptyState" class="empty d-none text-center py-5">
+            <i class="bi bi-journal-arrow-up fs-2 d-block mb-2 text-muted"></i>
+            <p class="text-muted mb-0">No loans found.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Loan Details Drawer -->
+  <div class="offcanvas offcanvas-end loan-drawer" tabindex="-1" id="loanDrawer" aria-labelledby="loanDrawerLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="loanDrawerLabel">Loan Details</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body" id="loanDrawerBody">
+      <!-- Content populated by JS -->
+    </div>
+  </div>
+
+  <!-- Return Book Confirmation Modal -->
+  <div class="modal fade" id="returnModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-body py-4 px-5">
+          <div class="return-confirm-icon mb-3">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+          <h5 class="modal-title mb-2 fw-bold">Confirm Return</h5>
+          <p class="text-muted mb-4" id="returnModalMessage">Are you sure you want to mark this book as returned?</p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="min-width: 100px;">Cancel</button>
+            <button type="button" class="btn btn-success" id="btnConfirmReturn" style="min-width: 100px;">Mark as Returned</button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Extend Due Date Modal -->
+  <div class="modal fade" id="extendModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background:var(--sidebar-bg); color:#fff; border-bottom:0;">
+          <h5 class="modal-title" style="color:#fff;">Extend Due Date</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="filter:invert(1);"></button>
+        </div>
+        <div class="modal-body" style="padding:24px;">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">New Due Date <span class="text-danger">*</span></label>
+            <input type="date" id="newDueDate" class="form-control" style="border:1.5px solid var(--ui-border); border-radius:var(--border-radius-sm); padding:10px 14px;" required>
+          </div>
+        </div>
+        <div class="modal-footer border-0" style="padding:16px 24px;">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn" id="btnConfirmExtend" style="background:var(--brand-gold); color:#fff; border-color:var(--brand-gold);">Extend</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-17-restructured"></script>
+  <script>
+    let currentLoan = null;
+    let currentPage = 1;
+    const pageSize = 20;
+    let allLoans = [];
+    let currentTab = 'all';
+    let currentFilterStatus = '';
+    let filterStatusSelect = null;
+
+    const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+    // Initialize
+    (async () => {
+      const res = await fetch('/api/check-auth', {credentials:'include'});
+      if (!res.ok) { location.href = 'login.html'; return; }
+      const data = await res.json().catch(()=>null);
+      const role = (data?.user?.role || '').toLowerCase();
+      if (role !== 'librarian' && role !== 'admin') { location.href = 'dashboard.html'; return; }
+
+      renderSidebar('loans', role, false);
+      localStorage.setItem('userRole', role);
+      
+      // Load avatar in header if available
+      const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+      if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') {
+        headerAvatar.src = data.user.avatar;
+      }
+      
+      document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+      
+      // Logout function
+      window.logout = async function() {
+        try {
+          await fetch('/api/logout', {method:'POST', credentials:'include'});
+          localStorage.removeItem('userRole');
+          location.href = 'login.html';
+        } catch(e) {
+          location.href = 'login.html';
+        }
+      };
+      
+      // Filter status management
+      filterStatusSelect = document.createElement('select');
+      filterStatusSelect.id = 'filterStatus';
+      filterStatusSelect.className = 'd-none';
+      filterStatusSelect.innerHTML = '<option value="">All</option><option value="borrowed">Borrowed</option><option value="returned">Returned</option>';
+      document.body.appendChild(filterStatusSelect);
+      
+      window.setFilterStatus = function(status) {
+        currentFilterStatus = status;
+        filterStatusSelect.value = status;
+        const statusText = status === '' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1);
+        document.getElementById('filterStatusText').textContent = statusText;
+        currentPage = 1;
+        loadLoans();
+        bootstrap.Dropdown.getInstance('#filterStatusBtn')?.hide();
+      };
+      
+      if (filterStatusSelect) {
+        filterStatusSelect.addEventListener('change', () => { currentPage = 1; loadLoans(); });
+      }
+      
+      // Tab switching
+      document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', (e) => {
+          if (e.target.id === 'tab-active') currentTab = 'active';
+          else if (e.target.id === 'tab-on-time') currentTab = 'on-time';
+          else if (e.target.id === 'tab-overdue') currentTab = 'overdue';
+          currentPage = 1;
+          loadLoans();
+        });
+      });
+      
+      // Set default tab to active
+      currentTab = 'active';
+      
+      loadLoans();
+    })();
+
+    async function loadLoans() {
+      const q = document.getElementById('loanSearch').value.trim();
+      const overdueOnly = currentTab === 'overdue' ? '1' : '0';
+      // Active Loans page should only show non-returned loans - use active_only parameter
+      const url = `/api/loans?page=${currentPage}&pagesize=${pageSize}&active_only=1${overdueOnly === '1' ? '&overdue_only=1' : ''}`;
+      
+      try {
+        const res = await fetch(url, {credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        if (!data.ok) { alert('Failed to load loans'); return; }
+        
+        allLoans = data.items || [];
+        
+        // Filter out returned loans (safety check - should already be excluded by backend)
+        allLoans = allLoans.filter(l => l.status !== 'returned' && !l.returned_at);
+        
+        // Filter by search query
+        if (q) {
+          allLoans = allLoans.filter(l => {
+            const searchText = `${l.student_name} ${l.student_no} ${l.book_title} ${l.isbn}`.toLowerCase();
+            return searchText.includes(q.toLowerCase());
+          });
+        }
+        
+        // Filter by tab
+        if (currentTab === 'overdue') {
+          // Show only overdue loans
+          allLoans = allLoans.filter(l => l.loan_status === 'overdue');
+        } else if (currentTab === 'on-time') {
+          // Show only on-time loans (borrowed but not overdue)
+          allLoans = allLoans.filter(l => l.loan_status === 'on-time');
+        } else if (currentTab === 'active') {
+          // Show all active loans (already filtered by backend to exclude returned)
+        }
+        
+        updateStats(allLoans);
+        render();
+      } catch (err) {
+        alert('Error loading loans: ' + err.message);
+      }
+    }
+
+    function updateStats(list) {
+      const today = new Date().toISOString().slice(0,10);
+      const active = list.filter(l => l.status === 'borrowed' && !l.returned_at).length;
+      const overdue = list.filter(l => {
+        if (l.status === 'returned' || l.returned_at) return false;
+        const dueDate = l.extended_due_at || l.due_at;
+        return dueDate && dueDate < today;
+      }).length;
+      const onTime = list.filter(l => {
+        if (l.status === 'returned' || l.returned_at) return false;
+        const dueDate = l.extended_due_at || l.due_at;
+        return dueDate && dueDate >= today;
+      }).length;
+      
+      document.getElementById('statActive').textContent = active;
+      document.getElementById('statOverdue').textContent = overdue;
+      document.getElementById('statOnTime').textContent = onTime;
+    }
+
+    function render() {
+      const tbody = document.getElementById('loanBody');
+      const empty = document.getElementById('emptyState');
+      
+      if (allLoans.length === 0) {
+        tbody.innerHTML = '';
+        empty.classList.remove('d-none');
+        document.getElementById('pageInfo').textContent = 'Showing 0 of 0';
+        document.getElementById('pager').innerHTML = '';
+        return;
+      }
+      
+      empty.classList.add('d-none');
+      
+      tbody.innerHTML = allLoans.map(l => {
+        const statusBadge = l.status === 'returned' ? '<span class="badge text-bg-secondary-soft">Returned</span>'
+                         : l.loan_status === 'overdue' ? '<span class="badge text-bg-danger-soft">Overdue</span>'
+                         : '<span class="badge text-bg-success-soft">On-Time</span>';
+        
+        return `
+          <tr>
+            <td>
+              <div class="fw-medium">${esc(l.student_name)}</div>
+              <small class="text-muted">${esc(l.student_no || '—')}</small>
+            </td>
+            <td>
+              <div class="fw-medium">${esc(l.book_title)}</div>
+              <small class="text-muted">${esc(l.isbn || '—')}</small>
+            </td>
+            <td>${l.borrowed_at ? new Date(l.borrowed_at).toLocaleDateString() : '—'}</td>
+            <td>${l.due_at ? new Date(l.due_at).toLocaleDateString() : '—'}</td>
+            <td>${statusBadge}</td>
+            <td class="text-end">
+              <div class="d-flex align-items-center gap-2 justify-content-end">
+                <button class="btn btn-outline-secondary btn-sm" onclick="viewLoan(${l.loan_id})" title="View" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-eye"></i>
+                </button>
+                ${l.status === 'borrowed' ? `
+                <button class="btn btn-outline-success btn-sm" onclick="markReturned(${l.loan_id})" title="Mark as Returned" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-box-arrow-in-left"></i>
+                </button>
+                <button class="btn btn-outline-warning btn-sm" onclick="showExtendModal(${l.loan_id})" title="Extend Due Date" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-calendar-plus"></i>
+                </button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      document.getElementById('pageInfo').textContent = `Showing ${allLoans.length} of ${allLoans.length}`;
+    }
+
+    async function viewLoan(loanId) {
+      const loan = allLoans.find(l => l.loan_id == loanId);
+      if (!loan) return;
+      
+      currentLoan = loan;
+      
+      const cover = loan.cover_url || 'assets/img/no-cover.png';
+      const statusBadge = loan.status === 'returned' ? '<span class="badge text-bg-secondary-soft">RETURNED</span>'
+                         : loan.loan_status === 'overdue' ? '<span class="badge text-bg-danger-soft">OVERDUE</span>'
+                         : '<span class="badge text-bg-success-soft">ON-TIME</span>';
+      
+      const body = `
+        <!-- Status Badge -->
+        <div class="mb-4 text-center">
+          ${statusBadge}
+        </div>
+        
+        <!-- Book Information -->
+        <div class="loan-section">
+          <div class="loan-section-title">
+            <i class="bi bi-book"></i> Book Information
+          </div>
+          <div class="book-info-card">
+            <div class="d-flex gap-3">
+              <img src="${cover}" alt="${esc(loan.book_title)}" class="book-cover-small" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+            <div class="flex-grow-1">
+                <div class="book-title">${esc(loan.book_title)}</div>
+                <div class="book-meta">
+                  <i class="bi bi-person"></i>
+                  <span>${esc(loan.author || '—')}</span>
+                </div>
+                <div class="book-meta">
+                  <i class="bi bi-tag"></i>
+                  <span>${esc(loan.category || '—')}</span>
+                </div>
+                <div class="book-meta">
+                  <i class="bi bi-upc-scan"></i>
+                  <span>ISBN: ${esc(loan.isbn || '—')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Student Information -->
+        <div class="loan-section">
+          <div class="loan-section-title">
+            <i class="bi bi-person-circle"></i> Student Information
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-person-fill"></i> Name
+            </div>
+            <div class="info-value">${esc(loan.student_name)}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-person-vcard-fill"></i> Student No.
+            </div>
+            <div class="info-value">${esc(loan.student_no || '—')}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-mortarboard-fill"></i> Course
+            </div>
+            <div class="info-value">${esc(loan.course || '—')}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar3"></i> Year / Section
+            </div>
+            <div class="info-value">${esc((loan.year_level || '—') + ' / ' + (loan.section || '—'))}</div>
+          </div>
+        </div>
+        
+        <!-- Loan Information -->
+        <div class="loan-section">
+          <div class="loan-section-title">
+            <i class="bi bi-clock-history"></i> Loan Information
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar-check"></i> Borrowed On
+            </div>
+            <div class="info-value">${loan.borrowed_at ? new Date(loan.borrowed_at).toLocaleString() : '—'}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar-event"></i> Due Date
+            </div>
+            <div class="info-value">${loan.due_at ? new Date(loan.due_at).toLocaleDateString() : '—'}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-box-arrow-in-left"></i> Returned On
+            </div>
+            <div class="info-value">${loan.returned_at ? new Date(loan.returned_at).toLocaleString() : '—'}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-info-circle"></i> Status
+            </div>
+            <div class="info-value">${statusBadge}</div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('loanDrawerLabel').textContent = `Loan Details – ${esc(loan.book_title)}`;
+      document.getElementById('loanDrawerBody').innerHTML = body;
+      bootstrap.Offcanvas.getOrCreateInstance('#loanDrawer').show();
+    }
+
+    async function markReturned(loanId) {
+      const loan = allLoans.find(l => l.loan_id == loanId);
+      if (!loan || loan.status === 'returned') return;
+      
+      // Show confirmation modal
+      document.getElementById('returnModalMessage').textContent = `Mark "${esc(loan.book_title)}" as returned?`;
+      const modal = new bootstrap.Modal('#returnModal');
+      modal.show();
+      
+      // Set up confirm button handler
+      document.getElementById('btnConfirmReturn').onclick = async function() {
+        try {
+          const fd = new FormData();
+          fd.set('loan_id', String(loanId));
+          
+          const res = await fetch('/api/loans/return', {
+            method: 'POST',
+            body: fd,
+            credentials: 'include'
+          });
+          
+          const data = await res.json().catch(() => null);
+          if (data?.ok) {
+            modal.hide();
+            bootstrap.Offcanvas.getInstance('#loanDrawer')?.hide();
+            alert('Book marked as returned successfully!');
+            loadLoans();
+          } else {
+            alert(data?.error || 'Failed to mark book as returned');
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      };
+    }
+
+    function showExtendModal(loanId) {
+      currentLoan = allLoans.find(l => l.loan_id == loanId);
+      if (!currentLoan || currentLoan.status === 'returned') return;
+      
+      const currentDueDate = currentLoan.due_at || new Date().toISOString().split('T')[0];
+      document.getElementById('newDueDate').value = currentDueDate;
+      document.getElementById('newDueDate').min = currentDueDate;
+      
+      const modal = new bootstrap.Modal('#extendModal');
+      modal.show();
+      
+      document.getElementById('btnConfirmExtend').onclick = async function() {
+        const newDate = document.getElementById('newDueDate').value;
+        if (!newDate) {
+          alert('Please select a new due date');
+          return;
+        }
+        
+        try {
+          const fd = new FormData();
+          fd.set('loan_id', String(loanId));
+          fd.set('new_due_date', newDate);
+          
+          const res = await fetch('/api/loans/extend', {
+            method: 'POST',
+            body: fd,
+            credentials: 'include'
+          });
+          
+          const data = await res.json().catch(() => null);
+          if (data?.ok) {
+            modal.hide();
+            bootstrap.Offcanvas.getInstance('#loanDrawer')?.hide();
+            alert('Due date extended successfully!');
+            loadLoans();
+          } else {
+            alert(data?.error || 'Failed to extend due date');
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      };
+    }
+
+    // Event listeners
+    document.getElementById('loanSearch').addEventListener('input', () => { currentPage = 1; loadLoans(); });
+    document.getElementById('btnRefresh').addEventListener('click', () => { loadLoans(); });
+
+    // Make functions global
+    window.viewLoan = viewLoan;
+    window.markReturned = markReturned;
+    window.showExtendModal = showExtendModal;
+  </script>
+</body>
+</html>
+
+

@@ -1,0 +1,78 @@
+/* Student Profile Page Styles */
+
+/* Profile Avatar */
+.avatar-wrap {
+  position: relative;
+  display: inline-block;
+  width: 100px;
+  height: 100px;
+}
+
+.avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e9eef6;
+  background: #f3f4f6;
+}
+
+.avatar-edit {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.avatar-edit:hover {
+  background: #f8f9fa !important;
+}
+
+/* Profile Card */
+.profile-card {
+  text-align: center;
+}
+
+.role-pill {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: rgba(78, 115, 223, 0.12);
+  color: #2546a8;
+  border-radius: 999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Stats */
+.stat {
+  padding: 0.5rem;
+}
+
+.stat-num {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f2c6c;
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.25rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+  margin-top: 1rem;
+}
+

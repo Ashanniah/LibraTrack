@@ -21,6 +21,33 @@ body{ background:transparent; }
   overflow-x:hidden; transition:width .25s ease;
   box-shadow:0 10px 30px rgba(0,0,0,.25);
   display:flex; flex-direction:column;
+  /* Prevent flicker - always visible */
+  visibility:visible !important;
+  opacity:1 !important;
+  /* Prevent layout shift during render */
+  will-change: auto;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+/* Sidebar root container - always visible */
+#sidebar-root{
+  visibility:visible !important;
+  opacity:1 !important;
+  /* Prevent any flicker during initial render */
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Prevent transitions during initial render to avoid flicker */
+#sidebar-root:not([data-rendered]) .sb-sidebar,
+#sidebar-root:not([data-rendered]) .sb-link {
+  transition: none !important;
+}
+
+/* Mark as rendered after first paint */
+#sidebar-root[data-rendered] .sb-sidebar,
+#sidebar-root[data-rendered] .sb-link {
+  transition: width .25s ease, background .2s ease, color .2s ease;
 }
 .sb-brand{
   color:#fff; padding:.55rem .55rem; display:flex; align-items:center; gap:.55rem;
@@ -53,8 +80,49 @@ body{ background:transparent; }
 /* Mobile slide-in */
 @media (max-width:991.98px){
   .sb-wrapper{ margin-left:0; }
-  .sb-sidebar{ transform:translateX(-100%); transition:transform .2s ease,width .25s ease; }
+  .sb-sidebar{ 
+    transform:translateX(-100%); 
+    transition:transform .3s cubic-bezier(0.4, 0, 0.2, 1),width .25s ease;
+    width: 280px !important;
+  }
   .sb-toggled .sb-sidebar{ transform:none; }
+  
+  /* Backdrop overlay */
+  .sb-toggled::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 1029;
+    animation: fadeIn 0.2s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  /* Expanded state on mobile */
+  .sb-expanded .sb-sidebar {
+    width: 280px !important;
+  }
+  
+  .sb-expanded .sb-text,
+  .sb-expanded .sb-label {
+    display: inline !important;
+  }
+  
+  /* Larger touch targets on mobile */
+  .sb-link {
+    min-height: 48px;
+    margin: 6px 8px;
+  }
+  
+  .sb-link i {
+    font-size: 18px;
+    width: 44px;
+    min-width: 44px;
+  }
 }
 
 /* Gold quick-action button look */

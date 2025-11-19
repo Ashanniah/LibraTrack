@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -199,7 +199,7 @@
       emailInput.classList.remove('is-invalid'); emailError.textContent='';
 
       try{
-        const res  = await fetch('backend/request-reset.php', {
+        const res  = await fetch('/api/password/request-reset', {
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ email: val })
@@ -281,7 +281,7 @@
       otpInputs().forEach(i=>i.classList.remove('is-invalid'));
 
       try{
-        const res = await fetch('backend/verify-code.php', {
+        const res = await fetch('/api/password/verify-code', {
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ email: currentEmail, code })
@@ -301,7 +301,7 @@
       if(btnResend.disabled) return;
       clearStatus();
       try{
-        const res = await fetch('backend/request-reset.php', {
+        const res = await fetch('/api/password/request-reset', {
           method:'POST',
           headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ email: currentEmail })

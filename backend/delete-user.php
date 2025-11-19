@@ -85,12 +85,28 @@ switch ($role) {
     exit;
 }
 
-// 🗑️ Perform delete
-$stmt = $conn->prepare("DELETE FROM users WHERE id = ? LIMIT 1");
-$stmt->bind_param("i", $id);
+// 🗑️ Perform soft delete (30 days before permanent deletion)
+// First, check if deleted_at column exists, if not, add it
+try {
+  $checkCol = $conn->query("SHOW COLUMNS FROM users LIKE 'deleted_at'");
+  if ($checkCol->num_rows === 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN deleted_at DATETIME NULL DEFAULT NULL");
+  }
+} catch (Exception $e) {
+  // Column might already exist or table structure issue - continue anyway
+}
+
+// Set deleted_at to 30 days from now
+$deletedAt = date('Y-m-d H:i:s', strtotime('+30 days'));
+$stmt = $conn->prepare("UPDATE users SET deleted_at = ? WHERE id = ? LIMIT 1");
+$stmt->bind_param("si", $deletedAt, $id);
 
 if ($stmt->execute()) {
-  echo json_encode(['success'=>true, 'deleted'=>$stmt->affected_rows]);
+  echo json_encode([
+    'success'=>true, 
+    'deleted'=>$stmt->affected_rows,
+    'message'=>'User will be permanently deleted in 30 days.'
+  ]);
 } else {
   http_response_code(500);
   echo json_encode(['success'=>false,'message'=>'Server error: '.$stmt->error]);

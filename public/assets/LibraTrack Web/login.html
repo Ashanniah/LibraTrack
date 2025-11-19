@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LibraTrack — Login</title>
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100..900&family=Poppins:wght@100..900&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Site CSS -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- ======= Header (same as index) ======= -->
+  <header id="header" class="header d-flex align-items-center sticky-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <img src="assets/img/library/LibraTrack-logo.png" alt="LibraTrack Logo" style="width:45px; height:100px;">
+        <h1 class="sitename" style="font-size: 24px;">LibraTrack</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html#hero">Home</a></li>
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="register.html">Register</a></li>
+          <li><a href="login.html" class="active">Login</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted d-none d-sm-block" href="index.html#menu">Browse Catalog</a>
+    </div>
+  </header>
+  <!-- End Header -->
+
+  <!-- ======= Login ======= -->
+  <section class="page-bg min-vh-100 d-flex align-items-center justify-content-center">
+    <div class="card login-card border-0 shadow-sm mx-auto">
+      <div class="card-body p-5">
+
+          <!-- Logo -->
+          <div class="text-center mb-4">
+            <img src="assets/img/library/LibraTrack-logo.png" alt="LibraTrack Logo" width="100" height="100">
+          </div>
+
+          <!-- Heading -->
+          <h3 class="form-big-label">Welcome back!</h3>
+
+          <!-- Form -->
+          <form id="loginForm" method="post" action="#" novalidate>
+            <!-- Email -->
+            <div class="mb-3">
+              <label for="email" class="form-label form-label-login-register">Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                class="form-control"
+                required
+                autocomplete="email"
+                inputmode="email"
+                aria-describedby="emailError"
+              />
+              <div class="invalid-feedback" id="emailError" aria-live="polite"></div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label for="password" class="form-label form-label-login-register">Password</label>
+              <div class="password-wrapper position-relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  class="form-control"
+                  required
+                  autocomplete="current-password"
+                  pattern="^(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$"
+                  title="At least 8 characters with 1 uppercase and 1 special character"
+                  aria-describedby="passwordError"
+                />
+                <button type="button" id="togglePassword"
+                        class="toggle-password position-absolute top-50 end-0 translate-middle-y me-3 btn btn-link p-0"
+                        aria-label="Show password">
+                  <i class="bi bi-eye" id="eyeIcon" aria-hidden="true"></i>
+                </button>
+                <div class="invalid-feedback" id="passwordError" aria-live="polite"></div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="remember" />
+                <label class="form-label-login-register ms-1" for="remember">Remember me?</label>
+              </div>
+              <a href="forgot.html" class="form-label-login-register">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 rounded-pill py-2 form-button-label">
+              Login
+            </button>
+          </form>
+
+          <!-- Footer -->
+          <div class="text-center mt-4">
+            <a href="register.html" class="form-label-create">Create an account</a>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ======= Footer (same as index) ======= -->
+  <footer id="footer" class="footer">
+    <div class="container footer-top">
+      <div class="row gy-4">
+        <div class="col-lg-5 col-md-12 footer-about">
+          <a href="index.html" class="logo d-flex align-items-center">
+            <span class="sitename">LibraTrack</span>
+          </a>
+          <p>Cras fermentum odio eu feugiat lide par naso tierra. Justo eget nada terra videa magna derita valies darta donna mare fermentum iaculis eu non diam phasellus.</p>
+          <div class="social-links d-flex mt-4">
+            <a href="#"><i class="bi bi-twitter-x"></i></a>
+            <a href="#"><i class="bi bi-facebook"></i></a>
+            <a href="#"><i class="bi bi-instagram"></i></a>
+            <a href="#"><i class="bi bi-linkedin"></i></a>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-6 footer-links">
+          <h4>Useful Links</h4>
+          <ul>
+            <li><a href="index.html#hero">Home</a></li>
+            <li><a href="index.html#about">About us</a></li>
+            <li><a href="#">Services</a></li>
+            <li><a href="#">Terms of service</a></li>
+            <li><a href="#">Privacy policy</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-6 footer-links">
+          <h4>Our Services</h4>
+          <ul>
+            <li><a href="#">Web Design</a></li>
+            <li><a href="#">Web Development</a></li>
+            <li><a href="#">Product Management</a></li>
+            <li><a href="#">Marketing</a></li>
+            <li><a href="#">Graphic Design</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
+          <h4>Contact Us</h4>
+          <p>A108 Adam Street</p>
+          <p>New York, NY 535022</p>
+          <p>United States</p>
+          <p class="mt-4"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
+          <p><strong>Email:</strong> <span>info@example.com</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="container copyright text-center mt-4">
+      <p>© <span>Copyright</span> <strong class="px-1 sitename">NiceRestaurant</strong> <span>All Rights Reserved</span></p>
+      <div class="credits">
+        Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+      </div>
+    </div>
+  </footer>
+  <!-- End Footer -->
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Site JS -->
+  <script src="assets/js/main.js"></script>
+
+  <!-- Client-side validation + show/hide password -->
+  <script>
+  (function () {
+    const form = document.getElementById('loginForm');
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const togglePassword = document.getElementById('togglePassword');
+    const eyeIcon = document.getElementById('eyeIcon');
+
+    // Show/hide password
+    togglePassword.addEventListener('click', function () {
+      const showing = password.type === 'password';
+      password.type = showing ? 'text' : 'password';
+      eyeIcon.classList.toggle('bi-eye', !showing);
+      eyeIcon.classList.toggle('bi-eye-slash', showing);
+      togglePassword.setAttribute('aria-label', showing ? 'Hide password' : 'Show password');
+    });
+
+    // Clear errors on input
+    [email, password].forEach(el => {
+      el.addEventListener('input', () => {
+        el.classList.remove('is-invalid');
+        if (el === email) emailError.textContent = '';
+        if (el === password) passwordError.textContent = '';
+      });
+    });
+
+    form.addEventListener('submit', function (e) {
+      let valid = true;
+
+      // Email validation
+      const emailVal = email.value.trim();
+      if (!emailVal) {
+        email.classList.add('is-invalid');
+        emailError.textContent = 'Email address is required';
+        valid = false;
+      } else if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(emailVal)) {
+        email.classList.add('is-invalid');
+        emailError.textContent = 'Invalid email address';
+        valid = false;
+      }
+
+      // Password validation
+      const pwd = password.value.trim();
+      const hasUppercase = /[A-Z]/.test(pwd);
+      const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+      const isAllText = /^[A-Za-z]+$/.test(pwd);
+      const isAllNumber = /^[0-9]+$/.test(pwd);
+
+      if (!pwd) {
+        password.classList.add('is-invalid');
+        passwordError.textContent = 'Password is required';
+        valid = false;
+      } else if (pwd.length < 8 || !hasUppercase || !hasSpecial || isAllText || isAllNumber) {
+        password.classList.add('is-invalid');
+        passwordError.textContent =
+          'Password must have at least 8 characters with 1 upper case and 1 special character';
+        valid = false;
+      }
+
+      if (!valid) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, false);
+  })();
+  </script>
+</body>
+</html>

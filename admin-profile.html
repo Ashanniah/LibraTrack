@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -12,19 +12,554 @@
 
   <!-- Shared + Page CSS -->
   <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
   <link href="assets/css/admin-profile.css" rel="stylesheet">
 
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
 
   <style>
+    :root{
+      --gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --card-bg:#fff;
+      --card-border:#e5e7eb;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --text-muted:#9ca3af;
+      --header-bg:#fff;
+      --table-header-bg:#f8f9fa;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --ui-border:#eef0f3;
+      --ui-muted:#6b7280;
+    }
     body.loading main, body.loading #sidebarToggle { visibility:hidden }
-    .role-pill{display:inline-block;padding:.25rem .6rem;border-radius:999px;background:#eee;font-weight:600;font-size:.75rem}
-    .role-admin{background:#efefef;color:#111}
-    .avatar-wrap{position:relative;width:112px;height:112px}
-    .avatar-img{width:112px;height:112px;border-radius:50%;object-fit:cover;border:2px solid #eee}
-    .avatar-edit{position:absolute;right:-6px;bottom:-6px;border-radius:999px}
-    .stat-num{font-weight:700}
-    .profile-card .stat-label{font-size:.8rem;color:#6b7280}
+    
+    /* Consistent Card Design */
+    .card{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      overflow:hidden;
+      background:#fff;
+    }
+    .card-header{
+      background:var(--sidebar-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:16px 20px;
+      font-weight:600;
+      font-size:0.9375rem;
+    }
+    .card-body{
+      padding:24px;
+      background:#fff;
+    }
+    
+    /* Profile Card Specific */
+    .profile-card{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      overflow:hidden;
+    }
+    .profile-card .card-body{
+      padding:32px 24px;
+    }
+    
+    /* Role Pill */
+    .role-pill{
+      display:inline-block;
+      padding:.25rem .75rem;
+      border-radius:999px;
+      background:#4a4a4a;
+      color:#fff;
+      font-weight:600;
+      font-size:.75rem;
+      letter-spacing:0.02em;
+    }
+    
+    /* Avatar Styling */
+    .avatar-wrap{
+      position:relative;
+      width:120px;
+      height:120px;
+      margin:0 auto;
+    }
+    .avatar-img{
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      object-fit:cover;
+      border:3px solid var(--gold);
+      box-shadow:var(--shadow-md);
+    }
+    .avatar-edit{
+      position:absolute;
+      right:0;
+      bottom:0;
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      background:var(--gold);
+      color:#fff;
+      border:3px solid #fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      transition:all 0.2s ease;
+      box-shadow:var(--shadow-sm);
+    }
+    .avatar-edit:hover{
+      background:var(--gold-dark);
+      transform:scale(1.05);
+    }
+    .avatar-edit i{
+      font-size:0.875rem;
+    }
+    
+    /* Stats */
+    .stat{
+      text-align:center;
+    }
+    .stat-num{
+      font-weight:700;
+      font-size:1.5rem;
+      color:var(--text-primary);
+      margin-bottom:4px;
+    }
+    .stat-label{
+      font-size:0.8125rem;
+      color:var(--text-secondary);
+      font-weight:500;
+    }
+    
+    /* Form Controls */
+    .form-label{
+      font-weight:600;
+      font-size:0.875rem;
+      color:var(--text-primary);
+      margin-bottom:8px;
+    }
+    .form-control{
+      padding:10px 14px;
+      font-size:0.9375rem;
+      border:1.5px solid var(--card-border);
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .form-control:focus{
+      border-color:var(--gold);
+      box-shadow:0 0 0 3px rgba(166,134,4,0.1);
+      outline:none;
+    }
+    .form-control::placeholder{
+      color:var(--text-muted);
+    }
+    
+    /* Buttons */
+    .btn-primary{
+      background:var(--gold);
+      border-color:var(--gold);
+      color:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-primary:hover{
+      background:var(--gold-dark);
+      border-color:var(--gold-dark);
+      transform:translateY(-1px);
+      box-shadow:var(--shadow-sm);
+    }
+    .btn-outline-primary{
+      border:2px solid var(--gold);
+      color:var(--gold);
+      background:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-outline-primary:hover{
+      background:var(--gold);
+      border-color:var(--gold);
+      color:#fff;
+      transform:translateY(-1px);
+      box-shadow:var(--shadow-sm);
+    }
+    .btn-outline-secondary{
+      border:2px solid var(--card-border);
+      color:var(--text-primary);
+      background:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-outline-secondary:hover{
+      background:var(--table-header-bg);
+      border-color:var(--card-border);
+      color:var(--text-primary);
+    }
+    .btn-light{
+      border:2px solid var(--card-border);
+      color:var(--text-primary);
+      background:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-light:hover{
+      background:var(--table-header-bg);
+      border-color:var(--card-border);
+    }
+    
+    /* Section Headers */
+    h5{
+      font-weight:700;
+      font-size:1.125rem;
+      color:var(--text-primary);
+      margin-bottom:20px;
+    }
+    h6{
+      font-weight:600;
+      font-size:1rem;
+      color:var(--text-primary);
+      margin-bottom:16px;
+    }
+    
+    /* Dividers */
+    hr{
+      border-color:var(--card-border);
+      opacity:1;
+      margin:24px 0;
+    }
+    
+    /* Quick Actions */
+    .quick-actions .btn{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    
+    /* Main Content */
+    main.container-fluid{
+      padding:24px;
+    }
+    
+    /* Name and Email */
+    #adminName{
+      font-weight:700;
+      font-size:1.25rem;
+      color:var(--text-primary);
+      margin-bottom:4px;
+    }
+    #adminEmail{
+      font-size:0.875rem;
+      color:var(--text-secondary);
+      margin-bottom:16px;
+    }
+    
+    /* Status Pill */
+    .status-pill{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:0.8125rem;
+      font-weight:600;
+      background:#d1fae5;
+      color:#059669;
+      border:1px solid rgba(5,150,105,0.2);
+      box-shadow:0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    /* Date Pill */
+    .date-pill{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:0.8125rem;
+      font-weight:600;
+      background:#dbeafe;
+      color:#2563eb;
+      border:1px solid rgba(37,99,235,0.2);
+      box-shadow:0 1px 2px rgba(0,0,0,0.05);
+    }
+    
+    /* Avatar Dropdown */
+    .avatar-dropdown{
+      min-width:260px;
+      border-radius:var(--border-radius-sm);
+      box-shadow:var(--shadow-lg);
+      border:1px solid var(--ui-border);
+      padding:8px;
+    }
+    .avatar-dropdown-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      cursor:pointer;
+      transition:all 0.2s ease;
+      color:var(--text-primary);
+      text-decoration:none;
+      font-size:0.875rem;
+      white-space:nowrap;
+    }
+    .avatar-dropdown-item:hover{
+      background:var(--table-header-bg);
+      color:var(--text-primary);
+    }
+    .avatar-dropdown-item i{
+      font-size:0.9375rem;
+      color:var(--gold);
+      width:18px;
+      text-align:center;
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    
+    /* Avatar Click Animation */
+    .avatar-img{
+      transition:all 0.2s ease;
+    }
+    .avatar-img:active{
+      transform:scale(0.95);
+      opacity:0.8;
+    }
+    .avatar-img.click-effect{
+      animation:avatarClick 0.3s ease;
+    }
+    @keyframes avatarClick{
+      0%{
+        transform:scale(1);
+      }
+      50%{
+        transform:scale(0.95);
+        box-shadow:0 0 0 4px rgba(166,134,4,0.3);
+      }
+      100%{
+        transform:scale(1);
+        box-shadow:0 0 0 0 rgba(166,134,4,0);
+      }
+    }
+    
+    /* Image Preview Modal */
+    #imagePreviewModal .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--ui-border);
+      box-shadow:var(--shadow-lg);
+    }
+    #imagePreviewModal .modal-header{
+      background:var(--sidebar-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:16px 20px;
+    }
+    #imagePreviewModal .modal-title{
+      color:#fff;
+      font-weight:600;
+    }
+    #imagePreviewModal .modal-body{
+      padding:24px;
+      text-align:center;
+    }
+    .preview-image-container{
+      max-width:100%;
+      margin:0 auto 20px;
+      border-radius:var(--border-radius);
+      overflow:hidden;
+      box-shadow:var(--shadow-md);
+    }
+    .preview-image-container img{
+      width:100%;
+      max-height:400px;
+      object-fit:contain;
+      display:block;
+    }
+    #imagePreviewModal .modal-footer{
+      border-top:1px solid var(--card-border);
+      padding:16px 20px;
+    }
+    
+    /* Success Modal */
+    #profileSuccessModal .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--ui-border);
+      box-shadow:var(--shadow-lg);
+    }
+    #profileSuccessModal .modal-body{
+      padding:32px 24px !important;
+      text-align:center;
+    }
+    .profile-success-icon{
+      width:64px;
+      height:64px;
+      margin:0 auto 16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#d1fae5;
+      border-radius:50%;
+    }
+    .profile-success-icon i{
+      font-size:2rem;
+      color:#10b981;
+    }
+    #profileSuccessModal .modal-title{
+      font-size:1.25rem;
+      color:#1f2937;
+      font-weight:700;
+      margin-bottom:8px;
+    }
+    #profileSuccessModal .btn-success{
+      background:#10b981 !important;
+      border-color:#10b981 !important;
+      color:#fff !important;
+      min-width:100px;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+    }
+    #profileSuccessModal .btn-success:hover{
+      background:#059669 !important;
+      border-color:#059669 !important;
+    }
+    
+    /* Consistent Header Design - Matching Dashboard */
+    .admin-header-gold {
+      background: #fff !important;
+      color: var(--text-primary) !important;
+      border-bottom:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      padding:12px 0;
+    }
+    .admin-header-gold .fw-bold,
+    .admin-header-gold .h5,
+    .admin-header-gold #pageTitle {
+      color: var(--text-primary) !important;
+      font-weight:700;
+      font-size:1.25rem;
+      letter-spacing:0.01em;
+    }
+    .admin-header-gold .btn-link {
+      color: var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .admin-header-gold .btn-link:hover {
+      color: var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    
+    /* Search Bar - Matching Dashboard */
+    .search-bar-custom {
+      height: 42px;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+    }
+    .search-bar-custom .input-group-text {
+      border-top-left-radius: var(--border-radius-sm);
+      border-bottom-left-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--ui-border);
+      border-right: none !important;
+      outline: none !important;
+      color:var(--text-secondary);
+    }
+    .search-bar-custom .form-control {
+      border-top-right-radius: var(--border-radius-sm);
+      border-bottom-right-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--ui-border);
+      border-left: none !important;
+      color: var(--text-primary);
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15);
+      border-radius: var(--border-radius-sm);
+    }
+    .search-bar-custom:focus-within .input-group-text,
+    .search-bar-custom:focus-within .form-control {
+      border-color: var(--gold);
+      background: #fff !important;
+    }
+    
+    /* Notification Button */
+    .notification-btn{
+      color:var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .notification-btn:hover{
+      color:var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    .notification-badge{
+      font-size:0.6875rem;
+      padding:3px 7px;
+      font-weight:600;
+      background:var(--gold) !important;
+      color:#fff !important;
+    }
+    .notification-dropdown{
+      border-radius:12px;
+      box-shadow:var(--shadow-lg);
+      border:1px solid var(--ui-border);
+      margin-top:8px;
+    }
+    
+    /* Admin Button - Avatar */
+    .admin-btn-custom {
+      padding: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--ui-border);
+      background: #fff;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .admin-btn-custom:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(166, 134, 4, 0.1);
+    }
+    .admin-btn-custom:focus,
+    .admin-btn-custom:active,
+    .admin-btn-custom.show {
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 0 0.2rem rgba(166, 134, 4, 0.25) !important;
+    }
+    .admin-btn-custom img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
   </style>
 </head>
 <body class="sb-body loading">
@@ -33,19 +568,35 @@
 
   <div class="sb-wrapper">
     <!-- Topbar -->
-    <nav class="sb-topbar navbar navbar-expand bg-white sticky-top">
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
       <div class="container-fluid">
         <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
           <i class="bi bi-list fs-4"></i>
         </button>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Admin Profile</div>
 
-        <!-- Page title -->
-        <div class="fw-bold h5 mb-0">Admin Profile</div>
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group input-group-sm search-bar-custom">
+              <span class="input-group-text bg-light border-0 search-icon-wrapper"><i class="bi bi-search"></i></span>
+              <input class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search">
+            </div>
+          </form>
 
-        <!-- Account dropdown -->
-        <div class="dropdown ms-auto">
-          <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" id="userMenuBtn">
-            <i class="bi bi-person-gear me-2"></i><span id="whoAmI">Admin</span>
+          <div class="dropdown me-2">
+            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
+              <i class="bi bi-bell fs-5"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
+              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
+              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userMenuBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
+              <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
             <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
@@ -53,71 +604,64 @@
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
           </ul>
+          </div>
         </div>
       </div>
     </nav>
 
     <!-- Content -->
-    <main class="container-fluid py-4">
+    <main class="sb-content container-fluid">
       <div class="row g-4">
         <!-- Left: Profile Summary -->
         <div class="col-12 col-lg-4">
-          <section class="card profile-card p-4">
-            <div class="text-center">
-              <div class="avatar-wrap mx-auto mb-3">
-                <img id="avatarPreview" src="assets/img/default-avatar.png" alt="Avatar" class="avatar-img">
-                <label for="avatarInput" class="avatar-edit btn btn-light btn-sm" title="Change photo">
+          <section class="card profile-card">
+            <div class="card-header">
+              <h5 class="mb-0" style="color:#fff;"><i class="bi bi-person-circle me-2"></i>Profile Summary</h5>
+            </div>
+            <div class="card-body">
+              <div class="text-center mb-4">
+                <div class="avatar-wrap mb-3 position-relative" style="display:inline-block;">
+                  <div class="dropdown">
+                    <img id="avatarPreview" src="assets/img/default-avatar.png" alt="Avatar" class="avatar-img" style="cursor:pointer;" data-bs-toggle="dropdown" aria-expanded="false">
+                    <ul class="dropdown-menu dropdown-menu-end avatar-dropdown">
+                      <li><a class="avatar-dropdown-item" href="#" id="viewProfilePicture"><i class="bi bi-eye"></i>See profile picture</a></li>
+                      <li><a class="avatar-dropdown-item" href="#" id="chooseProfilePicture"><i class="bi bi-image"></i>Choose profile picture</a></li>
+                    </ul>
+                  </div>
+                  <label for="avatarInput" class="avatar-edit" title="Change photo" id="avatarEditLabel">
                   <i class="bi bi-camera"></i>
                 </label>
                 <input id="avatarInput" type="file" accept="image/*" class="d-none">
               </div>
-              <h5 id="adminName" class="mb-1">—</h5>
-              <div id="adminEmail" class="text-muted small mb-3">—</div>
-              <span class="role-pill role-admin">Administrator</span>
+                <h5 id="adminName">—</h5>
+                <div id="adminEmail" class="mb-3">—</div>
+                <span class="role-pill">Administrator</span>
             </div>
 
-            <hr class="my-4">
+              <hr>
 
-            <div class="row text-center g-3">
-              <div class="col-4">
-                <div class="stat">
-                  <div class="stat-num" id="statAdmins">—</div>
-                  <div class="stat-label">Admins</div>
+              <div class="account-info">
+                <div class="mb-3">
+                  <div class="text-muted small mb-1 fw-bold" style="font-size:0.875rem; color:var(--text-secondary);"><i class="bi bi-check-circle-fill me-1"></i>Account Status</div>
+                  <span class="status-pill" id="accountStatus">Active</span>
+                </div>
+                <div>
+                  <div class="text-muted small mb-1 fw-bold" style="font-size:0.875rem; color:var(--text-secondary);"><i class="bi bi-calendar3 me-1"></i>Joined</div>
+                  <span class="date-pill" id="joinedDate">—</span>
                 </div>
               </div>
-              <div class="col-4">
-                <div class="stat">
-                  <div class="stat-num" id="statLibrarians">—</div>
-                  <div class="stat-label">Librarians</div>
-                </div>
-              </div>
-              <div class="col-4">
-                <div class="stat">
-                  <div class="stat-num" id="statStudents">—</div>
-                  <div class="stat-label">Students</div>
-                </div>
-              </div>
-            </div>
-
-            <hr class="my-4">
-
-            <div class="quick-actions d-grid gap-2">
-              <a href="dashboard.html" class="btn btn-outline-primary">
-                <i class="bi bi-speedometer2 me-2"></i>Dashboard
-              </a>
-              <a href="admin-users.html" class="btn btn-outline-secondary">
-                <i class="bi bi-people-fill me-2"></i>Manage Users
-              </a>
             </div>
           </section>
         </div>
 
         <!-- Right: Editable Form -->
         <div class="col-12 col-lg-8">
-          <section class="card p-4">
-            <h5 class="mb-3">Personal Information</h5>
-
-            <form id="profileForm" class="row g-3" novalidate>
+          <section class="card">
+            <div class="card-header">
+              <h5 class="mb-0" style="color:#fff;"><i class="bi bi-person-vcard me-2"></i>Personal Information</h5>
+            </div>
+            <div class="card-body">
+              <form id="profileForm" class="row g-4" novalidate>
               <div class="col-12 col-md-6">
                 <label class="form-label">Full Name</label>
                 <input id="fName" type="text" class="form-control" required>
@@ -138,17 +682,17 @@
               </div>
 
               <div class="col-12">
-                <hr class="my-2">
-                <h6 class="mb-2">Security</h6>
+                  <hr>
+                  <h6 class="mb-3" style="margin-top:8px;"><i class="bi bi-shield-lock me-2"></i>Security</h6>
               </div>
 
               <div class="col-12 col-md-6">
                 <label class="form-label">New Password</label>
-                <input id="fPw" type="password" class="form-control" placeholder="********">
+                  <input id="fPw" type="password" class="form-control" placeholder="Leave blank to keep current">
               </div>
               <div class="col-12 col-md-6">
                 <label class="form-label">Confirm Password</label>
-                <input id="fPw2" type="password" class="form-control" placeholder="********">
+                  <input id="fPw2" type="password" class="form-control" placeholder="Confirm new password">
               </div>
 
               <div class="col-12 d-flex gap-2 justify-content-end pt-2">
@@ -156,17 +700,62 @@
                 <button type="submit" class="btn btn-primary">Save Changes</button>
               </div>
             </form>
+            </div>
           </section>
 
-          <section class="card p-4 mt-4">
-            <h5 class="mb-3">About</h5>
-            <p class="mb-0 text-muted">
-              Update and manage your administrator profile details.
-            </p>
+          <section class="card mt-4">
+            <div class="card-header">
+              <h5 class="mb-0" style="color:#fff;"><i class="bi bi-info-circle me-2"></i>About</h5>
+            </div>
+            <div class="card-body">
+              <p class="mb-0" style="color:var(--text-secondary);">
+                Update and manage your administrator profile details. Changes to your profile information will be reflected across the system.
+              </p>
+            </div>
           </section>
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Image Preview Modal -->
+  <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Preview Profile Picture</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="preview-image-container">
+            <img id="previewImage" src="" alt="Profile picture preview" style="display:none;">
+          </div>
+          <p class="text-muted mb-0">Review your profile picture before saving.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="saveProfilePicture">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal fade" id="profileSuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-body py-4 px-5">
+          <div class="profile-success-icon">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <h5 class="modal-title mb-2 fw-bold">Profile Picture Updated</h5>
+          <p class="text-muted mb-4" style="font-size:0.875rem; color:#6b7280;">Your profile picture has been successfully updated.</p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button class="btn btn-success" data-bs-dismiss="modal" style="min-width: 100px;">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Scripts -->
@@ -175,7 +764,7 @@
   <script>
     // --- Auth helper (same contract as dashboard) ---
     async function getMe() {
-      const res = await fetch('backend/check-auth.php', { credentials:'include' });
+      const res = await fetch('/api/check-auth', { credentials:'include' });
       if (res.status === 401) { location.href = 'login.html'; return null; }
       const data = await res.json();
       if (!data.success) { location.href = 'login.html'; return null; }
@@ -188,11 +777,18 @@
         const me = await getMe();
         if (!me) return;
 
-        // Gate to admins only
-        if (me.role !== 'admin') { location.href = 'dashboard.html'; return; }
+        const role = (me.role || '').toLowerCase();
 
-        // Build sidebar for this page (active: profile)
-        renderSidebar('profile', me.role);
+        // Gate to admins only
+        if (role !== 'admin') { location.href = 'dashboard.html'; return; }
+
+        // Cache role for sidebar
+        if (['admin', 'librarian', 'student'].includes(role)) {
+          localStorage.setItem('userRole', role);
+        }
+
+        // Build sidebar for this page (active: profile) - prevent flicker
+        renderSidebar('profile', role, false);
 
         // Sidebar toggle
         document.getElementById('sidebarToggle')?.addEventListener('click', () => {
@@ -202,27 +798,210 @@
 
         // Header chip
         const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
-        document.getElementById('whoAmI').textContent = 'Admin';
-        document.getElementById('whoChip').innerHTML =
+        const whoChipEl = document.getElementById('whoChip');
+        if (whoChipEl) {
+          whoChipEl.innerHTML =
           `<span class="badge role-chip admin">ADMIN</span> ${fullName || me.email || ''}`;
+        }
 
         // Populate summary + form
-        document.getElementById('adminName').textContent  = fullName || '—';
-        document.getElementById('adminEmail').textContent = me.email || '—';
+        const adminNameEl = document.getElementById('adminName');
+        const adminEmailEl = document.getElementById('adminEmail');
+        if (adminNameEl) adminNameEl.textContent = fullName || '—';
+        if (adminEmailEl) adminEmailEl.textContent = me.email || '—';
 
-        document.getElementById('fName').value    = fullName || '';
-        document.getElementById('fEmail').value   = me.email || '';
-        document.getElementById('fPhone').value   = me.phone || '';
-        document.getElementById('fAddress').value = me.address || '';
+        // Load avatar if available
+        try {
+          const avatarPreview = document.getElementById('avatarPreview');
+          if (avatarPreview) {
+            if (me.avatar && me.avatar.trim() !== '') {
+              avatarPreview.src = me.avatar;
+            } else {
+              // Keep default avatar if no avatar is set
+              avatarPreview.src = avatarPreview.src || 'assets/img/default-avatar.png';
+            }
+          }
+          
+          // Also load avatar in header if available
+          const headerAvatar = document.querySelector('#userMenuBtn img.avatar-32, #userBtn img.avatar-32');
+          if (headerAvatar && me.avatar && me.avatar.trim() !== '') {
+            headerAvatar.src = me.avatar;
+          }
+        } catch (avatarError) {
+          console.error('Error loading avatar:', avatarError);
+          // Continue execution even if avatar fails
+        }
 
-        // (Optional) quick stats – you can wire this to a backend later
-        document.getElementById('statAdmins').textContent     = me.stats_admins ?? '—';
-        document.getElementById('statLibrarians').textContent = me.stats_librarians ?? '—';
-        document.getElementById('statStudents').textContent   = me.stats_students ?? '—';
+        const fNameEl = document.getElementById('fName');
+        const fEmailEl = document.getElementById('fEmail');
+        const fPhoneEl = document.getElementById('fPhone');
+        const fAddressEl = document.getElementById('fAddress');
+        
+        if (fNameEl) fNameEl.value = fullName || '';
+        if (fEmailEl) fEmailEl.value = me.email || '';
+        if (fPhoneEl) fPhoneEl.value = me.phone || '';
+        if (fAddressEl) fAddressEl.value = me.address || '';
+
+        // Account Status and Joined Date
+        const accountStatusEl = document.getElementById('accountStatus');
+        const joinedDateEl = document.getElementById('joinedDate');
+        
+        if (accountStatusEl) {
+          const statusText = (me.status || 'active').charAt(0).toUpperCase() + (me.status || 'active').slice(1);
+          accountStatusEl.textContent = statusText;
+        }
+        
+        if (joinedDateEl && me.created_at) {
+          const joinDate = new Date(me.created_at);
+          const options = { year: 'numeric', month: 'long', day: 'numeric' };
+          const formattedDate = joinDate.toLocaleDateString('en-US', options);
+          joinedDateEl.textContent = formattedDate;
+        } else if (joinedDateEl) {
+          // Fallback if created_at is not available
+          joinedDateEl.textContent = '—';
+        }
+
+        // Avatar dropdown and image handling
+        const avatarInput = document.getElementById('avatarInput');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const viewProfilePicture = document.getElementById('viewProfilePicture');
+        const chooseProfilePicture = document.getElementById('chooseProfilePicture');
+        const imagePreviewModal = new bootstrap.Modal('#imagePreviewModal');
+        const profileSuccessModal = new bootstrap.Modal('#profileSuccessModal');
+        const previewImage = document.getElementById('previewImage');
+        const saveProfilePictureBtn = document.getElementById('saveProfilePicture');
+        
+        let selectedImageFile = null;
+        let selectedImageDataUrl = null;
+
+        // Add click effect to avatar
+        avatarPreview.addEventListener('click', () => {
+          avatarPreview.classList.add('click-effect');
+          setTimeout(() => {
+            avatarPreview.classList.remove('click-effect');
+          }, 300);
+        });
+
+        // View profile picture
+        viewProfilePicture.addEventListener('click', (e) => {
+          e.preventDefault();
+          previewImage.src = avatarPreview.src;
+          previewImage.style.display = 'block';
+          imagePreviewModal.show();
+        });
+
+        // Choose profile picture
+        chooseProfilePicture.addEventListener('click', (e) => {
+          e.preventDefault();
+          avatarInput.click();
+        });
+
+        // Camera icon click
+        const avatarEditLabel = document.getElementById('avatarEditLabel');
+        if (avatarEditLabel) {
+          avatarEditLabel.addEventListener('click', (e) => {
+            e.stopPropagation();
+            avatarInput.click();
+          });
+        }
+
+        // File input change
+        avatarInput.addEventListener('change', () => {
+          const f = avatarInput.files?.[0];
+          if (!f) return;
+          
+          // Validate file size
+          if (f.size > 5*1024*1024) {
+            alert('Max image size is 5MB.');
+            avatarInput.value = '';
+            return;
+          }
+          
+          // Validate file type
+          if (!f.type.startsWith('image/')) {
+            alert('Please select a valid image file.');
+            avatarInput.value = '';
+            return;
+          }
+          
+          // Read and preview
+          const r = new FileReader();
+          r.onload = (e) => {
+            selectedImageDataUrl = e.target.result;
+            selectedImageFile = f;
+            previewImage.src = selectedImageDataUrl;
+            previewImage.style.display = 'block';
+            imagePreviewModal.show();
+          };
+          r.readAsDataURL(f);
+        });
+
+        // Save profile picture
+        saveProfilePictureBtn.addEventListener('click', async () => {
+          if (!selectedImageDataUrl || !selectedImageFile) return;
+          
+          try {
+            // Create FormData
+            const formData = new FormData();
+            formData.append('avatar', selectedImageFile);
+            
+            const response = await fetch('/api/profile/avatar', {
+              method: 'POST',
+              body: formData,
+              credentials: 'include'
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok && data.success) {
+              // Update preview with the server URL if provided, otherwise use local preview
+              if (data.avatar_url) {
+                avatarPreview.src = data.avatar_url;
+              } else {
+                avatarPreview.src = selectedImageDataUrl;
+              }
+              
+              // Close preview modal
+              imagePreviewModal.hide();
+              
+              // Show success modal
+              setTimeout(() => {
+                profileSuccessModal.show();
+              }, 300);
+              
+              // Reset file input
+              avatarInput.value = '';
+              selectedImageFile = null;
+              selectedImageDataUrl = null;
+            } else {
+              alert(data.message || 'Failed to update profile picture. Please try again.');
+            }
+          } catch (error) {
+            console.error('Error updating profile picture:', error);
+            alert('An error occurred while uploading the profile picture. Please try again.');
+          }
+        });
+
+        // Prevent avatar click from triggering dropdown when clicking camera
+        if (avatarEditLabel) {
+          avatarEditLabel.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+        }
 
       } catch (e) {
-        console.error(e);
+        console.error('Profile page error:', e);
+        // Only redirect to login if it's an authentication error
+        if (e.message && e.message.includes('401')) {
         location.href = 'login.html';
+        } else {
+          // For other errors, show error message but keep page visible
+          const errorMsg = document.createElement('div');
+          errorMsg.className = 'alert alert-danger m-4';
+          errorMsg.textContent = 'An error occurred while loading the profile. Please refresh the page.';
+          document.querySelector('main')?.prepend(errorMsg);
+          document.body.classList.remove('loading');
+        }
       } finally {
         document.body.classList.remove('loading');
       }
@@ -231,23 +1010,11 @@
     // Logout
     document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
       e.preventDefault();
-      try { await fetch('backend/logout.php', { method:'POST', credentials:'include' }); } catch {}
+      try { await fetch('/api/logout', { method:'POST', credentials:'include' }); } catch {}
       location.href = 'login.html';
     });
 
-    // UI-only avatar preview
-    const avatarInput = document.getElementById('avatarInput');
-    const avatarPreview = document.getElementById('avatarPreview');
-    avatarInput.addEventListener('change', () => {
-      const f = avatarInput.files?.[0];
-      if (!f) return;
-      if (f.size > 5*1024*1024) { alert('Max image size is 5MB.'); avatarInput.value=''; return; }
-      const r = new FileReader();
-      r.onload = e => avatarPreview.src = e.target.result;
-      r.readAsDataURL(f);
-    });
-
-    // Save (stub – wire to backend when ready)
+    // Save profile - wire to Laravel API
     document.getElementById('profileForm').addEventListener('submit', async (e)=>{
       e.preventDefault();
       const form = e.currentTarget;
@@ -257,25 +1024,94 @@
       const pw = document.getElementById('fPw').value.trim();
       const pw2= document.getElementById('fPw2').value.trim();
       if (pw || pw2) {
-        if (pw !== pw2) { alert('Passwords do not match.'); return; }
+        if (pw !== pw2) { 
+          alert('Passwords do not match.'); 
+          return; 
+        }
         if (!/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=[\]{}|\\:;'"<>,.?/~`]).{8,}$/.test(pw)) {
           alert('Use ≥8 chars with 1 uppercase & 1 special character.');
           return;
         }
       }
 
-      // Example payload
+      // Get current user info
+      const me = await getMe();
+      if (!me) {
+        alert('Session expired. Please login again.');
+        location.href = 'login.html';
+        return;
+      }
+
+      // Split full name into first_name and last_name
+      const fullName = document.getElementById('fName').value.trim();
+      const nameParts = fullName.split(/\s+/);
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      if (!firstName || !lastName) {
+        alert('Please enter both first and last name.');
+        return;
+      }
+
+      // Build payload for Laravel API
       const payload = {
-        name: document.getElementById('fName').value.trim(),
+        first_name: firstName,
+        last_name: lastName,
         email: document.getElementById('fEmail').value.trim(),
-        phone: document.getElementById('fPhone').value.trim(),
-        address: document.getElementById('fAddress').value.trim(),
-        password: pw || undefined
+        status: me.status || 'active'
       };
 
-      // TODO: POST to backend/update-admin-profile.php
-      console.log('Would save profile:', payload);
-      alert('Changes saved (demo).');
+      // Add password only if provided
+      if (pw) {
+        payload.password = pw;
+      }
+
+      // Disable submit button
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving...';
+
+      try {
+        const response = await fetch(`/api/users/${me.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          // Update displayed name and email
+          const adminNameEl = document.getElementById('adminName');
+          const adminEmailEl = document.getElementById('adminEmail');
+          if (adminNameEl) adminNameEl.textContent = fullName;
+          if (adminEmailEl) adminEmailEl.textContent = payload.email;
+
+          // Show success message
+          alert('Profile updated successfully!');
+          
+          // Reset password fields
+          document.getElementById('fPw').value = '';
+          document.getElementById('fPw2').value = '';
+          
+          // Reload page to get fresh data (force reload from server, not cache)
+          setTimeout(() => {
+            window.location.href = window.location.href.split('?')[0] + '?t=' + Date.now();
+          }, 500);
+        } else {
+          alert(data.message || 'Failed to update profile. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        alert('An error occurred while updating your profile. Please try again.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
     });
   </script>
 </body>

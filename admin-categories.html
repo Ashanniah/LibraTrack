@@ -1,0 +1,868 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Categories</title>
+
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+
+  <style>
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --text-muted:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --header-bg:#fff;
+      --table-header-bg:#f8f9fa;
+      --card-border:#e5e7eb;
+    }
+    html{font-size:14px;}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+
+    main.container-fluid{padding:24px!important}
+    
+    /* Consistent Header Design */
+    .admin-header-gold {
+      background: var(--header-bg) !important;
+      color: var(--text-primary) !important;
+      border-bottom:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      padding:12px 0;
+    }
+    .admin-header-gold .fw-bold,
+    .admin-header-gold .h5,
+    .admin-header-gold #pageTitle {
+      color: var(--text-primary) !important;
+      font-weight:700;
+      font-size:1.25rem;
+      letter-spacing:0.01em;
+    }
+    
+    /* Consistent Search Bar Design */
+    .search-bar-custom {
+      height: 42px;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+    }
+    .search-bar-custom .input-group-text {
+      border-top-left-radius: var(--border-radius-sm);
+      border-bottom-left-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-right: none !important;
+      outline: none !important;
+      color:var(--text-secondary);
+    }
+    .search-bar-custom .form-control {
+      border-top-right-radius: var(--border-radius-sm);
+      border-bottom-right-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-left: none !important;
+      color: var(--text-primary);
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .search-bar-custom .form-control:focus {
+      outline: none !important;
+      box-shadow: none !important;
+      border-color: var(--card-border) !important;
+    }
+    .search-bar-custom .form-control::placeholder {
+      color: var(--text-muted);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15);
+      border-radius: var(--border-radius-sm);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      border-color: var(--brand-gold);
+      border-right: none !important;
+      background: #fff !important;
+    }
+    .search-bar-custom:focus-within .form-control {
+      border-color: var(--brand-gold);
+      border-left: none !important;
+      background: #fff !important;
+    }
+    .search-bar-custom:focus-within .search-icon-wrapper {
+      background: #fff !important;
+      color: var(--text-primary) !important;
+      border-color: var(--brand-gold);
+    }
+    .search-bar-custom:focus-within .search-input-custom {
+      background: #fff !important;
+      border-color: var(--brand-gold);
+    }
+    
+    /* Notification Button */
+    .notification-btn{
+      color:var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .notification-btn:hover{
+      color:var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    .notification-badge{
+      font-size:0.6875rem;
+      padding:3px 7px;
+      font-weight:600;
+      background:var(--brand-gold) !important;
+      color:#fff !important;
+    }
+    .notification-dropdown{
+      border-radius:var(--border-radius-sm);
+      box-shadow:var(--shadow-lg);
+      border:1px solid var(--card-border);
+    }
+    
+    /* Admin Button */
+    .admin-btn-custom {
+      padding:0 !important;
+      width:44px !important;
+      height:44px !important;
+      border-radius:var(--border-radius-sm) !important;
+      border:1px solid var(--card-border) !important;
+      background:#fff !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+    }
+    .admin-btn-custom:hover {
+      background:#f8f9fa !important;
+    }
+    .admin-btn-custom:focus,
+    .admin-btn-custom:active,
+    .admin-btn-custom.show {
+      background: var(--brand-gold) !important;
+      border-color: var(--brand-gold) !important;
+      color: #fff !important;
+      box-shadow: 0 0 0 0.2rem rgba(166, 134, 4, 0.25) !important;
+    }
+    .avatar-32 {
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+    
+    .table-card.card{
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--ui-border);
+      overflow:visible;
+      background:#fff;
+    }
+    .table-card .card-header{
+      padding:20px var(--card-pad);
+      border-bottom:0;
+      background:var(--sidebar-bg);
+      color:#fff;
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+    .table-card .card-header .fw-semibold{
+      color:#fff;
+      font-size:1rem;
+      font-weight:600;
+    }
+    .table-card .card-body{padding:0}
+    .table-modern{
+      border-collapse:separate;
+      border-spacing:0;
+      width:100%;
+    }
+    .table-modern thead th{
+      background:#f8f9fa;
+      color:var(--text-secondary);
+      font-weight:600;
+      font-size:0.75rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      padding:14px var(--cell-pad-x);
+      border-bottom:2px solid var(--ui-border);
+      border-top:none;
+      white-space:nowrap;
+      vertical-align:middle;
+    }
+    .table-modern tbody td{
+      padding:16px var(--cell-pad-x);
+      border-bottom:1px solid #f0f0f0;
+      color:var(--text-primary);
+      font-size:0.875rem;
+      vertical-align:middle;
+    }
+    .table-modern tbody tr{
+      transition:background-color 0.2s ease;
+    }
+    .table-modern tbody tr:hover{
+      background-color:#f8f9fa;
+    }
+    .table-modern tbody tr:last-child td{
+      border-bottom:none;
+    }
+    
+    .btn-dark{
+      background:var(--brand-gold)!important;
+      border-color:var(--brand-gold)!important;
+      color:#fff!important;
+      border-radius:var(--border-radius-sm);
+      padding:.6rem 1.2rem;
+      font-weight:600;
+      font-size:.95rem;
+      transition:all 0.2s ease;
+    }
+    .btn-dark:hover{
+      background:var(--gold-dark)!important;
+      border-color:var(--gold-dark)!important;
+      transform:translateY(-1px);
+      box-shadow:var(--shadow-sm);
+    }
+    
+    /* Modal Styling */
+    .modal-header-dark{
+      background:var(--sidebar-bg);
+      color:#fff;
+      border-bottom:1px solid var(--ui-border);
+      padding:16px 20px;
+    }
+    .modal-header-dark .modal-title{
+      color:#fff;
+      font-weight:600;
+      font-size:1rem;
+    }
+    .modal-header-dark .btn-close{
+      filter:invert(1);
+      opacity:0.8;
+    }
+    .modal-header-dark .btn-close:hover{
+      opacity:1;
+    }
+    
+    .form-label{
+      font-weight:500;
+      color:var(--text-primary);
+      margin-bottom:8px;
+      font-size:0.875rem;
+    }
+    .form-control,
+    .form-select{
+      border-radius:var(--border-radius-sm);
+      border:1px solid var(--card-border);
+      padding:10px 14px;
+      font-size:0.875rem;
+      transition:all 0.2s ease;
+    }
+    .form-control:focus,
+    .form-select:focus{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 0.2rem rgba(166,134,4,0.15);
+      outline:none;
+    }
+    textarea.form-control{
+      min-height:80px;
+      resize:vertical;
+    }
+    
+    .btn-primary{
+      background:var(--brand-gold);
+      border-color:var(--brand-gold);
+      color:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+      transition:all 0.2s ease;
+    }
+    .btn-primary:hover{
+      background:var(--gold-dark);
+      border-color:var(--gold-dark);
+      transform:translateY(-1px);
+      box-shadow:var(--shadow-sm);
+    }
+    .btn-secondary{
+      background:#6c757d;
+      border-color:#6c757d;
+      color:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+    }
+    .btn-danger{
+      background:#dc3545;
+      border-color:#dc3545;
+      color:#fff;
+      border-radius:var(--border-radius-sm);
+      padding:10px 20px;
+      font-weight:600;
+    }
+    
+    .action-btn{
+      padding:6px 12px;
+      font-size:0.8125rem;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .action-btn.btn-outline-primary{
+      color:#0d6efd;
+      border-color:#0d6efd;
+    }
+    .action-btn.btn-outline-primary:hover{
+      background:#0d6efd;
+      color:#fff;
+    }
+    .action-btn.btn-outline-danger{
+      color:#dc3545;
+      border-color:#dc3545;
+    }
+    .action-btn.btn-outline-danger:hover{
+      background:#dc3545;
+      color:#fff;
+    }
+    
+    .text-muted{
+      color:var(--text-muted)!important;
+    }
+    
+    .empty-state{
+      padding:60px 20px;
+      text-align:center;
+      color:var(--text-muted);
+    }
+    .empty-state i{
+      font-size:3rem;
+      margin-bottom:16px;
+      opacity:0.5;
+      color:var(--text-muted);
+    }
+    .empty-state h5{
+      color:var(--text-muted) !important;
+      font-weight:500;
+    }
+    .empty-state p{
+      color:var(--text-muted) !important;
+    }
+    
+    /* Success/Error Toast */
+    .toast-container{
+      position:fixed;
+      top:20px;
+      right:20px;
+      z-index:9999;
+    }
+  </style>
+</head>
+<body class="sb-body sb-expanded">
+	<div id="sidebar-root"></div>
+
+	<div class="sb-wrapper">
+    <nav class="sb-topbar navbar navbar-expand admin-header-gold sticky-top">
+			<div class="container-fluid">
+				<button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+					<i class="bi bi-list fs-4"></i>
+				</button>
+				<div class="fw-bold h5 mb-0" id="pageTitle">Categories</div>
+
+				<div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group input-group-sm search-bar-custom">
+              <span class="input-group-text bg-light border-0 search-icon-wrapper"><i class="bi bi-search"></i></span>
+              <input class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search categories..." id="searchInput">
+						</div>
+					</form>
+
+          <div class="dropdown me-2">
+            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
+              <i class="bi bi-bell fs-5"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
+              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
+              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
+            </ul>
+          </div>
+
+					<div class="dropdown">
+            <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:var(--border-radius-sm);">
+              <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+						</button>
+						<ul class="dropdown-menu dropdown-menu-end">
+              <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
+							<li><a class="dropdown-item" href="admin-profile.html"><i class="bi bi-gear me-2"></i>Profile</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+    <main class="container-fluid">
+      <div class="table-card card">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between">
+            <span class="fw-semibold"><i class="bi bi-tags me-2"></i>Categories</span>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge bg-light text-dark" id="categoryCount">0</span>
+              <button class="btn btn-dark btn-sm" id="btnAdd" style="padding:.5rem 1rem; font-size:.875rem;">
+                <i class="bi bi-plus-circle me-2"></i>Add Category
+              </button>
+            </div>
+				</div>
+			</div>
+        <div class="card-body">
+					<div class="table-responsive">
+            <table class="table table-modern align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Category Name</th>
+                  <th>Description</th>
+                  <th class="text-center">Total Books</th>
+                  <th>Created At</th>
+                  <th class="text-end">Actions</th>
+								</tr>
+							</thead>
+              <tbody id="tbody">
+                <tr>
+                  <td colspan="5" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+						</table>
+					</div>
+          <div id="empty" class="empty-state d-none">
+            <i class="bi bi-tags"></i>
+            <h5 class="mt-3 mb-2">No categories found</h5>
+            <p class="mb-0">Get started by adding your first category.</p>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+
+  <!-- Add/Edit Category Modal -->
+	<div class="modal fade" id="catModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+        <div class="modal-header modal-header-dark">
+					<h5 class="modal-title" id="catModalTitle">Add Category</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<form id="catForm">
+          <div class="modal-body" style="padding:24px;">
+						<input type="hidden" id="catId">
+            
+            <div class="mb-3">
+              <label class="form-label">Category Name <span class="text-danger">*</span></label>
+              <input type="text" id="catName" class="form-control" required minlength="2" maxlength="255" placeholder="e.g., Fantasy, Science Fiction">
+              <div class="invalid-feedback" id="nameError"></div>
+              <small class="form-text text-muted">Must be at least 2 characters and unique.</small>
+            </div>
+            
+            <div class="mb-0">
+              <label class="form-label">Description <span class="text-muted">(optional)</span></label>
+              <textarea id="catDescription" class="form-control" rows="3" maxlength="1000" placeholder="Brief description of this category..."></textarea>
+              <small class="form-text text-muted">Maximum 1000 characters.</small>
+            </div>
+					</div>
+          <div class="modal-footer" style="padding:16px 24px; border-top:1px solid var(--ui-border);">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btnSaveCat">
+              <i class="bi bi-check-lg me-2"></i>Save
+            </button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+  <!-- Delete Confirmation Modal -->
+	<div class="modal fade" id="delModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+        <div class="modal-header modal-header-dark">
+					<h5 class="modal-title">Delete Category</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+        <div class="modal-body" style="padding:24px;">
+          <div class="d-flex align-items-start gap-3">
+            <div class="flex-shrink-0">
+              <div class="rounded-circle bg-danger bg-opacity-10 d-flex align-items-center justify-content-center" style="width:48px; height:48px;">
+                <i class="bi bi-exclamation-triangle-fill text-danger fs-4"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="mb-2">Are you sure?</h6>
+              <p class="mb-0 text-muted" id="delText">This action cannot be undone.</p>
+              <div class="alert alert-warning mt-3 mb-0" id="deleteWarning" style="display:none;">
+                <i class="bi bi-info-circle me-2"></i>
+                <span id="deleteWarningText"></span>
+              </div>
+            </div>
+          </div>
+				</div>
+        <div class="modal-footer" style="padding:16px 24px; border-top:1px solid var(--ui-border);">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btnConfirmDelete">
+            <i class="bi bi-trash me-2"></i>Delete
+          </button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+  <!-- Toast Container -->
+  <div class="toast-container">
+    <div id="toastSuccess" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="display:none;">
+      <div class="toast-header bg-success text-white">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <strong class="me-auto">Success</strong>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+      </div>
+      <div class="toast-body" id="toastSuccessMessage"></div>
+    </div>
+    <div id="toastError" class="toast" role="alert" aria-live="assertive" aria-atomic="true" style="display:none;">
+      <div class="toast-header bg-danger text-white">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong class="me-auto">Error</strong>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+      </div>
+      <div class="toast-body" id="toastErrorMessage"></div>
+		</div>
+	</div>
+
+	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+	<script>
+		async function getMe() {
+			const authUrl = '/api/check-auth';
+			try {
+				const res = await fetch(authUrl, { credentials: 'include', headers: { 'Accept':'application/json' } });
+				if (res.status === 401) {
+					location.href = '/login';
+					return null;
+				}
+				if (!res.ok) return null;
+				const data = await res.json();
+				if (data && data.success === true && data.user) return data.user;
+				if (data && data.ok === true && data.user) return data.user;
+				location.href = '/login';
+				return null;
+			} catch (e) {
+				console.error('Auth check error:', e);
+				return null;
+			}
+		}
+
+    function showToast(type, message) {
+      const toastEl = type === 'success' ? document.getElementById('toastSuccess') : document.getElementById('toastError');
+      const messageEl = type === 'success' ? document.getElementById('toastSuccessMessage') : document.getElementById('toastErrorMessage');
+      messageEl.textContent = message;
+      toastEl.style.display = 'block';
+      const toast = new bootstrap.Toast(toastEl);
+      toast.show();
+      toastEl.addEventListener('hidden.bs.toast', () => {
+        toastEl.style.display = 'none';
+      }, { once: true });
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '—';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+		}
+
+		(async function () {
+			const me = await getMe();
+			if (!me) return;
+
+			const role = (me.role || '').toLowerCase();
+      if (role !== 'admin') {
+        location.href = 'dashboard.html';
+        return;
+      }
+
+      renderSidebar('categories', role, false);
+      
+      // Cache role for sidebar
+      if (['admin', 'librarian', 'student'].includes(role)) {
+        localStorage.setItem('userRole', role);
+      }
+
+      // Load avatar in header if available
+      const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+      if (headerAvatar && me.avatar && me.avatar.trim() !== '') {
+        headerAvatar.src = me.avatar;
+      }
+
+			document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+				if (typeof toggleSidebar === 'function') toggleSidebar();
+				else document.body.classList.toggle('sb-expanded');
+			});
+
+			const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
+      const whoChipEl = document.getElementById('whoChip');
+      if (whoChipEl) {
+        whoChipEl.innerHTML = `<span class="badge" style="background:#4a4a4a;color:#fff;font-weight:600;">${role.toUpperCase()}</span> ${fullName || me.email}`;
+      }
+
+			document.getElementById('logoutLink')?.addEventListener('click', async e => {
+				e.preventDefault();
+				try { await fetch('/api/logout', { method:'POST', credentials:'include' }); } catch {}
+				location.href = '/login';
+			});
+
+			const tbody = document.getElementById('tbody');
+			const empty = document.getElementById('empty');
+			const catModal = new bootstrap.Modal(document.getElementById('catModal'));
+			const delModal = new bootstrap.Modal(document.getElementById('delModal'));
+			let deleteId = null;
+      let categoriesData = [];
+
+      async function loadCategories(search = '') {
+        try {
+          const url = '/api/categories' + (search ? `?search=${encodeURIComponent(search)}` : '');
+          const res = await fetch(url, { credentials: 'include' });
+          const data = await res.json();
+          
+          if (data && data.success && data.categories) {
+            categoriesData = data.categories;
+            renderTable(categoriesData);
+          } else {
+            throw new Error(data?.error || 'Failed to load categories');
+          }
+        } catch (error) {
+          console.error('Error loading categories:', error);
+          tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading categories. Please refresh the page.</td></tr>`;
+        }
+      }
+
+      function renderTable(categories) {
+        if (categories.length === 0) {
+          tbody.innerHTML = '';
+          empty.classList.remove('d-none');
+          document.getElementById('categoryCount').textContent = '0';
+          return;
+        }
+
+        empty.classList.add('d-none');
+        document.getElementById('categoryCount').textContent = categories.length;
+
+        tbody.innerHTML = categories.map(cat => `
+          <tr>
+            <td>
+              <div class="fw-semibold">${escapeHtml(cat.name || '')}</div>
+            </td>
+            <td>
+              <div class="text-muted" style="max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                ${escapeHtml(cat.description || '—')}
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="badge bg-primary">${cat.book_count || 0}</span>
+            </td>
+            <td>
+              <span class="text-muted">${formatDate(cat.created_at)}</span>
+            </td>
+            <td class="text-end">
+              <button class="btn btn-sm action-btn btn-outline-primary me-2" data-edit="${cat.id}" title="Edit">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+              <button class="btn btn-sm action-btn btn-outline-danger" data-del="${cat.id}" data-name="${escapeHtml(cat.name || '')}" data-count="${cat.book_count || 0}" title="Delete">
+                <i class="bi bi-trash"></i> Delete
+              </button>
+						</td>
+					</tr>
+				`).join('');
+      }
+
+      // Search functionality
+      let searchTimeout;
+      document.getElementById('searchInput').addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          loadCategories(e.target.value.trim());
+        }, 300);
+      });
+
+      // Add Category
+			document.getElementById('btnAdd').addEventListener('click', () => {
+				document.getElementById('catModalTitle').textContent = 'Add Category';
+				document.getElementById('catId').value = '';
+				document.getElementById('catName').value = '';
+        document.getElementById('catDescription').value = '';
+        document.getElementById('catName').classList.remove('is-invalid');
+        document.getElementById('nameError').textContent = '';
+				catModal.show();
+			});
+
+      // Edit Category
+			tbody.addEventListener('click', (e) => {
+        const editBtn = e.target.closest('[data-edit]');
+        if (editBtn) {
+          const id = editBtn.getAttribute('data-edit');
+          const category = categoriesData.find(c => c.id == id);
+          if (category) {
+					document.getElementById('catModalTitle').textContent = 'Edit Category';
+            document.getElementById('catId').value = category.id;
+            document.getElementById('catName').value = category.name || '';
+            document.getElementById('catDescription').value = category.description || '';
+            document.getElementById('catName').classList.remove('is-invalid');
+            document.getElementById('nameError').textContent = '';
+					catModal.show();
+          }
+					return;
+				}
+
+				const delBtn = e.target.closest('[data-del]');
+				if (delBtn) {
+					deleteId = delBtn.getAttribute('data-del');
+					const name = delBtn.getAttribute('data-name') || 'this category';
+          const bookCount = parseInt(delBtn.getAttribute('data-count') || 0);
+          
+          document.getElementById('delText').textContent = `You are about to delete "${name}".`;
+          
+          const warningEl = document.getElementById('deleteWarning');
+          const warningTextEl = document.getElementById('deleteWarningText');
+          
+          if (bookCount > 0) {
+            warningEl.style.display = 'block';
+            warningTextEl.textContent = `This category is currently used by ${bookCount} book(s). You cannot delete it until all books are removed or reassigned.`;
+            document.getElementById('btnConfirmDelete').disabled = true;
+          } else {
+            warningEl.style.display = 'none';
+            document.getElementById('btnConfirmDelete').disabled = false;
+          }
+          
+					delModal.show();
+				}
+			});
+
+      // Save Category (Add/Edit)
+			document.getElementById('catForm').addEventListener('submit', async (e) => {
+				e.preventDefault();
+        
+				const id = document.getElementById('catId').value.trim();
+				const name = document.getElementById('catName').value.trim();
+        const description = document.getElementById('catDescription').value.trim();
+        
+        // Validation
+        if (name.length < 2) {
+          document.getElementById('catName').classList.add('is-invalid');
+          document.getElementById('nameError').textContent = 'Category name must be at least 2 characters.';
+          return;
+        }
+        
+        document.getElementById('catName').classList.remove('is-invalid');
+        document.getElementById('nameError').textContent = '';
+        
+        try {
+          const url = id ? `/api/categories/${id}` : '/api/categories';
+          const method = id ? 'PUT' : 'POST';
+          
+          const response = await fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              name: name,
+              description: description || null
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (data && data.success) {
+					catModal.hide();
+            showToast('success', id ? 'Category updated successfully!' : 'Category created successfully!');
+            await loadCategories(document.getElementById('searchInput').value.trim());
+				} else {
+            const errorMsg = data?.error || 'Failed to save category';
+            document.getElementById('catName').classList.add('is-invalid');
+            document.getElementById('nameError').textContent = errorMsg;
+            showToast('error', errorMsg);
+          }
+        } catch (error) {
+          console.error('Error saving category:', error);
+          showToast('error', 'An error occurred while saving the category.');
+        }
+      });
+
+      // Delete Category
+			document.getElementById('btnConfirmDelete').addEventListener('click', async () => {
+				if (!deleteId) return;
+        
+        try {
+          const response = await fetch('/api/categories', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ id: deleteId })
+          });
+          
+          const data = await response.json();
+          
+          if (data && data.success) {
+					delModal.hide();
+					deleteId = null;
+            showToast('success', 'Category deleted successfully!');
+            await loadCategories(document.getElementById('searchInput').value.trim());
+				} else {
+            const errorMsg = data?.error || 'Cannot delete category';
+            showToast('error', errorMsg);
+            // Update warning if books are using it
+            if (errorMsg.includes('book')) {
+              document.getElementById('deleteWarning').style.display = 'block';
+              document.getElementById('deleteWarningText').textContent = errorMsg;
+            }
+          }
+        } catch (error) {
+          console.error('Error deleting category:', error);
+          showToast('error', 'An error occurred while deleting the category.');
+        }
+      });
+
+      // Initial load
+      await loadCategories();
+		})();
+	</script>
+</body>
+</html>

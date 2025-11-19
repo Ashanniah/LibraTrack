@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -10,10 +10,10 @@
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
-  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
   <link href="assets/css/student-pages.css" rel="stylesheet">
 </head>
-<body class="sb-body">
+<body class="sb-body sb-expanded">
   <div id="sidebar-root"></div>
 
   <div class="sb-wrapper">
@@ -68,42 +68,26 @@
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
   <script>
-    /* ---------- Minimal student sidebar ---------- */
-    function renderStudentSidebar(active='search'){
-      const root=document.getElementById('sidebar-root');
-      if(!root) return;
-      root.innerHTML = `
-      <nav id="sidebar" class="sb-sidebar d-flex flex-column">
-        <a class="sb-brand" href="student-dashboard.html">
-          <img src="assets/img/LibraTrack-logo.png" alt="LibraTrack" class="sb-logo">
-          <span class="sb-text fw-semibold">LibraTrack</span>
-        </a>
-        <div class="sb-menu flex-grow-1">
-          <div class="sb-label">Main</div>
-          <a class="sb-link ${active==='dashboard'?'active':''}" href="student-dashboard.html"><i class="bi bi-speedometer2"></i><span class="sb-text">Dashboard</span></a>
-          <a class="sb-link ${active==='search'?'active':''}" href="student-search.html"><i class="bi bi-search"></i><span class="sb-text">Search Books</span></a>
-          <a class="sb-link ${active==='history'?'active':''}" href="student-history.html"><i class="bi bi-clock-history"></i><span class="sb-text">History</span></a>
-          <a class="sb-link ${active==='favorites'?'active':''}" href="student-favorites.html"><i class="bi bi-heart"></i><span class="sb-text">Favorites</span></a>
-          <a class="sb-link ${active==='overdue'?'active':''}" href="student-overdue.html"><i class="bi bi-exclamation-triangle"></i><span class="sb-text">Overdue</span></a>
-          <a class="sb-link ${active==='notifications'?'active':''}" href="student-notifications.html"><i class="bi bi-bell"></i><span class="sb-text">Notifications</span></a>
-
-          <div class="sb-label mt-3">Account</div>
-          <a class="sb-link" href="student-profile.html"><i class="bi bi-person"></i><span class="sb-text">Profile</span></a>
-          <a class="sb-link" href="login.html"><i class="bi bi-box-arrow-right"></i><span class="sb-text">Logout</span></a>
-        </div>
-        <div class="mt-auto small text-secondary px-3 pb-3 sb-text">© <span id="year"></span> LibraTrack</div>
-      </nav>`;
-      document.getElementById('year').textContent=new Date().getFullYear();
-    }
-    function toggleSidebar(){
-      const isDesktop=window.innerWidth>=992;
-      const cls=isDesktop?'sb-expanded':'sb-toggled';
-      document.body.classList.toggle(cls);
-      if(isDesktop) document.body.classList.remove('sb-toggled');
-    }
-    renderStudentSidebar('search');
-    document.getElementById('sidebarToggle')?.addEventListener('click',toggleSidebar);
+    // Initialize sidebar using unified sidebar.js
+    (async () => {
+      try {
+        const res = await fetch('/api/check-auth', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+        const data = await res.ok ? await res.json() : null;
+        const role = (data?.user?.role || 'student').toLowerCase();
+        if (['admin', 'librarian', 'student'].includes(role)) {
+          renderSidebar('search', role);
+        }
+      } catch {
+        renderSidebar('search', 'student');
+      }
+      // Wire up sidebar toggle
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        if (typeof toggleSidebar === 'function') toggleSidebar();
+        else document.body.classList.toggle('sb-expanded');
+      });
+    })();
 
     /* ---- Demo search (front-end only) ---- */
     const data = [

@@ -23,3 +23,8 @@ Stack trace:
 #0 C:\xampp\htdocs\LibraTrack\backend\create-student.php(112): mysqli->prepare('SELECT id FROM ...')
 #1 {main}
   thrown in C:\xampp\htdocs\LibraTrack\backend\create-student.php on line 112
+[17-Nov-2025 08:51:58 Europe/Berlin] PHP Fatal error:  Uncaught ArgumentCountError: The number of elements in the type definition string must match the number of bind variables in C:\xampp\htdocs\LibraTrack\backend\create-student.php:109
+Stack trace:
+#0 C:\xampp\htdocs\LibraTrack\backend\create-student.php(109): mysqli_stmt->bind_param('sssssssssssss i', 'Mark', '', 'Padingdong', '', 'mark123@gmail.c...', '$2y$10$elZLoSNo...', '23208655', 'Bachelor of Sci...', '4th', 'B', 'active', '', 8)
+#1 {main}
+  thrown in C:\xampp\htdocs\LibraTrack\backend\create-student.php on line 109

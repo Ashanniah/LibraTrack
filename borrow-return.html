@@ -1,0 +1,1136 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Borrow / Return</title>
+
+  <!-- Fonts / Icons / Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Shared + page styles -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+  <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <style>
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --header-bg:#fff;
+      --table-header-bg:#111;
+      --card-border:#e5e7eb;
+    }
+    html{font-size:14px;}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+    main.container-fluid{padding:24px!important}
+
+    /* Header Styling */
+    .admin-header-gold{
+      background:#fff!important;
+      border-bottom:1px solid var(--card-border);
+      padding:12px 24px;
+    }
+    .search-bar-custom {
+      height: 42px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-sm);
+      background: #fff;
+      overflow: hidden;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+      border: none !important;
+      background: transparent !important;
+    }
+    .search-bar-custom .input-group-text {
+      color: var(--text-secondary);
+      padding-left: 16px;
+      padding-right: 8px;
+    }
+    .search-bar-custom .form-control {
+      color: var(--text-primary);
+      padding-left: 8px;
+      padding-right: 16px;
+    }
+    .search-bar-custom .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166,134,4,0.15);
+      border-color: var(--brand-gold);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      color: var(--text-primary);
+    }
+    .notification-btn{
+      width:44px;
+      height:44px;
+      border-radius:var(--border-radius-sm);
+      border:none;
+      background:transparent;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+      color:var(--text-primary);
+      padding:0;
+      position:relative;
+    }
+    .notification-btn:hover{
+      background:#f8f9fa;
+      color:var(--text-primary);
+    }
+    .notification-btn i{
+      font-size:1.25rem;
+    }
+    .admin-btn-custom{
+      padding:0;
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:1px solid var(--card-border);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+      overflow:hidden;
+    }
+    .admin-btn-custom:hover{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 2px rgba(166,134,4,0.1);
+    }
+    .admin-btn-custom img{
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    /* Stat Cards - Dashboard Style */
+    .sb-card{
+      background:#fff;
+      border:1px solid var(--card-border);
+      border-radius:var(--border-radius);
+      padding:20px;
+      transition:all 0.2s ease;
+      cursor:pointer;
+    }
+    .sb-card.elevated{
+      box-shadow:var(--shadow-sm);
+    }
+    .sb-card-title{
+      font-size:0.875rem;
+      font-weight:600;
+      color:var(--text-secondary);
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .sb-card-title i{
+      color:var(--text-secondary);
+      font-size:1rem;
+    }
+    .sb-card-value{
+      font-size:1.75rem;
+      font-weight:700;
+      color:var(--text-secondary);
+      line-height:1.2;
+    }
+    
+    /* Color-coded cards */
+    .sb-card.card-danger .sb-card-title,
+    .sb-card.card-danger .sb-card-title i,
+    .sb-card.card-danger .sb-card-value{
+      color:#dc2626 !important;
+    }
+    .sb-card.card-warning .sb-card-title,
+    .sb-card.card-warning .sb-card-title i,
+    .sb-card.card-warning .sb-card-value{
+      color:#f59e0b !important;
+    }
+    .sb-card.card-success .sb-card-title,
+    .sb-card.card-success .sb-card-title i,
+    .sb-card.card-success .sb-card-value{
+      color:#10b981 !important;
+    }
+    .sb-card.card-info .sb-card-title,
+    .sb-card.card-info .sb-card-title i,
+    .sb-card.card-info .sb-card-value{
+      color:#3b82f6 !important;
+    }
+
+    /* Table Styling */
+    .table-modern{
+      margin-bottom:0;
+    }
+    .table-modern thead th{
+      background:#fff;
+      color:var(--text-secondary);
+      font-weight:700;
+      font-size:0.8125rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      padding:16px var(--cell-pad-x);
+      border-bottom:2px solid var(--ui-border);
+      vertical-align:middle;
+    }
+    .table-modern tbody td{
+      padding:var(--cell-pad-y) var(--cell-pad-x);
+      vertical-align:middle;
+      border-bottom:1px solid var(--ui-border);
+      color:var(--text-primary);
+    }
+    .table-modern tbody tr:hover{
+      background:#f8f9fa;
+    }
+
+    /* Card Styling */
+    .card{
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--ui-border);
+      background:#fff;
+    }
+    .card-header{
+      background:var(--table-header-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:20px var(--card-pad);
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+
+    /* Pagination */
+    .pagination .page-item.active .page-link{
+      background:var(--brand-gold)!important;
+      color:#fff!important;
+      border-color:var(--brand-gold)!important;
+    }
+    
+    /* Badge Styling */
+    .text-bg-success-soft {
+      background: #d1fae5 !important;
+      color: #065f46 !important;
+      padding: 6px 12px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-danger-soft {
+      background: #fee2e2 !important;
+      color: #991b1b !important;
+      padding: 6px 12px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-primary-soft {
+      background: #dbeafe !important;
+      color: #1e40af !important;
+      padding: 6px 12px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    
+    /* Borrow Modal Styling - Similar to Add Student */
+    #borrowModal .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:none;
+      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+      overflow:visible !important;
+    }
+    #borrowModal .modal-header-dark{
+      background:var(--sidebar-bg) !important;
+      color:#fff !important;
+      border-bottom:none !important;
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
+      padding:24px 32px !important;
+    }
+    #borrowModal .modal-header-dark .modal-title{
+      color:#fff !important;
+      font-weight:700 !important;
+      font-size:1.25rem;
+      letter-spacing:-0.01em;
+    }
+    #borrowModal .modal-header-dark .btn-close{
+      filter:invert(1) grayscale(1);
+      opacity:0.7;
+      transition:opacity 0.2s ease;
+      padding:8px;
+    }
+    #borrowModal .modal-header-dark .btn-close:hover{
+      opacity:1;
+    }
+    #borrowModal .modal-body{
+      padding:32px !important;
+      background:#fff;
+      overflow:visible !important;
+    }
+    #borrowModal .modal-content{
+      overflow:visible !important;
+    }
+    #borrowModal .modal-dialog{
+      overflow:visible !important;
+    }
+    #borrowModal .form-label{
+      font-weight:600;
+      font-size:0.875rem;
+      color:#374151;
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+    }
+    #borrowModal .form-label:has(+ .form-text-hint){
+      margin-bottom:4px;
+    }
+    #borrowModal .form-control,
+    #borrowModal .form-select{
+      padding:10px 14px;
+      font-size:0.9375rem;
+      border:1.5px solid #e5e7eb;
+      border-radius:8px;
+      background:#fff;
+      transition:all 0.2s ease;
+    }
+    #borrowModal .form-control:focus,
+    #borrowModal .form-select:focus{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 3px rgba(166,134,4,0.1);
+      outline:none;
+    }
+    #borrowModal .form-control:hover:not(:focus),
+    #borrowModal .form-select:hover:not(:focus){
+      border-color:#d1d5db;
+    }
+    #borrowModal .form-control::placeholder{
+      color:#9ca3af;
+      font-size:0.875rem;
+    }
+    #borrowModal .form-text-hint{
+      font-size:0.75rem;
+      color:#6b7280;
+      margin-top:4px;
+      margin-bottom:0;
+      font-weight:400;
+    }
+    #borrowModal .form-control.is-invalid,
+    #borrowModal .form-select.is-invalid{
+      border-color:#dc3545;
+      background-color:#fef2f2;
+    }
+    #borrowModal .form-control.is-invalid:focus,
+    #borrowModal .form-select.is-invalid:focus{
+      border-color:#dc3545;
+      box-shadow:0 0 0 3px rgba(220,53,69,0.1);
+    }
+    #borrowModal .modal-footer{
+      padding:20px 32px;
+      border-top:1px solid #e5e7eb;
+      background:#f9fafb;
+      border-radius:0 0 var(--border-radius-lg) var(--border-radius-lg);
+      display:flex;
+      justify-content:flex-end;
+      gap:12px;
+    }
+    #borrowModal .modal-footer .btn{
+      border-radius:8px;
+      font-weight:600;
+      font-size:0.9375rem;
+      padding:10px 24px;
+      min-width:100px;
+      transition:all 0.2s ease;
+    }
+    #borrowModal .modal-footer .btn-light{
+      background:#fff !important;
+      border-color:#d1d5db !important;
+      color:#374151 !important;
+    }
+    #borrowModal .modal-footer .btn-light:hover{
+      background:#f9fafb !important;
+      border-color:#9ca3af !important;
+      color:#111827 !important;
+      transform:translateY(-1px);
+      box-shadow:0 2px 4px rgba(0,0,0,0.05);
+    }
+    #borrowModal .modal-footer .btn-primary{
+      background:var(--brand-gold) !important;
+      border-color:var(--brand-gold) !important;
+      color:#fff !important;
+      box-shadow:0 2px 4px rgba(166,134,4,0.2);
+    }
+    #borrowModal .modal-footer .btn-primary:hover{
+      background:var(--gold-dark) !important;
+      border-color:var(--gold-dark) !important;
+      color:#fff !important;
+      transform:translateY(-1px);
+      box-shadow:0 4px 8px rgba(166,134,4,0.3);
+    }
+    #borrowModal .modal-footer .btn:active{
+      transform:translateY(0);
+    }
+    #borrowModal .invalid-feedback{
+      display:none;
+      color:#dc3545;
+      font-size:0.8125rem;
+      margin-top:6px;
+    }
+    #borrowModal .was-validated .form-control:invalid ~ .invalid-feedback,
+    #borrowModal .was-validated .form-select:invalid ~ .invalid-feedback{
+      display:block;
+    }
+  </style>
+</head>
+
+<body class="sb-body sb-expanded">
+  <!-- Shared Sidebar -->
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Borrow / Return</div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <button class="btn btn-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#borrowModal" style="background:var(--brand-gold); color:#fff; border-color:var(--brand-gold); padding:8px 24px; min-width:140px; white-space:nowrap;">
+            <i class="bi bi-plus-circle me-2"></i><span>New Borrow</span>
+          </button>
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group search-bar-custom">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="txSearch" class="form-control" type="search" placeholder="Search">
+            </div>
+          </form>
+
+          <div class="dropdown position-relative">
+            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
+              <i class="bi bi-bell"></i>
+              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
+              <li><h6 class="dropdown-header">Notifications</h6></li>
+              <li><hr class="dropdown-divider"></li>
+              <li id="notificationList">
+                <div class="px-3 py-2 text-center text-muted">
+                  <small>No notifications</small>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container-fluid py-4">
+      <!-- Quick Stats -->
+      <section class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+          <div class="sb-card elevated text-center card-info">
+            <div class="sb-card-title"><i class="bi bi-journal-arrow-up"></i>Active Loans</div>
+            <div class="sb-card-value" id="statActive">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="sb-card elevated text-center card-danger">
+            <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue</div>
+            <div class="sb-card-value" id="statOverdue">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="sb-card elevated text-center card-success">
+            <div class="sb-card-title"><i class="bi bi-clipboard-check"></i>Returned (today)</div>
+            <div class="sb-card-value" id="statReturnedToday">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="sb-card elevated text-center card-warning">
+            <div class="sb-card-title"><i class="bi bi-hourglass-split"></i>Due Today</div>
+            <div class="sb-card-value" id="statDueToday">0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filters -->
+      <section class="card mb-3" style="margin-top:24px;">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="fw-semibold">Borrow / Return</div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="dropdown">
+                <button id="filterStatusBtn" class="btn btn-sm" data-bs-toggle="dropdown" style="background:#fff; color:#111; border:1px solid rgba(255,255,255,0.3); padding:6px 16px; cursor:pointer; min-width:80px;">
+                  <span id="filterStatusText">All</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus(''); return false;">All</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus('borrowed'); return false;">Active Loans</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus('overdue'); return false;">Overdue Only</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus('returned'); return false;">Returned</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus('due_today'); return false;">Due Today</a></li>
+                </ul>
+              </div>
+              <button id="btnRefresh" class="btn btn-sm" style="background:#fff; color:#111; border:1px solid rgba(255,255,255,0.3); padding:6px 16px; cursor:pointer; min-width:80px;"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Transactions table -->
+      <section class="card">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-modern align-middle mb-0">
+              <thead>
+                <tr>
+                  <th style="width:38px"><input class="form-check-input" type="checkbox" id="checkAll"></th>
+                  <th>Member</th>
+                  <th>Book</th>
+                  <th class="d-none d-lg-table-cell">ISBN</th>
+                  <th>Borrowed</th>
+                  <th>Due</th>
+                  <th>Returned</th>
+                  <th>Status</th>
+                  <th class="text-end" style="width:140px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="txBody"><!-- JS --></tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+            <div class="text-muted small" id="pageInfo">Showing 1–10 of 0</div>
+            <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+          </div>
+
+          <div id="emptyState" class="empty d-none text-center py-5">
+            <i class="bi bi-journal-arrow-up fs-2 d-block mb-2 text-muted"></i>
+            <p class="text-muted mb-0">No transactions found.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Borrow Modal -->
+  <div class="modal fade" id="borrowModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <form id="borrowForm" class="modal-content" novalidate>
+        <div class="modal-header modal-header-dark">
+          <h5 class="modal-title">Record Borrow</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label class="form-label">Member</label>
+              <input id="bMember" type="text" class="form-control" placeholder="Search by name or student number..." required>
+              <div class="invalid-feedback">Member is required.</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label class="form-label">Book</label>
+              <input id="bBook" type="text" class="form-control" placeholder="Search by title, author, or ISBN..." required>
+              <div class="invalid-feedback">Book is required.</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <label class="form-label">Borrowed Date</label>
+              <input id="bBorrowed" type="date" class="form-control" required>
+              <div class="invalid-feedback">Borrowed date is required.</div>
+            </div>
+            <div class="col-6 col-md-4">
+              <label class="form-label">Due Date</label>
+              <input id="bDue" type="date" class="form-control" required>
+              <div class="invalid-feedback">Due date is required.</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+          <button id="btnSaveBorrow" class="btn btn-primary" type="submit">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Return Modal -->
+  <div class="modal fade" id="returnModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+      <form id="returnForm" class="modal-content" novalidate>
+        <div class="modal-header">
+          <h5 class="modal-title">Record Return</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small text-muted mb-2">Confirm the return date for the selected transaction.</p>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">Return Date</label>
+              <input id="rReturned" type="date" class="form-control" required>
+            </div>
+            <input id="rTxId" type="hidden">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
+          <button id="btnSaveReturn" class="btn btn-success" type="submit">Mark as Returned</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Details Modal (Field / Details) -->
+  <div class="modal fade" id="viewTxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content txview">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title">Transaction Details</h5>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body pt-0">
+          <div class="tv-head">
+            <div class="tv-icon"><i class="bi bi-journal-bookmark"></i></div>
+            <div class="tv-id">
+              <div class="tv-title" id="vtBook">—</div>
+              <div class="tv-sub small text-muted" id="vtMember">—</div>
+              <div class="tv-chips">
+                <span id="vtStatus" class="chip chip-status">Borrowed</span>
+                <span id="vtIsbn" class="chip chip-neutral">ISBN —</span>
+              </div>
+            </div>
+            <div class="tv-actions">
+              <button class="btn btn-outline-success btn-sm" id="vtReturnBtn"><i class="bi bi-box-arrow-in-left me-1"></i>Return</button>
+            </div>
+          </div>
+
+          <div class="tv-sheet">
+            <div class="tv-row tv-headrow">
+              <div class="tv-col tv-field"><i class="bi bi-info-circle me-2"></i> Field</div>
+              <div class="tv-col tv-value"><i class="bi bi-clipboard-check me-2"></i> Details</div>
+            </div>
+
+            <div class="tv-row"><div class="tv-col tv-field"><i class="bi bi-calendar-plus"></i> Borrowed</div><div class="tv-col tv-value" id="vfBorrowed">—</div></div>
+            <div class="tv-row"><div class="tv-col tv-field"><i class="bi bi-hourglass-split"></i> Due</div><div class="tv-col tv-value" id="vfDue">—</div></div>
+            <div class="tv-row"><div class="tv-col tv-field"><i class="bi bi-calendar-check"></i> Returned</div><div class="tv-col tv-value" id="vfReturned">—</div></div>
+          </div>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-17"></script>
+  <script>
+    // Initialize with authentication check
+    (async () => {
+      const res = await fetch('/api/check-auth', {credentials:'include'});
+      if (!res.ok) { location.href = 'login.html'; return; }
+      const data = await res.json().catch(()=>null);
+      const role = (data?.user?.role || '').toLowerCase();
+      if (role !== 'librarian' && role !== 'admin') { location.href = 'dashboard.html'; return; }
+
+      // Sidebar + highlight
+      renderSidebar('borrowreturn', role, false);
+      localStorage.setItem('userRole', role);
+      
+      // Load avatar in header if available
+      const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+      if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') {
+        headerAvatar.src = data.user.avatar;
+      }
+      
+      document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+      
+      // Logout function
+      window.logout = async function() {
+        try {
+          await fetch('/api/logout', {method:'POST', credentials:'include'});
+          localStorage.removeItem('userRole');
+          location.href = 'login.html';
+        } catch(e) {
+          location.href = 'login.html';
+        }
+      };
+
+      document.getElementById('btnGoBorrowRequests')?.addEventListener('click', () => {
+        location.href = 'librarian-borrow-requests.html';
+      });
+
+      // ===== Data from Backend =====
+      let allLoans = [];
+
+    // ===== Elements =====
+    const txBody = document.getElementById('txBody');
+    const empty = document.getElementById('emptyState');
+    const search = document.getElementById('txSearch');
+    const fStatus = filterStatusSelect;
+    const fDate = filterDateSelect;
+    const checkAll = document.getElementById('checkAll');
+    const pageInfo = document.getElementById('pageInfo');
+    const pager = document.getElementById('pager');
+
+    const statActive = document.getElementById('statActive');
+    const statOverdue = document.getElementById('statOverdue');
+    const statReturnedToday = document.getElementById('statReturnedToday');
+    const statDueToday = document.getElementById('statDueToday');
+
+    // modals
+    const borrowModal = new bootstrap.Modal('#borrowModal');
+    const returnModal = new bootstrap.Modal('#returnModal');
+    const viewTxModal = new bootstrap.Modal('#viewTxModal');
+
+    // forms
+    const borrowForm = document.getElementById('borrowForm');
+    const bMember = document.getElementById('bMember');
+    const bBook = document.getElementById('bBook');
+    const bBorrowed = document.getElementById('bBorrowed');
+    const bDue = document.getElementById('bDue');
+
+    const returnForm = document.getElementById('returnForm');
+    const rReturned = document.getElementById('rReturned');
+    const rTxId = document.getElementById('rTxId');
+
+    // view refs
+    const vtBook = document.getElementById('vtBook');
+    const vtMember = document.getElementById('vtMember');
+    const vtStatus = document.getElementById('vtStatus');
+    const vtIsbn = document.getElementById('vtIsbn');
+    const vtReturnBtn = document.getElementById('vtReturnBtn');
+    const vfBorrowed = document.getElementById('vfBorrowed');
+    const vfDue = document.getElementById('vfDue');
+    const vfReturned = document.getElementById('vfReturned');
+
+    // ===== Helpers =====
+    const pageSize = 10;
+    let currentPage = 1;
+
+    // If a preset filter is provided via URL (?status=overdue|borrowed|returned|due_today),
+    // apply it to the Status dropdown on first load.
+    (function applyInitialStatusFromUrl(){
+      const params = new URLSearchParams(window.location.search);
+      const st = (params.get('status') || '').toLowerCase();
+      if (st) {
+        const allowed = ['borrowed','overdue','returned','due_today'];
+        if (allowed.includes(st)) {
+          fStatus.value = st;
+        }
+      }
+    })();
+
+    const todayStr = () => new Date().toISOString().slice(0,10);
+    function isOverdue(loan){ 
+      // A loan is overdue only if it's not returned and due date has passed
+      if (loan.status === 'returned' || loan.returned_at) return false;
+      const dueDate = loan.extended_due_at || loan.due_at;
+      if (!dueDate) return false;
+      return dueDate < todayStr();
+    }
+    function statusOf(loan){
+      // Check both status field and returned_at to determine if returned
+      if (loan.status === 'returned' || (loan.returned_at && loan.returned_at.trim() !== '')) {
+        return 'returned';
+      }
+      // For active loans, check if overdue
+      if (isOverdue(loan)) return 'overdue';
+      // Otherwise it's borrowed (active)
+      return 'borrowed';
+    }
+    function inDateRange(loan, filter){
+      const d = loan.borrowed_at ? loan.borrowed_at.split(' ')[0] : '';
+      if (!d) return true;
+      const now = new Date();
+      const weekStart = new Date(now); weekStart.setDate(now.getDate()-now.getDay());
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      if(filter==='today') return d === todayStr();
+      if(filter==='thisweek') return new Date(d) >= weekStart;
+      if(filter==='thismonth') return new Date(d) >= monthStart;
+      return true;
+    }
+
+    function applyFilters(){
+      const q = (search.value||"").toLowerCase().trim();
+      const st = currentFilterStatus || fStatus.value;
+      const dr = currentFilterDate || fDate.value;
+
+      return allLoans.filter(loan=>{
+        const studentName = (loan.student_name || '').toLowerCase();
+        const studentNo = (loan.student_no || '').toLowerCase();
+        const bookTitle = (loan.book_title || '').toLowerCase();
+        const isbn = (loan.isbn || '').toLowerCase();
+        const hit = (studentName + " " + studentNo + " " + bookTitle + " " + isbn).includes(q);
+        let stOk = true;
+        if (st === 'due_today') {
+          // due today = not returned and due date equals today
+          const due = (loan.extended_due_at || loan.due_at) || '';
+          stOk = (!loan.returned_at && (loan.status !== 'returned') && due === todayStr());
+        } else if (st) {
+          stOk = statusOf(loan) === st;
+        }
+        const drOk = inDateRange(loan, dr);
+        return hit && stOk && drOk;
+      });
+    }
+
+    async function loadLoans() {
+      try {
+        const url = `/api/loans?page=1&pagesize=1000`;
+        const res = await fetch(url, {credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        if (!data.ok) { 
+          console.error('Failed to load loans:', data.error);
+          return;
+        }
+        allLoans = data.items || [];
+        render();
+      } catch(err) {
+        console.error('Error loading loans:', err);
+        alert('Error loading loans: ' + err.message);
+      }
+    }
+
+    function render(){
+      const list = applyFilters();
+
+      // stats
+      const active = list.filter(r=>statusOf(r)==='borrowed').length;
+      const overdue = list.filter(r=>statusOf(r)==='overdue').length;
+      const returnedToday = list.filter(r=>{
+        const returned = r.returned_at ? r.returned_at.split(' ')[0] : '';
+        return returned === todayStr();
+      }).length;
+      const dueToday = list.filter(r=>{
+        if (r.status === 'returned' || r.returned_at) return false;
+        const dueDate = r.due_at || r.extended_due_at;
+        return dueDate === todayStr();
+      }).length;
+      statActive.textContent = active;
+      statOverdue.textContent = overdue;
+      statReturnedToday.textContent = returnedToday;
+      statDueToday.textContent = dueToday;
+
+      // paging
+      const total = list.length;
+      const pages = Math.max(1, Math.ceil(total/pageSize));
+      if(currentPage>pages) currentPage = pages;
+      const start = (currentPage-1)*pageSize;
+      const end = Math.min(start+pageSize,total);
+      const slice = list.slice(start,end);
+
+      empty.classList.toggle('d-none', !!slice.length);
+      txBody.innerHTML = slice.map(rowHtml).join('');
+      pageInfo.textContent = `Showing ${total? start+1:0}–${end} of ${total}`;
+
+      pager.innerHTML = '';
+      const addItem=(label, page, disabled=false, active=false)=>{
+        const li = document.createElement('li');
+        li.className = `page-item ${disabled?'disabled':''} ${active?'active':''}`;
+        li.innerHTML = `<a class="page-link" href="#">${label}</a>`;
+        li.onclick = (e)=>{e.preventDefault(); if(!disabled){ currentPage=page; render(); }};
+        pager.appendChild(li);
+      };
+      addItem('«',1,currentPage===1); addItem('‹',Math.max(1,currentPage-1),currentPage===1);
+      for(let p=1;p<=pages;p++) addItem(p,p,false,p===currentPage);
+      addItem('›',Math.min(pages,currentPage+1),currentPage===pages); addItem('»',pages,currentPage===pages);
+
+      checkAll.checked = false;
+    }
+
+    // Clicking cards applies the corresponding filter
+    document.getElementById('statActive')?.closest('.sb-card')?.addEventListener('click', ()=>{ fStatus.value='borrowed'; currentPage=1; render(); });
+    document.getElementById('statOverdue')?.closest('.sb-card')?.addEventListener('click', ()=>{ fStatus.value='overdue'; currentPage=1; render(); });
+    document.getElementById('statReturnedToday')?.closest('.sb-card')?.addEventListener('click', ()=>{ fStatus.value='returned'; currentPage=1; render(); });
+    document.getElementById('statDueToday')?.closest('.sb-card')?.addEventListener('click', ()=>{ fStatus.value='due_today'; currentPage=1; render(); });
+
+    function rowHtml(loan){
+      const st = statusOf(loan);
+      const badge = st==='returned'
+        ? `<span class="badge text-bg-success-soft">Returned</span>`
+        : st==='overdue'
+          ? `<span class="badge text-bg-danger-soft">Overdue</span>`
+          : `<span class="badge text-bg-primary-soft">Borrowed</span>`;
+      const borrowedDate = loan.borrowed_at ? new Date(loan.borrowed_at).toLocaleDateString() : '—';
+      const dueDate = (loan.extended_due_at || loan.due_at) ? new Date(loan.extended_due_at || loan.due_at).toLocaleDateString() : '—';
+      const returnedDate = loan.returned_at ? new Date(loan.returned_at).toLocaleDateString() : '—';
+      return `
+      <tr>
+        <td><input class="form-check-input row-check" type="checkbox" value="${loan.loan_id}"></td>
+        <td><div class="fw-medium">${escape(loan.student_name)}</div><div class="small text-muted">${escape(loan.student_no || '—')}</div></td>
+        <td>${escape(loan.book_title)}</td>
+        <td class="d-none d-lg-table-cell">${escape(loan.isbn || '—')}</td>
+        <td>${borrowedDate}</td>
+        <td>${dueDate}</td>
+        <td>${returnedDate}</td>
+        <td>${badge}</td>
+        <td class="text-end">
+          <div class="d-flex align-items-center gap-2 justify-content-end">
+            <button class="btn btn-outline-secondary btn-sm" title="View" onclick="viewTx(${loan.loan_id})" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+              <i class="bi bi-eye"></i>
+            </button>
+            ${st!=='returned' ? `<button class="btn btn-outline-success btn-sm" title="Return" onclick="openReturn(${loan.loan_id})" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="bi bi-box-arrow-in-left"></i></button>`:''}
+            <button class="btn btn-outline-danger btn-sm" title="Delete" onclick="deleteTx(${loan.loan_id})" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="bi bi-trash3"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }
+    const escape = s => String(s??'').replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+
+    // ===== Events =====
+    search.addEventListener('input', ()=>{ currentPage=1; render(); });
+    fStatus.addEventListener('change', ()=>{ currentFilterStatus = fStatus.value; currentPage=1; render(); });
+    fDate.addEventListener('change', ()=>{ currentFilterDate = fDate.value; currentPage=1; render(); });
+    checkAll.addEventListener('change', ()=>{ document.querySelectorAll('.row-check').forEach(cb=>cb.checked=checkAll.checked); });
+    
+    // Refresh button
+    document.getElementById('btnRefresh')?.addEventListener('click', () => {
+      loadLoans();
+    });
+
+    document.getElementById('btnMarkReturned').onclick = ()=>{
+      const ids = selectedIds(); if(!ids.length) return alert('Select transactions first.');
+      const first = allLoans.find(t=>ids.includes(t.loan_id) && t.status !== 'returned' && !t.returned_at);
+      if(!first) return alert('Selected transactions are already returned.');
+      // open modal prefilled with today for the first one
+      rTxId.value = first.loan_id; rReturned.value = todayStr();
+      returnModal.show();
+    };
+    document.getElementById('btnDelete').onclick = async ()=>{
+      const ids = selectedIds(); if(!ids.length) return alert('Select transactions first.');
+      if(!confirm('Delete selected transactions?')) return;
+      for (const id of ids) {
+        await deleteLoan(id);
+      }
+      await loadLoans();
+    };
+    document.getElementById('btnExport').onclick = ()=>{
+      const rows = applyFilters().map(r=>[
+        r.loan_id,
+        r.student_name,
+        r.student_no||"",
+        r.book_title,
+        r.isbn||"",
+        r.borrowed_at||"",
+        (r.extended_due_at || r.due_at)||"",
+        r.returned_at||"",
+        statusOf(r)
+      ]);
+      const csv = ["loan_id,member,studentNo,book,isbn,borrowed,due,returned,status", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+      a.download = "transactions.csv"; a.click(); URL.revokeObjectURL(a.href);
+    };
+
+    let selectedStudentId = null;
+    let selectedBookId = null;
+
+    // Auto-complete for member and book
+    bMember.addEventListener('input', async function() {
+      const q = this.value.trim();
+      if (q.length < 2) return;
+      try {
+        const res = await fetch(`/api/users/search?q=${encodeURIComponent(q)}&type=students`, {credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        if (data.ok && data.students.length > 0) {
+          // Simple auto-fill: use first match
+          const student = data.students[0];
+          this.value = student.display;
+          selectedStudentId = student.id;
+        }
+      } catch(err) {
+        console.error('Search error:', err);
+      }
+    });
+
+    bBook.addEventListener('input', async function() {
+      const q = this.value.trim();
+      if (q.length < 2) return;
+      try {
+        const res = await fetch(`/api/users/search?q=${encodeURIComponent(q)}&type=books`, {credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        if (data.ok && data.books.length > 0) {
+          // Simple auto-fill: use first match
+          const book = data.books[0];
+          this.value = book.display;
+          selectedBookId = book.id;
+        }
+      } catch(err) {
+        console.error('Search error:', err);
+      }
+    });
+
+    // Borrow form
+    document.getElementById('borrowModal').addEventListener('shown.bs.modal', ()=>{
+      // defaults
+      bBorrowed.value = todayStr();
+      const d = new Date(); d.setDate(d.getDate()+7); bDue.value = d.toISOString().slice(0,10);
+      bMember.value = "";
+      bBook.value = "";
+      selectedStudentId = null;
+      selectedBookId = null;
+    });
+    
+    borrowForm.addEventListener('submit', async (e)=>{
+      e.preventDefault(); 
+      borrowForm.classList.add('was-validated'); 
+      if(!borrowForm.checkValidity()) return;
+      
+      if (!selectedStudentId || !selectedBookId) {
+        alert('Please select a valid student and book from the search results.');
+        return;
+      }
+
+      try {
+        const fd = new FormData();
+        fd.set('student_id', String(selectedStudentId));
+        fd.set('book_id', String(selectedBookId));
+        fd.set('borrowed_at', bBorrowed.value + ' 00:00:00');
+        fd.set('due_at', bDue.value);
+
+        const res = await fetch('/api/loans', {
+          method: 'POST',
+          body: fd,
+          credentials: 'include'
+        });
+        
+        const data = await res.json().catch(()=>({ok:false}));
+        if (data.ok) {
+          borrowModal.hide(); 
+          borrowForm.reset(); 
+          borrowForm.classList.remove('was-validated');
+          selectedStudentId = null;
+          selectedBookId = null;
+          currentPage = 1;
+          await loadLoans();
+        } else {
+          alert(data.error || 'Failed to create loan');
+        }
+      } catch(err) {
+        alert('Error creating loan: ' + err.message);
+      }
+    });
+
+    // Return form
+    returnForm.addEventListener('submit', async (e)=>{
+      e.preventDefault(); 
+      returnForm.classList.add('was-validated'); 
+      if(!returnForm.checkValidity()) return;
+      
+      const loanId = Number(rTxId.value);
+      try {
+        const fd = new FormData();
+        fd.set('loan_id', String(loanId));
+        fd.set('returned_at', rReturned.value + ' 00:00:00');
+
+        const res = await fetch('/api/loans/return', {
+          method: 'POST',
+          body: fd,
+          credentials: 'include'
+        });
+        
+        const data = await res.json().catch(()=>({ok:false}));
+        if (data.ok) {
+          returnModal.hide(); 
+          returnForm.reset(); 
+          returnForm.classList.remove('was-validated');
+          await loadLoans();
+        } else {
+          alert(data.error || 'Failed to return book');
+        }
+      } catch(err) {
+        alert('Error returning book: ' + err.message);
+      }
+    });
+
+    // View & Return helpers
+    window.viewTx = function(loanId){
+      const loan = allLoans.find(x=>x.loan_id===loanId); 
+      if(!loan) return;
+      vtBook.textContent = loan.book_title;
+      vtMember.textContent = `${loan.student_name} • ${loan.student_no||"—"}`;
+      vtIsbn.textContent = `ISBN ${loan.isbn||"—"}`;
+      const st = statusOf(loan);
+      vtStatus.textContent = st.charAt(0).toUpperCase()+st.slice(1);
+      vtStatus.className = 'chip chip-status ' + (st==='overdue'?'danger': st==='returned'?'success':'');
+      vfBorrowed.textContent = loan.borrowed_at ? new Date(loan.borrowed_at).toLocaleString() : '—';
+      vfDue.textContent = (loan.extended_due_at || loan.due_at) ? new Date(loan.extended_due_at || loan.due_at).toLocaleDateString() : '—';
+      vfReturned.textContent = loan.returned_at ? new Date(loan.returned_at).toLocaleString() : '—';
+      if(st==='returned'){ vtReturnBtn.classList.add('d-none'); }
+      else { vtReturnBtn.classList.remove('d-none'); vtReturnBtn.onclick = ()=>{ openReturn(loanId); viewTxModal.hide(); }; }
+      viewTxModal.show();
+    };
+    window.openReturn = function(loanId){
+      const loan = allLoans.find(x=>x.loan_id===loanId); 
+      if(!loan) return;
+      rTxId.value = loanId; 
+      rReturned.value = todayStr();
+      returnModal.show();
+    };
+    window.deleteTx = async function(loanId){
+      if(!confirm('Delete this transaction?')) return;
+      await deleteLoan(loanId);
+      await loadLoans();
+    };
+
+    async function deleteLoan(loanId) {
+      try {
+        const fd = new FormData();
+        fd.set('loan_id', String(loanId));
+        const res = await fetch('/api/loans', {
+          method: 'POST',
+          body: fd,
+          credentials: 'include'
+        });
+        const data = await res.json().catch(()=>({ok:false}));
+        if (!data.ok) {
+          alert(data.error || 'Failed to delete loan');
+        }
+      } catch(err) {
+        alert('Error deleting loan: ' + err.message);
+      }
+    }
+
+    function selectedIds(){ const ids=[]; document.querySelectorAll('.row-check:checked').forEach(cb=>ids.push(Number(cb.value))); return ids; }
+
+      // Init
+      loadLoans();
+    })();
+  </script>
+</body>
+</html>

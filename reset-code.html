@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -247,7 +247,7 @@
       }
       try {
         // Backend should re-send a code email
-        const res = await fetch('backend/request-reset.php', {
+        const res = await fetch('/api/password/request-reset', {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ email })
         });
@@ -289,12 +289,12 @@
 
       try {
         // 1) Optional: verify code first (if your backend requires a separate step)
-        // const v = await fetch('backend/verify-reset.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email, code})});
+        // const v = await fetch('/api/password/verify-reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email, code})});
         // const vData = await v.json().catch(()=>({}));
         // if (!vData.success) { throw new Error(vData.message || 'Invalid or expired code.'); }
 
         // 2) Reset password
-        const res = await fetch('backend/reset-password.php', {
+        const res = await fetch('/api/password/reset', {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ email, code, new_password: pwd })
         });

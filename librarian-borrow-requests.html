@@ -1,0 +1,1128 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Borrow Requests</title>
+
+  <!-- Fonts / Icons / Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Shared + page styles -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+  <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <style>
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --header-bg:#fff;
+      --table-header-bg:#111;
+      --card-border:#e5e7eb;
+    }
+    html{font-size:14px;}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+    main.container-fluid{padding:24px!important}
+
+    /* Header Styling */
+    .admin-header-gold{
+      background:#fff!important;
+      border-bottom:1px solid var(--card-border);
+      padding:12px 24px;
+    }
+    .search-bar-custom {
+      height: 42px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-sm);
+      background: #fff;
+      overflow: hidden;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+      border: none !important;
+      background: transparent !important;
+    }
+    .search-bar-custom .input-group-text {
+      color: var(--text-secondary);
+      padding-left: 16px;
+      padding-right: 8px;
+    }
+    .search-bar-custom .form-control {
+      color: var(--text-primary);
+      padding-left: 8px;
+      padding-right: 16px;
+    }
+    .search-bar-custom .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166,134,4,0.15);
+      border-color: var(--brand-gold);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      color: var(--text-primary);
+    }
+    .notification-btn{
+      width:44px;
+      height:44px;
+      border-radius:var(--border-radius-sm);
+      border:none;
+      background:transparent;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+      color:var(--text-primary);
+      padding:0;
+      position:relative;
+    }
+    .notification-btn:hover{
+      background:#f8f9fa;
+      color:var(--text-primary);
+    }
+    .notification-btn i{
+      font-size:1.25rem;
+    }
+    .admin-btn-custom{
+      padding:0;
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:1px solid var(--card-border);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+    }
+    .admin-btn-custom:hover{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 2px rgba(166,134,4,0.1);
+    }
+    .admin-btn-custom img{
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    /* Stat Cards - Dashboard Style */
+    .sb-card{
+      background:#fff;
+      border:1px solid var(--card-border);
+      border-radius:var(--border-radius);
+      padding:20px;
+      transition:all 0.2s ease;
+    }
+    .sb-card.elevated{
+      box-shadow:var(--shadow-sm);
+    }
+    .sb-card-title{
+      font-size:0.875rem;
+      font-weight:600;
+      color:var(--text-secondary);
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .sb-card-title i{
+      color:var(--text-secondary);
+      font-size:1rem;
+    }
+    .sb-card-value{
+      font-size:1.75rem;
+      font-weight:700;
+      color:var(--text-secondary);
+      line-height:1.2;
+    }
+    
+    /* Color-coded cards */
+    .sb-card.card-danger .sb-card-title,
+    .sb-card.card-danger .sb-card-title i,
+    .sb-card.card-danger .sb-card-value{
+      color:#dc2626 !important;
+    }
+    .sb-card.card-warning .sb-card-title,
+    .sb-card.card-warning .sb-card-title i,
+    .sb-card.card-warning .sb-card-value{
+      color:#f59e0b !important;
+    }
+    .sb-card.card-success .sb-card-title,
+    .sb-card.card-success .sb-card-title i,
+    .sb-card.card-success .sb-card-value{
+      color:#10b981 !important;
+    }
+    .sb-card.card-info .sb-card-title,
+    .sb-card.card-info .sb-card-title i,
+    .sb-card.card-info .sb-card-value{
+      color:#3b82f6 !important;
+    }
+
+    /* Table Styling */
+    .table-modern{
+      margin-bottom:0;
+    }
+    .table-modern thead th{
+      background:#fff;
+      color:var(--text-secondary);
+      font-weight:700;
+      font-size:0.8125rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      padding:16px var(--cell-pad-x);
+      border-bottom:2px solid var(--ui-border);
+      vertical-align:middle;
+    }
+    .table-modern tbody td{
+      padding:var(--cell-pad-y) var(--cell-pad-x);
+      vertical-align:middle;
+      border-bottom:1px solid var(--ui-border);
+      color:var(--text-primary);
+    }
+    .table-modern tbody tr:hover{
+      background:#f8f9fa;
+    }
+
+    /* Card Styling */
+    .card{
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--ui-border);
+      background:#fff;
+    }
+    .card-header{
+      background:var(--table-header-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:20px var(--card-pad);
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+
+    /* Pagination */
+    .pagination .page-item.active .page-link{
+      background:var(--brand-gold)!important;
+      color:#fff!important;
+      border-color:var(--brand-gold)!important;
+    }
+
+    .request-drawer { width: 520px; max-width: 90vw; }
+    .request-drawer .offcanvas-header {
+      background: var(--sidebar-bg);
+      color: #fff;
+      border-bottom: none;
+      padding: 24px;
+    }
+    .request-drawer .offcanvas-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    .request-drawer .offcanvas-header .btn-close {
+      filter: invert(1) grayscale(1);
+      opacity: 0.8;
+    }
+    .request-drawer .offcanvas-body { 
+      padding: 24px;
+      background: #fff;
+    }
+    .book-cover-small { 
+      width: 100px; 
+      height: 140px; 
+      object-fit: cover; 
+      border-radius: var(--border-radius-sm);
+      background: #f3f4f6;
+      box-shadow: var(--shadow-sm);
+    }
+    .request-section {
+      margin-bottom: 28px;
+    }
+    .request-section:last-child {
+      margin-bottom: 0;
+    }
+    .request-section-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--sidebar-bg);
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+    }
+    .request-section-title i {
+      color: #fff;
+      font-size: 1rem;
+    }
+    .book-info-card {
+      background: #f8f9fa;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      border: 1px solid var(--ui-border);
+    }
+    .book-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .book-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .book-meta i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-row {
+      display: flex;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--ui-border);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .info-label i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-value {
+      color: var(--text-primary);
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+    .form-section {
+      background: #f8f9fa;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      border: 1px solid var(--ui-border);
+    }
+    .form-section .form-label {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .form-section .form-select,
+    .form-section .form-control {
+      border: 1.5px solid var(--ui-border);
+      border-radius: var(--border-radius-sm);
+      padding: 10px 14px;
+      font-size: 0.9375rem;
+      transition: all 0.2s ease;
+    }
+    .form-section .form-select:focus,
+    .form-section .form-control:focus {
+      border-color: var(--brand-gold);
+      box-shadow: 0 0 0 3px rgba(166,134,4,0.1);
+      outline: none;
+    }
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .action-buttons .btn {
+      padding: 12px 24px;
+      font-weight: 600;
+      border-radius: var(--border-radius-sm);
+      transition: all 0.2s ease;
+    }
+    .action-buttons .btn-success {
+      background: var(--brand-gold);
+      border-color: var(--brand-gold);
+      color: #fff;
+    }
+    .action-buttons .btn-success:hover {
+      background: var(--gold-dark);
+      border-color: var(--gold-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(166,134,4,0.3);
+    }
+    .action-buttons .btn-danger {
+      background: #dc3545;
+      border-color: #dc3545;
+      color: #fff;
+    }
+    .action-buttons .btn-danger:hover {
+      background: #c82333;
+      border-color: #c82333;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(220,53,69,0.3);
+    }
+    .text-bg-warning-soft {
+      background: #fef3c7 !important;
+      color: #92400e !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-success-soft {
+      background: #d1fae5 !important;
+      color: #065f46 !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-danger-soft {
+      background: #fee2e2 !important;
+      color: #991b1b !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    
+    /* Action buttons styling */
+    .table-modern .btn-link{
+      background:none !important;
+      border:none !important;
+      color:#000 !important;
+      padding:4px 8px;
+      text-decoration:none;
+      transition:all 0.2s ease;
+    }
+    .table-modern .btn-link:hover{
+      color:var(--brand-gold) !important;
+      transform:scale(1.1);
+    }
+    .table-modern .btn-link i{
+      color:inherit;
+    }
+  </style>
+</head>
+
+<body class="sb-body">
+  <!-- Shared Sidebar -->
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Borrow Requests</div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group search-bar-custom">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="requestSearch" class="form-control" type="search" placeholder="Search">
+            </div>
+          </form>
+
+          <div class="dropdown position-relative">
+            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
+              <i class="bi bi-bell"></i>
+              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
+              <li><h6 class="dropdown-header">Pending Borrow Requests</h6></li>
+              <li><hr class="dropdown-divider"></li>
+              <li id="notificationList">
+                <div class="px-3 py-2 text-center text-muted">
+                  <small>No pending requests</small>
+                </div>
+              </li>
+              <li id="notificationFooter" class="d-none"><hr class="dropdown-divider"></li>
+              <li id="notificationActions" class="d-none">
+                <div class="px-3 py-2">
+                  <a href="#" class="btn btn-sm btn-primary w-100" onclick="event.preventDefault(); setFilterStatus('pending'); bootstrap.Dropdown.getInstance('#btnNotifications')?.hide();">View All Pending</a>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container-fluid py-4">
+      <!-- Quick Stats -->
+      <section class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+          <div class="sb-card elevated text-center card-warning">
+            <div class="sb-card-title"><i class="bi bi-clock-history"></i>Pending</div>
+            <div class="sb-card-value" id="statPending">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="sb-card elevated text-center card-success">
+            <div class="sb-card-title"><i class="bi bi-check-circle"></i>Approved</div>
+            <div class="sb-card-value" id="statApproved">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="sb-card elevated text-center card-danger">
+            <div class="sb-card-title"><i class="bi bi-x-circle"></i>Rejected</div>
+            <div class="sb-card-value" id="statRejected">0</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="sb-card elevated text-center card-info">
+            <div class="sb-card-title"><i class="bi bi-journal-arrow-up"></i>Total</div>
+            <div class="sb-card-value" id="statTotal">0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Requests table -->
+      <section class="card" style="margin-top:24px;">
+        <div class="card-header">
+          <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="fw-semibold">Borrow Requests</div>
+            <div class="d-flex align-items-center gap-2">
+              <div class="dropdown">
+                <button id="filterStatusBtn" class="btn btn-sm" data-bs-toggle="dropdown" style="background:#fff; color:#111; border:1px solid rgba(255,255,255,0.3); padding:6px 16px; cursor:pointer; min-width:80px;">
+                  <span id="filterStatusText">All</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus(''); return false;">All</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus('pending'); return false;">Pending</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus('approved'); return false;">Approved</a></li>
+                  <li><a class="dropdown-item" href="#" onclick="setFilterStatus('rejected'); return false;">Rejected</a></li>
+                </ul>
+              </div>
+              <button id="btnRefresh" class="btn btn-sm" style="background:#fff; color:#111; border:1px solid rgba(255,255,255,0.3); padding:6px 16px; cursor:pointer; min-width:80px;"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-modern align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Request ID</th>
+                  <th>Date Requested</th>
+                  <th>Student</th>
+                  <th>Book</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                  <th class="text-end" style="width:140px">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="requestBody"><!-- JS --></tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+            <div class="text-muted small" id="pageInfo">Showing 1–10 of 0</div>
+            <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+          </div>
+
+          <div id="emptyState" class="empty d-none text-center py-5">
+            <i class="bi bi-inbox fs-2 d-block mb-2 text-muted"></i>
+            <p class="text-muted mb-0">No borrow requests found.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Request Details Drawer -->
+  <div class="offcanvas offcanvas-end request-drawer" tabindex="-1" id="requestDrawer" aria-labelledby="requestDrawerLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="requestDrawerLabel">Borrow Request</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body" id="requestDrawerBody">
+      <!-- Content populated by JS -->
+    </div>
+  </div>
+
+  <!-- Approve Confirmation Modal -->
+  <div class="modal fade" id="approveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Approve Borrow Request</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Approve borrow request for <strong id="approveBookTitle"></strong> by <strong id="approveStudentName"></strong>?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" id="btnConfirmApprove">Approve & Issue Book</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-body py-4">
+          <div class="mb-3">
+            <i class="bi bi-check-circle-fill text-success fs-1"></i>
+          </div>
+          <h5 class="mb-2">Success</h5>
+          <p id="successMessage" class="mb-0">Action completed successfully.</p>
+        </div>
+        <div class="modal-footer border-0 justify-content-center pt-0">
+          <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reject Modal -->
+  <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Reject Borrow Request</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+            <textarea id="rejectionReason" class="form-control" rows="3" placeholder="Please provide a reason for rejection..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btnConfirmReject">Reject Request</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-17-restructured"></script>
+  <script>
+    let currentRequest = null;
+    let currentPage = 1;
+    const pageSize = 20;
+    let allRequests = [];
+
+    const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+    // Initialize
+    (async () => {
+      const res = await fetch('/api/check-auth', {credentials:'include'});
+      if (!res.ok) { location.href = 'login.html'; return; }
+      const data = await res.json().catch(()=>null);
+      const role = (data?.user?.role || '').toLowerCase();
+      if (role !== 'librarian' && role !== 'admin') { location.href = 'dashboard.html'; return; }
+
+      renderSidebar('borrowrequests', role, false);
+      localStorage.setItem('userRole', role);
+      
+      // Load avatar in header if available
+      const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+      if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') {
+        headerAvatar.src = data.user.avatar;
+      }
+      
+      document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+      
+      // Logout function
+      window.logout = async function() {
+        try {
+          await fetch('/api/logout', {method:'POST', credentials:'include'});
+          localStorage.removeItem('userRole');
+          location.href = 'login.html';
+        } catch(e) {
+          location.href = 'login.html';
+        }
+      };
+      
+      loadRequests();
+      updateNotificationBadge();
+      updateNotificationDropdown();
+      
+      // Refresh notification badge and dropdown every 30 seconds
+      setInterval(() => {
+        updateNotificationBadge();
+        updateNotificationDropdown();
+      }, 30000);
+    })();
+
+    let currentFilterStatus = '';
+    
+    function setFilterStatus(status) {
+      currentFilterStatus = status;
+      const statusText = status === '' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1);
+      document.getElementById('filterStatusText').textContent = statusText;
+      currentPage = 1;
+      loadRequests();
+      bootstrap.Dropdown.getInstance('#filterStatusDropdown')?.hide();
+    }
+    
+    async function loadRequests() {
+      const status = currentFilterStatus;
+      const q = document.getElementById('requestSearch').value.trim();
+      const url = `/api/borrow-requests?page=${currentPage}&pagesize=${pageSize}${status ? '&status='+encodeURIComponent(status) : ''}`;
+      
+      try {
+        const res = await fetch(url, {credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        if (!data.ok) { alert('Failed to load requests'); return; }
+        
+        allRequests = data.items || [];
+        
+        // Filter by search query
+        if (q) {
+          allRequests = allRequests.filter(r => {
+            const searchText = `${r.student_name} ${r.student_no} ${r.book_title} ${r.isbn}`.toLowerCase();
+            return searchText.includes(q.toLowerCase());
+          });
+        }
+        
+        updateStats(allRequests);
+        render();
+      } catch (err) {
+        alert('Error loading requests: ' + err.message);
+      }
+    }
+
+    function updateStats(list) {
+      const pending = list.filter(r => r.status === 'pending').length;
+      const approved = list.filter(r => r.status === 'approved').length;
+      const rejected = list.filter(r => r.status === 'rejected').length;
+      
+      document.getElementById('statPending').textContent = pending;
+      document.getElementById('statApproved').textContent = approved;
+      document.getElementById('statRejected').textContent = rejected;
+      document.getElementById('statTotal').textContent = list.length;
+    }
+
+    async function updateNotificationBadge() {
+      try {
+        const res = await fetch('/api/borrow-requests/count-pending', {credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        if (data.ok) {
+          const count = data.count || 0;
+          const badge = document.getElementById('notificationBadge');
+          if (count > 0) {
+            badge.textContent = count;
+            badge.classList.remove('d-none');
+          } else {
+            badge.classList.add('d-none');
+          }
+        }
+      } catch (err) {
+        console.error('Error updating notification badge:', err);
+      }
+    }
+
+    async function updateNotificationDropdown() {
+      try {
+        const res = await fetch('/api/borrow-requests?status=pending&pagesize=5', {credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        const list = document.getElementById('notificationList');
+        const footer = document.getElementById('notificationFooter');
+        const actions = document.getElementById('notificationActions');
+        const dropdown = document.getElementById('notificationDropdown');
+        
+        // Remove old notification items (anything between the divider and footer)
+        const oldItems = dropdown.querySelectorAll('li[data-notification-item]');
+        oldItems.forEach(item => item.remove());
+        
+        if (data.ok && data.items && data.items.length > 0) {
+          const pendingRequests = data.items;
+          
+          // Insert notification items before footer
+          pendingRequests.forEach((r) => {
+            const li = document.createElement('li');
+            li.setAttribute('data-notification-item', 'true');
+            li.innerHTML = `
+              <a class="dropdown-item py-2" href="#" onclick="event.preventDefault(); viewRequest(${r.request_id}); bootstrap.Dropdown.getInstance('#btnNotifications')?.hide();">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="flex-grow-1">
+                    <div class="fw-medium small">${esc(r.book_title)}</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">${esc(r.student_name)} • ${r.requested_at ? new Date(r.requested_at).toLocaleDateString() : '—'}</div>
+                  </div>
+                  <span class="badge text-bg-warning-soft ms-2">Pending</span>
+                </div>
+              </a>
+            `;
+            dropdown.insertBefore(li, footer);
+          });
+          
+          // Hide empty state
+          list.classList.add('d-none');
+          
+          if (data.total > 5) {
+            footer.classList.remove('d-none');
+            actions.classList.remove('d-none');
+          } else {
+            footer.classList.add('d-none');
+            actions.classList.add('d-none');
+          }
+        } else {
+          // Show empty state
+          list.classList.remove('d-none');
+          list.innerHTML = '<div class="px-3 py-2 text-center text-muted"><small>No pending requests</small></div>';
+          footer.classList.add('d-none');
+          actions.classList.add('d-none');
+        }
+      } catch (err) {
+        console.error('Error updating notification dropdown:', err);
+        const list = document.getElementById('notificationList');
+        if (list) {
+          list.classList.remove('d-none');
+          list.innerHTML = '<div class="px-3 py-2 text-center text-danger"><small>Error loading notifications</small></div>';
+        }
+      }
+    }
+
+    function render() {
+      const tbody = document.getElementById('requestBody');
+      const empty = document.getElementById('emptyState');
+      
+      if (allRequests.length === 0) {
+        tbody.innerHTML = '';
+        empty.classList.remove('d-none');
+        document.getElementById('pageInfo').textContent = 'Showing 0 of 0';
+        document.getElementById('pager').innerHTML = '';
+        return;
+      }
+      
+      empty.classList.add('d-none');
+      
+      tbody.innerHTML = allRequests.map(r => {
+        const statusBadge = r.status === 'pending' ? '<span class="badge text-bg-warning-soft">Pending</span>'
+                         : r.status === 'approved' ? '<span class="badge text-bg-success-soft">Approved</span>'
+                         : '<span class="badge text-bg-danger-soft">Rejected</span>';
+        
+        return `
+          <tr>
+            <td>#${r.request_id}</td>
+            <td>${r.requested_at ? new Date(r.requested_at).toLocaleDateString() : '—'}</td>
+            <td>
+              <div class="fw-medium">${esc(r.student_name)}</div>
+              <small class="text-muted">${esc(r.student_no || '—')}</small>
+            </td>
+            <td>
+              <div class="fw-medium">${esc(r.book_title)}</div>
+              <small class="text-muted">${esc(r.isbn || '—')}</small>
+            </td>
+            <td>${r.duration_days} days</td>
+            <td>${statusBadge}</td>
+            <td class="text-end">
+              <div class="d-flex align-items-center gap-2 justify-content-end">
+                <button class="btn btn-outline-secondary btn-sm" onclick="viewRequest(${r.request_id})" title="View" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-eye"></i>
+                </button>
+                ${r.status === 'pending' ? `
+                <button class="btn btn-outline-success btn-sm" onclick="approveRequest(${r.request_id})" title="Approve" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-check2"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="showRejectModal(${r.request_id})" title="Reject" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-x"></i>
+                </button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      document.getElementById('pageInfo').textContent = `Showing ${allRequests.length} of ${allRequests.length}`;
+    }
+
+    async function viewRequest(requestId) {
+      const request = allRequests.find(r => r.request_id == requestId);
+      if (!request) return;
+      
+      currentRequest = request;
+      
+      const cover = request.cover_url || 'assets/img/no-cover.png';
+      const statusBadge = request.status === 'pending' ? '<span class="badge text-bg-warning-soft">PENDING</span>'
+                         : request.status === 'approved' ? '<span class="badge text-bg-success-soft">APPROVED</span>'
+                         : '<span class="badge text-bg-danger-soft">REJECTED</span>';
+      
+      const body = `
+        <!-- Status Badge -->
+        <div class="mb-4 text-center">
+          ${statusBadge}
+        </div>
+        
+        <!-- Book Information -->
+        <div class="request-section">
+          <div class="request-section-title">
+            <i class="bi bi-book"></i> Book Information
+          </div>
+          <div class="book-info-card">
+            <div class="d-flex gap-3">
+              <img src="${cover}" alt="${esc(request.book_title)}" class="book-cover-small" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+              <div class="flex-grow-1">
+                <div class="book-title">${esc(request.book_title)}</div>
+                <div class="book-meta">
+                  <i class="bi bi-person"></i>
+                  <span>${esc(request.author || '—')}</span>
+                </div>
+                <div class="book-meta">
+                  <i class="bi bi-tag"></i>
+                  <span>${esc(request.category || '—')}</span>
+                </div>
+                <div class="book-meta">
+                  <i class="bi bi-upc-scan"></i>
+                  <span>ISBN: ${esc(request.isbn || '—')}</span>
+                </div>
+                <div class="mt-3">
+                  <span class="badge" style="background:#d1fae5; color:#065f46; font-weight:600; padding:6px 12px;">
+                    <i class="bi bi-box-seam me-1"></i>Quantity Available: ${request.book_quantity ?? 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Student Information -->
+        <div class="request-section">
+          <div class="request-section-title">
+            <i class="bi bi-person-circle"></i> Student Information
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-person-fill"></i> Name
+            </div>
+            <div class="info-value">${esc(request.student_name)}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-person-vcard-fill"></i> Student No.
+            </div>
+            <div class="info-value">${esc(request.student_no || '—')}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-mortarboard-fill"></i> Course
+            </div>
+            <div class="info-value">${esc(request.course || '—')}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar3"></i> Year / Section
+            </div>
+            <div class="info-value">${esc((request.year_level || '—') + ' / ' + (request.section || '—'))}</div>
+          </div>
+        </div>
+        
+        <!-- Loan Settings -->
+        <div class="request-section">
+          <div class="request-section-title">
+            <i class="bi bi-gear"></i> Loan Settings
+          </div>
+          <div class="form-section">
+            <div class="mb-3">
+              <label class="form-label">Borrow Duration</label>
+              <select id="requestDuration" class="form-select">
+                <option value="3" ${request.duration_days == 3 ? 'selected' : ''}>3 days</option>
+                <option value="7" ${request.duration_days == 7 ? 'selected' : ''}>7 days</option>
+                <option value="14" ${request.duration_days == 14 ? 'selected' : ''}>14 days</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">Librarian Note (Optional)</label>
+              <textarea id="librarianNote" class="form-control" rows="3" placeholder="e.g., For project use">${esc(request.librarian_note || '')}</textarea>
+            </div>
+          </div>
+        </div>
+        
+        ${request.status === 'pending' ? `
+        <div class="action-buttons">
+          <button class="btn btn-success" onclick="approveRequest(${request.request_id})">
+            <i class="bi bi-check2-circle me-2"></i> Approve & Issue Book
+          </button>
+          <button class="btn btn-danger" onclick="showRejectModal(${request.request_id})">
+            <i class="bi bi-x-circle me-2"></i> Reject Request
+          </button>
+        </div>
+        ` : request.status === 'rejected' && request.rejection_reason ? `
+        <div class="alert alert-danger" style="border-radius:var(--border-radius-sm); padding:16px; background:#fee2e2; border:1px solid #fecaca; color:#991b1b;">
+          <div class="fw-semibold mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Rejection Reason:</div>
+          <div>${esc(request.rejection_reason)}</div>
+        </div>
+        ` : ''}
+      `;
+      
+      document.getElementById('requestDrawerLabel').textContent = `Borrow Request – ${esc(request.book_title)}`;
+      document.getElementById('requestDrawerBody').innerHTML = body;
+      bootstrap.Offcanvas.getOrCreateInstance('#requestDrawer').show();
+    }
+
+    async function approveRequest(requestId) {
+      const request = allRequests.find(r => r.request_id == requestId);
+      if (!request || request.status !== 'pending') return;
+      
+      // Show confirmation modal
+      document.getElementById('approveBookTitle').textContent = `"${request.book_title}"`;
+      document.getElementById('approveStudentName').textContent = request.student_name;
+      
+      const approveModal = new bootstrap.Modal('#approveModal');
+      const successModalEl = document.getElementById('successModal');
+      const successMessageEl = document.getElementById('successMessage');
+      const successModal = new bootstrap.Modal(successModalEl);
+      approveModal.show();
+      
+      // Store the request ID and set up confirm handler (replace any existing)
+      const confirmBtn = document.getElementById('btnConfirmApprove');
+      // Remove old event listeners by cloning and replacing
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+      
+      newConfirmBtn.onclick = async function() {
+        // Get duration and note from offcanvas if open, otherwise use request defaults
+        const durationEl = document.getElementById('requestDuration');
+        const noteEl = document.getElementById('librarianNote');
+        const duration = durationEl ? parseInt(durationEl.value || request.duration_days) : request.duration_days;
+        const note = noteEl ? noteEl.value.trim() : '';
+        
+        try {
+          const fd = new FormData();
+          fd.set('request_id', String(requestId));
+          fd.set('duration_days', String(duration));
+          fd.set('librarian_note', note);
+          
+          const res = await fetch('/api/borrow-requests/approve', {
+            method: 'POST',
+            body: fd,
+            credentials: 'include'
+          });
+          
+          const data = await res.json().catch(() => null);
+          if (data?.ok || data?.success) {
+            approveModal.hide();
+            bootstrap.Offcanvas.getInstance('#requestDrawer')?.hide();
+            successMessageEl.textContent = 'Request approved and book issued successfully!';
+            successModal.show();
+            loadRequests();
+            updateNotificationBadge();
+            updateNotificationDropdown();
+          } else {
+            alert(data?.error || 'Failed to approve request');
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      };
+    }
+
+    function showRejectModal(requestId) {
+      currentRequest = allRequests.find(r => r.request_id == requestId);
+      if (!currentRequest) return;
+      
+      document.getElementById('rejectionReason').value = '';
+      const modal = new bootstrap.Modal('#rejectModal');
+      modal.show();
+      
+      document.getElementById('btnConfirmReject').onclick = async function() {
+        const reason = document.getElementById('rejectionReason').value.trim();
+        if (!reason) {
+          alert('Please provide a rejection reason');
+          return;
+        }
+        
+        try {
+          const fd = new FormData();
+          fd.set('request_id', String(requestId));
+          fd.set('rejection_reason', reason);
+          
+          const res = await fetch('/api/borrow-requests/reject', {
+            method: 'POST',
+            body: fd,
+            credentials: 'include'
+          });
+          
+          const data = await res.json().catch(() => null);
+          if (data?.ok) {
+            modal.hide();
+            bootstrap.Offcanvas.getInstance('#requestDrawer')?.hide();
+            alert('Request rejected successfully');
+            loadRequests();
+            updateNotificationBadge();
+          } else {
+            alert(data?.error || 'Failed to reject request');
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      };
+    }
+
+    // Event listeners
+    document.getElementById('requestSearch').addEventListener('input', () => { currentPage = 1; loadRequests(); });
+    document.getElementById('btnRefresh').addEventListener('click', () => { 
+      loadRequests(); 
+      updateNotificationBadge(); 
+      updateNotificationDropdown();
+    });
+    
+    // Filter button is already clickable via data-bs-toggle="dropdown"
+    
+    // Update notification dropdown when dropdown is shown
+    document.getElementById('btnNotifications').addEventListener('shown.bs.dropdown', () => {
+      updateNotificationDropdown();
+    });
+
+    // Make functions global
+    window.viewRequest = viewRequest;
+    window.approveRequest = approveRequest;
+    window.showRejectModal = showRejectModal;
+    window.setFilterStatus = setFilterStatus;
+  </script>
+</body>
+</html>
+
+

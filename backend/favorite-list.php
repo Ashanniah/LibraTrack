@@ -28,7 +28,7 @@ try {
   
   // Add cover_url with proper path
   foreach ($items as &$item) {
-    $item['cover_url'] = $item['cover'] ? "/libratrack/uploads/covers/" . $item['cover'] : null;
+    $item['cover_url'] = $item['cover'] ? "/uploads/covers/" . $item['cover'] : null;
   }
   unset($item); // Important: unset reference after loop
   

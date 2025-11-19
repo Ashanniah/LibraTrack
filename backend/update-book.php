@@ -4,7 +4,8 @@ declare(strict_types=1);
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/db.php'; // gives $conn + helpers
-requireRole(['librarian','admin']);
+require_once __DIR__ . '/auth.php';
+$user = require_role($conn, ['librarian','admin']);
 
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
   json_response(['ok'=>false,'error'=>'Method not allowed'], 405);
@@ -49,7 +50,8 @@ if (!empty($_FILES['cover']) && is_uploaded_file($_FILES['cover']['tmp_name'])) 
   $mime  = $finfo->file($file['tmp_name']) ?: 'application/octet-stream';
   $allowed = ['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp','image/gif'=>'gif'];
   if (!isset($allowed[$mime])) json_response(['ok'=>false,'error'=>'Invalid cover type'], 400);
-  $dir = realpath(__DIR__ . '/../uploads') ?: (__DIR__ . '/../uploads');
+  // Save to public/uploads/covers for web accessibility
+  $dir = realpath(__DIR__ . '/../public/uploads') ?: (__DIR__ . '/../public/uploads');
   $covers = $dir . '/covers';
   if (!is_dir($covers) && !mkdir($covers,0775,true) && !is_dir($covers)) {
     json_response(['ok'=>false,'error'=>'Upload dir error'], 500);
@@ -85,6 +87,6 @@ try{
   $stmt->close();
   json_response(['ok'=>true]);
 }catch(Throwable $e){
-  if ($coverFile) @unlink(__DIR__.'/../uploads/covers/'.$coverFile);
+  if ($coverFile) @unlink(__DIR__.'/../public/uploads/covers/'.$coverFile);
   json_response(['ok'=>false,'error'=>'Update failed'],500);
 }

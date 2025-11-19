@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -10,59 +10,534 @@
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
-  <!-- App CSS (reuse your books styles) -->
+  <!-- App CSS -->
   <link href="assets/css/sidebar.css" rel="stylesheet">
-  <link href="assets/css/books.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
   <link rel="icon" href="assets/img/LibraTrack-logo.png"/>
 
-  <script src="assets/js/sidebar.js" defer></script>
-
   <style>
-    .page-title{ font-weight:600; }
-    .fav-header{ display:flex; align-items:center; justify-content:space-between; gap:12px }
-    .fav-header h5{ margin:0; font-weight:700 }
-    .subtle{ color:#6b7280 }
-    .grid-wrap{ display:flex; flex-wrap:wrap; gap:12px }
-    .grid-item{ flex:0 0 auto; width:180px }
-    .badge-ghost{ background:#f3f4f6; color:#111827; border-radius:999px; padding:.25rem .5rem; font-size:.75rem }
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --header-bg:#fff;
+      --table-header-bg:#fff;
+      --card-border:#e5e7eb;
+    }
+    html{font-size:14px;}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+    main.container-fluid{padding:24px!important}
+
+    /* Header Styling */
+    .admin-header-gold{
+      background:#fff!important;
+      border-bottom:1px solid var(--card-border);
+      padding:12px 24px;
+    }
+    .admin-header-gold .fw-bold,
+    .admin-header-gold .h5,
+    .admin-header-gold #pageTitle {
+      color: var(--text-primary) !important;
+      font-weight:700;
+      font-size:1.25rem;
+      letter-spacing:0.01em;
+    }
+    .search-bar-custom {
+      height: 42px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-sm);
+      background: #fff;
+      overflow: hidden;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+      border: none !important;
+      background: transparent !important;
+    }
+    .search-bar-custom .input-group-text {
+      color: var(--text-secondary);
+      padding-left: 16px;
+      padding-right: 8px;
+    }
+    .search-bar-custom .form-control {
+      color: var(--text-primary);
+      padding-left: 8px;
+      padding-right: 16px;
+    }
+    .search-bar-custom .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166,134,4,0.15);
+      border-color: var(--brand-gold);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      color: var(--text-primary);
+    }
+    .notification-btn{
+      width:44px;
+      height:44px;
+      border-radius:var(--border-radius-sm);
+      border:none;
+      background:transparent;
+      color:var(--text-primary);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+    }
+    .notification-btn:hover{
+      background:#f8f9fa;
+      color:var(--text-primary);
+    }
+    .notification-btn i{
+      font-size:1.25rem;
+    }
+    .admin-btn-custom{
+      padding:0;
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:1px solid var(--card-border);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+      overflow:hidden;
+    }
+    .admin-btn-custom:hover{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 2px rgba(166,134,4,0.1);
+    }
+    .avatar-32 {
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    /* Card Styling */
+    .card {
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      background: #fff;
+    }
+    .fav-header{ 
+      display:flex; 
+      align-items:center; 
+      justify-content:space-between; 
+      gap:12px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .fav-header h5{ 
+      margin:0; 
+      font-weight:700;
+      color: #fff;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--sidebar-bg);
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .fav-header h5 i {
+      color: #fff;
+      font-size: 1rem;
+    }
+    .card-body {
+      padding: 24px;
+    }
+    .subtle{ color:var(--text-secondary); }
+    .grid-wrap{ 
+      display:flex; 
+      flex-wrap:wrap; 
+      gap:16px;
+    }
+    .grid-item{ 
+      flex:0 0 auto; 
+      width: 180px;
+      min-width: 180px;
+    }
+    .book-card {
+      background: #fff;
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-lg);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      padding: 16px;
+      width: 180px;
+      min-width: 180px;
+      box-shadow: var(--shadow-sm);
+    }
+    .book-card:hover {
+      box-shadow: 0 8px 24px rgba(166, 134, 4, 0.15);
+      transform: translateY(-4px);
+      border-color: var(--brand-gold);
+    }
+    .cover-wrap {
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+      background: #f9fafb;
+      border-radius: 12px;
+    }
+    .cover-wrap img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 12px;
+    }
+    .btn-fav {
+      --fav-size: 30px;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: var(--fav-size);
+      height: var(--fav-size);
+      border-radius: 50% !important;
+      border: 1px solid rgba(2, 6, 23, .08);
+      background: rgba(255,255,255,.96);
+      backdrop-filter: saturate(180%) blur(4px);
+      box-shadow: 0 2px 6px rgba(15,23,42,.10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      z-index: 2;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    .btn-fav:hover {
+      background: #fff;
+      transform: scale(1.05);
+    }
+    .btn-fav i {
+      display: block !important;
+      line-height: 0 !important;
+      font-size: 18px;
+      transform: translateY(1.5px);
+      pointer-events: none;
+      vertical-align: middle !important;
+    }
+    .btn-fav .bi-heart-fill {
+      color: #dc2626 !important;
+    }
+    .book-card .title {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 1.05rem;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .book-card .meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
+    }
+
+    /* Empty State */
+    .empty {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--text-secondary);
+    }
+    .empty i {
+      opacity: 0.3;
+      margin-bottom: 12px;
+    }
+    .empty a {
+      color: var(--brand-gold);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .empty a:hover {
+      text-decoration: underline;
+    }
+
+    /* Drawer Styling - Similar to Librarian */
+    .request-drawer { 
+      width: 520px; 
+      max-width: 90vw; 
+    }
+    .request-drawer .offcanvas-header {
+      background: var(--sidebar-bg);
+      color: #fff;
+      border-bottom: none;
+      padding: 24px;
+    }
+    .request-drawer .offcanvas-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    .request-drawer .offcanvas-header .btn-close {
+      filter: invert(1) grayscale(1);
+      opacity: 0.8;
+    }
+    .request-drawer .offcanvas-body { 
+      padding: 24px;
+      background: #fff;
+    }
+    .book-cover-small { 
+      width: 100px; 
+      height: 140px; 
+      object-fit: cover; 
+      border-radius: var(--border-radius-sm);
+      background: #f3f4f6;
+      box-shadow: var(--shadow-sm);
+    }
+    .request-section {
+      margin-bottom: 28px;
+    }
+    .request-section:last-child {
+      margin-bottom: 0;
+    }
+    .request-section-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--sidebar-bg);
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+    }
+    .request-section-title i {
+      color: #fff;
+      font-size: 1rem;
+    }
+    .book-info-card {
+      background: #f8f9fa;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      border: 1px solid var(--ui-border);
+    }
+    .book-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .book-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .book-meta i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-row {
+      display: flex;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--ui-border);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .info-label i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-value {
+      color: var(--text-primary);
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+
+    /* Browse Books Button */
+    .btn-browse {
+      background: var(--brand-gold);
+      border-color: var(--brand-gold);
+      color: #fff;
+      font-weight: 600;
+      padding: 8px 20px;
+      border-radius: var(--border-radius-sm);
+      transition: all 0.2s ease;
+    }
+    .btn-browse:hover {
+      background: var(--gold-dark);
+      border-color: var(--gold-dark);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(166,134,4,0.3);
+    }
+
+    /* Category Chips - Same as Books Page */
+    .chips-container {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 8px 0;
+    }
+    .chip {
+      border: 1px solid var(--card-border);
+      background: #fff;
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-secondary);
+      font-family: "Times New Roman", Times, serif;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .chip:hover {
+      background: #f9fafb;
+      border-color: #111;
+      color: var(--text-primary);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .chip.active {
+      background: #111 !important;
+      color: #fff !important;
+      border-color: #111 !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* Section Spacing */
+    .section-spacing {
+      margin-top: 32px;
+    }
+    .section-spacing:first-child {
+      margin-top: 0;
+    }
   </style>
 </head>
-
-<body class="sb-body loading">
+<body class="sb-body">
   <div id="sidebar-root"></div>
 
   <div class="sb-wrapper">
-    <div class="topbar">
-      <div class="page-head d-flex align-items-center gap-2">
-        <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
           <i class="bi bi-list fs-4"></i>
         </button>
-        <div class="page-title">My Favorites</div>
+        <div class="fw-bold h5 mb-0" id="pageTitle">My Favorites</div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group search-bar-custom">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="favoritesSearch" class="form-control" type="search" placeholder="Search favorites">
+            </div>
+          </form>
+
+          <div class="dropdown position-relative">
+            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
+              <i class="bi bi-bell"></i>
+              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
+              <li><h6 class="dropdown-header">Notifications</h6></li>
+              <li><hr class="dropdown-divider"></li>
+              <li id="notificationList">
+                <div class="px-3 py-2 text-center text-muted">
+                  <small>No notifications</small>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="student-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
-    </div>
+    </nav>
 
     <main class="container-fluid py-4">
-      <div class="card p-3 p-md-4">
-        <div class="fav-header mb-3">
-          <h5 class="m-0">Books you’ve favorited</h5>
-          <a href="books.html" class="btn btn-light btn-sm"><i class="bi bi-book me-1"></i>Browse books</a>
+      <div class="card">
+        <div class="fav-header">
+          <div>
+            <h5 class="m-0"><i class="bi bi-heart"></i> Books you've favorited</h5>
+            <div id="countLine" class="subtle small mt-2"></div>
+          </div>
+          <a href="books.html" class="btn btn-browse"><i class="bi bi-book me-1"></i>Browse books</a>
         </div>
 
-        <div id="countLine" class="subtle small mb-2"></div>
+        <div class="card-body">
+          <!-- Categories Section -->
+          <div class="mb-3">
+            <span class="badge" style="background:var(--brand-gold); color:#fff; padding:8px 16px; font-size:0.875rem; font-weight:600; border-radius:999px;">Categories</span>
+          </div>
+          <div id="catChips" class="chips-container mb-4"></div>
 
-        <!-- Grid -->
-        <div id="grid" class="grid-wrap"></div>
+          <!-- Grid -->
+          <div class="section-spacing">
+            <div class="mb-3">
+              <span class="badge" style="background:var(--brand-gold); color:#fff; padding:8px 16px; font-size:0.875rem; font-weight:600; border-radius:999px;">Book List Grid</span>
+            </div>
+            <div id="grid" class="grid-wrap"></div>
 
-        <!-- Empty state -->
-        <div id="empty" class="empty d-none">
-          You have no favorites yet. Go to <a href="books.html">Books</a> and tap the heart to add some.
+            <!-- Empty state -->
+            <div id="empty" class="empty d-none">
+              <i class="bi bi-heart fs-1 d-block mb-2"></i>
+              <p class="mb-2">You have no favorites yet.</p>
+              <p class="mb-0">Go to <a href="books.html">Books</a> and tap the heart to add some.</p>
+            </div>
+          </div>
         </div>
       </div>
     </main>
   </div>
 
   <!-- Offcanvas: book details -->
-  <div class="offcanvas offcanvas-end" tabindex="-1" id="bookDetails" aria-labelledby="bookDetailsLabel">
+  <div class="offcanvas offcanvas-end request-drawer" tabindex="-1" id="bookDetails" aria-labelledby="bookDetailsLabel">
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="bookDetailsLabel">Book</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
@@ -81,17 +556,25 @@
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
   <script>
     // === Helpers ===
-    const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+    const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     const toast = new bootstrap.Toast(document.getElementById('toastInfo'));
     const toastMsg = document.getElementById('toastMsg');
 
     function showToast(msg){ toastMsg.textContent = msg; toast.show(); }
 
+    async function logout() {
+      try {
+        await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      } catch {}
+      location.href = 'login.html';
+    }
+
     async function getMe(){
       try{
-        const r = await fetch('backend/check-auth.php', {credentials:'include'});
+        const r = await fetch('/api/check-auth', {credentials:'include'});
         const d = await r.json().catch(()=>null);
         return d?.user || null;
       }catch{ return null; }
@@ -102,44 +585,179 @@
       const me = await getMe();
       const role = (me?.role || 'student').toLowerCase();
       if (typeof renderSidebar === 'function') renderSidebar('favorites', role);
+      
+      // Load avatar if available
+      const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+      if (headerAvatar && me?.avatar && me.avatar.trim() !== '') {
+        headerAvatar.src = me.avatar;
+      }
+      
       document.getElementById('sidebarToggle')?.addEventListener('click', ()=>{
-        if (typeof toggleSidebar === 'function') toggleSidebar(); else document.body.classList.toggle('sb-collapsed');
+        if (typeof toggleSidebar === 'function') toggleSidebar(); else document.body.classList.toggle('sb-expanded');
       });
 
+      // Search functionality
+      const searchInput = document.getElementById('favoritesSearch');
+      if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+          clearTimeout(searchTimeout);
+          const query = e.target.value.trim().toLowerCase();
+          searchTimeout = setTimeout(() => {
+            filterBySearch(query);
+          }, 300);
+        });
+      }
+
       await loadFavorites();
-      document.body.classList.remove('loading');
     })();
 
-    // === API routes ===
-    const API_FAVORITES = 'backend/favorite-list.php';
-    const API_TOGGLE    = 'backend/favorite-toggle.php';
-
-    // === Rendering ===
-    function renderStars(rating=0){
-      const r = Math.max(0, Math.min(5, Math.round(Number(rating)||0)));
-      return Array.from({length:5},(_,i)=>`<i class="bi ${i<r?'bi-star-fill text-warning':'bi-star text-secondary'}"></i>`).join('');
+    function filterBySearch(query) {
+      // Filter by search query in addition to category filter
+      let filtered = allFavorites;
+      if (favoritesState.category) {
+        filtered = allFavorites.filter(b => b.category === favoritesState.category);
+      }
+      
+      if (query) {
+        filtered = filtered.filter(b => {
+          const searchText = `${b.title} ${b.author} ${b.category} ${b.isbn || ''}`.toLowerCase();
+          return searchText.includes(query);
+        });
+      }
+      
+      const grid = document.getElementById('grid');
+      const empty = document.getElementById('empty');
+      empty.classList.toggle('d-none', filtered.length > 0);
+      grid.innerHTML = filtered.length ? filtered.map(renderCard).join('') : '';
+      
+      // Rebind unfavorite buttons
+      bindUnfavoriteButtons();
     }
 
+    // === API routes ===
+    const API_FAVORITES = '/api/favorites';
+    const API_TOGGLE    = '/api/favorites/toggle';
+
+    // === State ===
+    let favoritesState = { category: '' };
+    let allFavorites = [];
+
+    // === Category Chips ===
+    function renderChips() {
+      const container = document.getElementById('catChips');
+      if (!container) return;
+
+      // Get unique categories from all favorites
+      const categories = ['All', ...new Set(allFavorites.map(b => b.category).filter(c => c && c.trim()))].sort();
+      
+      container.innerHTML = categories.map(cat => {
+        const v = cat === 'All' ? '' : cat;
+        return `<button class="chip ${favoritesState.category === v ? 'active' : ''}" data-cat="${v}">${cat}</button>`;
+      }).join('');
+
+      container.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          favoritesState.category = btn.dataset.cat || '';
+          filterFavorites();
+          renderChips();
+        });
+      });
+    }
+
+    function filterFavorites() {
+      const grid = document.getElementById('grid');
+      const empty = document.getElementById('empty');
+      
+      let filtered = allFavorites;
+      if (favoritesState.category) {
+        filtered = allFavorites.filter(b => b.category === favoritesState.category);
+      }
+
+      empty.classList.toggle('d-none', filtered.length > 0);
+      grid.innerHTML = filtered.length ? filtered.map(renderCard).join('') : '';
+
+      // Rebind unfavorite buttons
+      bindUnfavoriteButtons();
+    }
+
+    // === Rendering ===
     function renderCard(b){
       const cover = b.cover_url || 'assets/img/no-cover.png';
       const t = esc(b.title||''), a = esc(b.author||'');
       const c = esc(b.category||''), i = esc(b.isbn||'');
       return `
         <div class="grid-item">
-          <div class="book-card p-2">
+          <div class="book-card">
             <div class="cover-wrap position-relative" role="button" onclick='showDetails(${JSON.stringify(b).replace(/'/g,"&#39;")})'>
-              <img class="thumb-lg" src="${cover}" alt="${t}">
+              <img src="${cover}" alt="${t}" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
               <button class="btn-fav active" title="Remove from favorites" data-id="${b.id}">
                 <i class="bi bi-heart-fill text-danger"></i>
               </button>
             </div>
-            <div class="p-2">
-              <div class="title text-truncate" title="${t}">${t}</div>
-              <div class="meta text-truncate">${a||'Unknown author'}</div>
-              <div class="meta">${c}${c&&i?' • ':''}${i?('ISBN: '+i):''}</div>
-            </div>
+            <div class="title text-truncate" title="${t}">${t}</div>
+            <div class="meta text-truncate">${a||'Unknown author'}</div>
+            <div class="meta">${c}${c&&i?' • ':''}${i?('ISBN: '+i):''}</div>
           </div>
         </div>`;
+    }
+
+    function bindUnfavoriteButtons() {
+      const grid = document.getElementById('grid');
+      const countLine = document.getElementById('countLine');
+      
+      grid.querySelectorAll('.btn-fav').forEach(btn => {
+        btn.onclick = async (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          const icon = btn.querySelector('i');
+          
+          // Optimistically update UI immediately (before API call)
+          // Directly set classes instead of toggling to avoid border heart flash
+          if (icon) {
+            icon.className = 'bi bi-heart';
+          }
+          btn.title = 'Add to favorites';
+          
+          try {
+            const r = await fetch(API_TOGGLE, {
+              method: 'POST',
+              credentials: 'include',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ book_id: id })
+            });
+            const out = await r.json().catch(() => null);
+            if (out?.ok) {
+              // remove from allFavorites array
+              allFavorites = allFavorites.filter(b => String(b.id) !== String(id));
+              
+              // Update count
+              const totalCount = allFavorites.length;
+              countLine.textContent = `${totalCount} favorite${totalCount === 1 ? '' : 's'}`;
+              
+              // Refresh chips and filter
+              renderChips();
+              filterFavorites();
+              
+              showToast('Removed from favorites');
+            } else {
+              // Revert on error
+              if (icon) {
+                icon.className = 'bi bi-heart-fill text-danger';
+              }
+              btn.title = 'Remove from favorites';
+              alert(out?.error || 'Failed to update favorite.');
+            }
+          } catch {
+            // Revert on error
+            if (icon) {
+              icon.className = 'bi bi-heart-fill text-danger';
+            }
+            btn.title = 'Remove from favorites';
+            alert('Network error.');
+          }
+        };
+      });
     }
 
     async function loadFavorites(){
@@ -162,61 +780,69 @@
         return;
       }
 
-      const items = data.items || [];
-      countLine.textContent = `${items.length} favorite${items.length===1?'':'s'}`;
-      empty.classList.toggle('d-none', items.length>0);
-
-      grid.innerHTML = items.length ? items.map(renderCard).join('') : '';
-
-      // bind unfavorite
-      grid.querySelectorAll('.btn-fav').forEach(btn=>{
-        btn.onclick = async (e)=>{
-          e.stopPropagation();
-          const id = btn.dataset.id;
-          try{
-            const r = await fetch(API_TOGGLE, {
-              method:'POST',
-              credentials:'include',
-              headers:{'Content-Type':'application/json'},
-              body: JSON.stringify({ book_id: id })
-            });
-            const out = await r.json().catch(()=>null);
-            if (out?.ok){
-              // remove card if unfavorited
-              if (out.favorited === false){
-                btn.closest('.grid-item')?.remove();
-                const left = document.querySelectorAll('#grid .grid-item').length;
-                countLine.textContent = `${left} favorite${left===1?'':'s'}`;
-                if (left === 0) document.getElementById('empty').classList.remove('d-none');
-                showToast('Removed from favorites');
-              } else {
-                showToast('Added to favorites');
-              }
-            } else {
-              alert(out?.error || 'Failed to update favorite.');
-            }
-          }catch{
-            alert('Network error.');
-          }
-        };
-      });
+      allFavorites = data.items || [];
+      countLine.textContent = `${allFavorites.length} favorite${allFavorites.length===1?'':'s'}`;
+      
+      // Render chips and filter
+      renderChips();
+      filterFavorites();
     }
 
-    // details offcanvas (same pattern as books)
+    // details offcanvas (similar to librarian/book details)
     window.showDetails = function(b){
       const cover = b.cover_url || 'assets/img/no-cover.png';
+      const quantityStatus = (b.quantity ?? 0) > 5 ? 'success' : (b.quantity ?? 0) > 0 ? 'warning' : 'danger';
+      const quantityText = (b.quantity ?? 0) > 5 ? 'In Stock' : (b.quantity ?? 0) > 0 ? 'Low Stock' : 'Out of Stock';
+      
       const body = `
-        <div class="d-flex gap-3">
-          <img src="${cover}" alt="${esc(b.title)}" style="width:110px;height:150px;object-fit:cover;border-radius:8px;background:#f3f4f6">
-          <div>
-            <div class="fw-semibold">${esc(b.title||'')}</div>
-            <div class="text-muted">${esc(b.author||'')}</div>
-            <div class="small text-muted mt-1">${esc(b.category||'')}${b.category&&b.isbn?' • ':''}${b.isbn?('ISBN: '+esc(b.isbn)) : ''}</div>
-            <div class="small mt-1">Qty: <span class="badge text-bg-light">${b.quantity??0}</span></div>
-            <div class="small mt-1">Published: ${b.published_at||''}</div>
-            <div class="small mt-1">Publisher: ${esc(b.publisher||'')}</div>
+        <!-- Book Information -->
+        <div class="request-section">
+          <div class="request-section-title">
+            <i class="bi bi-journal-text"></i> Book Information
           </div>
-        </div>`;
+          <div class="book-info-card">
+            <div class="d-flex gap-3 mb-3">
+              <img src="${cover}" alt="${esc(b.title)}" class="book-cover-small" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+              <div class="flex-grow-1">
+                <div class="book-title">${esc(b.title||'')}</div>
+                <div class="book-meta">
+                  <i class="bi bi-person"></i> ${esc(b.author||'—')}
+                </div>
+                <div class="book-meta">
+                  <i class="bi bi-tag"></i> ${esc(b.category||'—')}
+                </div>
+                ${b.isbn ? `<div class="book-meta">
+                  <i class="bi bi-upc-scan"></i> ISBN: ${esc(b.isbn)}
+                </div>` : ''}
+                <div class="mt-2">
+                  <span class="badge" style="background:${quantityStatus === 'success' ? '#d1fae5' : quantityStatus === 'warning' ? '#fef3c7' : '#fee2e2'}; color:${quantityStatus === 'success' ? '#065f46' : quantityStatus === 'warning' ? '#92400e' : '#991b1b'}; font-weight:600; padding:6px 12px;">
+                    <i class="bi bi-box-seam me-1"></i>Quantity: ${b.quantity??0} (${quantityText})
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Publishing Details -->
+        <div class="request-section">
+          <div class="request-section-title">
+            <i class="bi bi-info-circle"></i> Publishing Details
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar3"></i> Published
+            </div>
+            <div class="info-value">${b.published_at ? new Date(b.published_at).toLocaleDateString() : '—'}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-building"></i> Publisher
+            </div>
+            <div class="info-value">${esc(b.publisher||'—')}</div>
+          </div>
+        </div>
+      `;
       document.getElementById('bookDetailsLabel').textContent = b.title || 'Book';
       document.getElementById('detailsBody').innerHTML = body;
       bootstrap.Offcanvas.getOrCreateInstance('#bookDetails').show();

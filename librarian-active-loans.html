@@ -1,0 +1,1556 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Loans</title>
+
+  <!-- Fonts / Icons / Bootstrap -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Shared + page styles -->
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
+
+  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <style>
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --header-bg:#fff;
+      --table-header-bg:#f8f9fa;
+      --card-border:#e5e7eb;
+    }
+    html{font-size:14px;}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+    main.container-fluid{padding:24px!important}
+
+    /* Consistent Header Design */
+    .admin-header-gold {
+      background: #fff !important;
+      color: var(--text-primary) !important;
+      border-bottom:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      padding:12px 0;
+    }
+    .admin-header-gold .fw-bold,
+    .admin-header-gold .h5,
+    .admin-header-gold #pageTitle {
+      color: var(--text-primary) !important;
+      font-weight:700;
+      font-size:1.25rem;
+      letter-spacing:0.01em;
+    }
+    
+    /* Consistent Search Bar Design */
+    .search-bar-custom {
+      height: 42px;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+    }
+    .search-bar-custom .input-group-text {
+      border-top-left-radius: var(--border-radius-sm);
+      border-bottom-left-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-right: none !important;
+      color:var(--text-secondary);
+    }
+    .search-bar-custom .form-control {
+      border-top-right-radius: var(--border-radius-sm);
+      border-bottom-right-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-left: none !important;
+      color: var(--text-primary);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15);
+      border-radius: var(--border-radius-sm);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      border-color: var(--brand-gold);
+      background: #fff !important;
+    }
+    .search-bar-custom:focus-within .form-control {
+      border-color: var(--brand-gold);
+      background: #fff !important;
+    }
+    /* Notification button styling */
+    .notification-btn{
+      color:var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .notification-btn:hover{
+      color:var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    .notification-badge{
+      font-size:0.6875rem;
+      padding:3px 7px;
+      font-weight:600;
+      background:var(--brand-gold) !important;
+      color:#fff !important;
+    }
+    .notification-dropdown{
+      border-radius:var(--border-radius-sm);
+      box-shadow:var(--shadow-lg);
+      border:1px solid var(--card-border);
+    }
+    .admin-btn-custom {
+      padding:0 !important;
+      width:44px !important;
+      height:44px !important;
+      border-radius:50% !important;
+      border:1px solid var(--card-border) !important;
+      background:#fff !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+      overflow:hidden !important;
+    }
+    .admin-btn-custom:hover {
+      background:#f8f9fa !important;
+    }
+    .admin-btn-custom:focus,
+    .admin-btn-custom:active,
+    .admin-btn-custom.show {
+      background: var(--brand-gold) !important;
+      border-color: var(--brand-gold) !important;
+      color: #fff !important;
+      box-shadow: 0 0 0 0.2rem rgba(166, 134, 4, 0.25) !important;
+    }
+    .avatar-32 {
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    /* Stat Cards - Dashboard Style */
+    .sb-card{
+      background:#fff;
+      border:1px solid var(--card-border);
+      border-radius:var(--border-radius);
+      padding:20px;
+      transition:all 0.2s ease;
+      min-height:120px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    .sb-card.elevated{
+      box-shadow:var(--shadow-sm);
+    }
+    .sb-card-title{
+      font-size:0.875rem;
+      font-weight:600;
+      color:var(--text-secondary);
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .sb-card-title i{
+      color:var(--text-secondary);
+      font-size:1rem;
+    }
+    .sb-card-value{
+      font-size:1.75rem;
+      font-weight:700;
+      color:var(--text-secondary);
+      line-height:1.2;
+      text-align:center;
+    }
+    
+    /* Color-coded cards */
+    .sb-card.card-danger .sb-card-title,
+    .sb-card.card-danger .sb-card-title i,
+    .sb-card.card-danger .sb-card-value{
+      color:#dc2626 !important;
+    }
+    .sb-card.card-warning .sb-card-title,
+    .sb-card.card-warning .sb-card-title i,
+    .sb-card.card-warning .sb-card-value{
+      color:#f59e0b !important;
+    }
+    .sb-card.card-success .sb-card-title,
+    .sb-card.card-success .sb-card-title i,
+    .sb-card.card-success .sb-card-value{
+      color:#10b981 !important;
+    }
+    .sb-card.card-info .sb-card-title,
+    .sb-card.card-info .sb-card-title i,
+    .sb-card.card-info .sb-card-value{
+      color:#3b82f6 !important;
+    }
+
+
+
+    /* Empty Box */
+    .empty-box { 
+      background: #F1F5F9; 
+      border: 1px dashed #cbd5e1; 
+      border-radius: 12px; 
+      padding: 48px 16px; 
+      text-align: center; 
+    }
+    .empty-box h6 { 
+      color: #2563eb; 
+      font-weight: 700; 
+    }
+    .empty-box p { 
+      color: #64748b; 
+      margin: 0; 
+    }
+
+    /* Table Styling */
+    .table-modern{
+      border-collapse:separate;
+      border-spacing:0;
+      width:100%;
+      margin-bottom:0;
+    }
+    .table-modern thead th{
+      background:var(--table-header-bg);
+      color:var(--text-secondary);
+      font-weight:600;
+      font-size:0.75rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      padding:14px 20px;
+      border-bottom:2px solid var(--card-border);
+      vertical-align:middle;
+    }
+    .table-modern tbody td{
+      padding:16px 20px;
+      border-bottom:1px solid #f0f0f0;
+      color:var(--text-primary);
+      font-size:0.875rem;
+      vertical-align:middle;
+    }
+    .table-modern tbody tr:hover{
+      background-color:#f8f9fa;
+    }
+
+    /* Table Card Design */
+    .table-card{
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--card-border);
+      overflow:hidden;
+    }
+    .table-card .card-header{
+      background:var(--sidebar-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:16px 20px;
+      font-weight:600;
+    }
+    .table-card .card-header .btn-outline-light{
+      border-color:rgba(255,255,255,0.3);
+      color:#fff;
+      background:transparent;
+    }
+    .table-card .card-header .btn-outline-light:hover{
+      background:rgba(255,255,255,0.1);
+      border-color:rgba(255,255,255,0.5);
+      color:#fff;
+    }
+    .table-card .card-header .btn-outline-light:focus,
+    .table-card .card-header .btn-outline-light:active,
+    .table-card .card-header .btn-outline-light.show{
+      background:rgba(255,255,255,0.15);
+      border-color:rgba(255,255,255,0.6);
+      color:#fff;
+      box-shadow:0 0 0 0.2rem rgba(255,255,255,0.25);
+    }
+    .card{
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--card-border);
+      background:#fff;
+    }
+    .card-header{
+      background:var(--sidebar-bg);
+      color:#fff;
+      border-bottom:0;
+      padding:16px 20px;
+      font-weight:600;
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+
+    /* Pagination */
+    .pagination .page-item.active .page-link{
+      background:var(--brand-gold)!important;
+      color:#fff!important;
+      border-color:var(--brand-gold)!important;
+    }
+
+    /* Nav Tabs */
+    .nav-tabs{
+      border-bottom:2px solid var(--ui-border);
+      margin-bottom:24px;
+    }
+    .nav-tabs .nav-link{
+      border:none;
+      color:var(--text-secondary);
+      font-weight:600;
+      padding:12px 24px;
+      border-bottom:3px solid transparent;
+      transition:all 0.2s ease;
+    }
+    .nav-tabs .nav-link:hover{
+      border-bottom-color:var(--brand-gold);
+      color:var(--text-primary);
+    }
+    .nav-tabs .nav-link.active{
+      color:var(--text-primary);
+      border-bottom-color:var(--brand-gold);
+      background:transparent;
+    }
+
+    /* Loan Drawer */
+    .loan-drawer { width: 520px; max-width: 90vw; }
+    .loan-drawer .offcanvas-header {
+      background: var(--sidebar-bg);
+      color: #fff;
+      border-bottom: none;
+      padding: 24px;
+    }
+    .loan-drawer .offcanvas-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    .loan-drawer .offcanvas-header .btn-close {
+      filter: invert(1) grayscale(1);
+      opacity: 0.8;
+    }
+    .loan-drawer .offcanvas-body { 
+      padding: 24px;
+      background: #fff;
+    }
+    .book-cover-small { 
+      width: 100px; 
+      height: 140px; 
+      object-fit: cover; 
+      border-radius: var(--border-radius-sm);
+      background: #f3f4f6;
+      box-shadow: var(--shadow-sm);
+    }
+    .loan-section {
+      margin-bottom: 28px;
+    }
+    .loan-section:last-child {
+      margin-bottom: 0;
+    }
+    .loan-section-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--sidebar-bg);
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+    }
+    .loan-section-title i {
+      color: #fff;
+      font-size: 1rem;
+    }
+    .book-info-card {
+      background: #f8f9fa;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      border: 1px solid var(--ui-border);
+    }
+    .book-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .book-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .book-meta i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-row {
+      display: flex;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--ui-border);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .info-label i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-value {
+      color: var(--text-primary);
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+    .text-bg-success-soft {
+      background: #d1fae5 !important;
+      color: #065f46 !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-danger-soft {
+      background: #fee2e2 !important;
+      color: #991b1b !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-warning-soft {
+      background: #fef3c7 !important;
+      color: #92400e !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-secondary-soft {
+      background: #e5e7eb !important;
+      color: #374151 !important;
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    
+    /* Modal Styling */
+    #returnModal .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--ui-border);
+      box-shadow:var(--shadow-lg);
+    }
+    #returnModal .modal-body{
+      padding:32px 24px !important;
+    }
+    .return-confirm-icon{
+      width:64px;
+      height:64px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#d1fae5;
+      border-radius:50%;
+    }
+    .return-confirm-icon i{
+      font-size:2rem;
+      color:#059669;
+    }
+    #returnModal .modal-title{
+      font-size:1.25rem;
+      color:#1f2937;
+    }
+    #returnModal .btn-outline-secondary{
+      border-color:#d1d5db;
+      color:#374151;
+    }
+    #returnModal .btn-outline-secondary:hover{
+      background:#f3f4f6;
+      border-color:#9ca3af;
+    }
+    #extendModal .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:1px solid var(--ui-border);
+      box-shadow:var(--shadow-lg);
+    }
+    #extendModal .modal-header{
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0;
+    }
+    #extendModal .form-control:focus{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 3px rgba(166,134,4,0.1);
+      outline:none;
+    }
+    
+    /* Action buttons styling */
+    .table-modern .btn-link{
+      background:none !important;
+      border:none !important;
+      color:#000 !important;
+      padding:4px 8px;
+      text-decoration:none;
+      transition:all 0.2s ease;
+    }
+    .table-modern .btn-link:hover{
+      color:var(--brand-gold) !important;
+      transform:scale(1.1);
+    }
+    .table-modern .btn-link i{
+      color:inherit;
+    }
+  </style>
+</head>
+
+<body class="sb-body">
+  <!-- Shared Sidebar -->
+  <div id="sidebar-root"></div>
+
+  <div class="sb-wrapper">
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+            <i class="bi bi-list fs-4"></i>
+          </button>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Loans</div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group input-group-sm search-bar-custom">
+              <span class="input-group-text bg-light border-0 search-icon-wrapper"><i class="bi bi-search"></i></span>
+              <input id="loanSearch" class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search member, book, ISBN…">
+            </div>
+          </form>
+
+          <div class="dropdown me-2">
+            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
+              <i class="bi bi-bell fs-5"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
+              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
+              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
+              <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
+              <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-gear me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container-fluid py-4">
+      <!-- Tabs -->
+      <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item">
+          <button class="nav-link active" id="tab-active" data-bs-toggle="tab" data-bs-target="#panel-active" type="button">Active</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tab-on-time" data-bs-toggle="tab" data-bs-target="#panel-on-time" type="button">On-Time</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" id="tab-overdue" data-bs-toggle="tab" data-bs-target="#panel-overdue" type="button">Overdue</button>
+        </li>
+      </ul>
+
+      <!-- Tab Panels -->
+      <div class="tab-content">
+        <!-- Active Tab Panel -->
+        <div class="tab-pane fade show active" id="panel-active" role="tabpanel">
+          <!-- Quick Stats -->
+          <section class="row g-3 mb-3">
+            <div class="col-6 col-md-4">
+              <div class="sb-card elevated text-center card-info">
+                <div class="sb-card-title"><i class="bi bi-journal-arrow-up"></i>Active</div>
+                <div class="sb-card-value" id="statActive">0</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="sb-card elevated text-center card-danger">
+                <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue</div>
+                <div class="sb-card-value" id="statOverdue">0</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="sb-card elevated text-center card-success">
+                <div class="sb-card-title"><i class="bi bi-check-circle"></i>On-Time</div>
+                <div class="sb-card-value" id="statOnTime">0</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Loans table -->
+          <div class="table-card card">
+            <div class="card-header">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <span class="fw-semibold"><i class="bi bi-journal-text me-2"></i>Loans</span>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="dropdown">
+                    <button id="filterStatusBtn" class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown">
+                      <span id="filterStatusText">All</span> <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="#" onclick="setFilterStatus(''); return false;">All</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterStatus('borrowed'); return false;">Borrowed</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterStatus('returned'); return false;">Returned</a></li>
+                    </ul>
+                  </div>
+                  <button id="btnRefresh" class="btn btn-sm btn-outline-light"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</button>
+                  <span class="badge bg-light text-dark" id="loanCountActive">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0" id="loansTableActive">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Book</th>
+                      <th>Borrowed On</th>
+                      <th>Due Date</th>
+                      <th>Status</th>
+                      <th class="text-end" style="width:180px">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="loanBodyActive"><!-- JS --></tbody>
+                </table>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+                <div class="text-muted small" id="pageInfoActive">Showing 1–10 of 0</div>
+                <nav><ul class="pagination pagination-sm mb-0" id="pagerActive"></ul></nav>
+              </div>
+
+              <div id="emptyStateActive" class="empty d-none text-center py-5">
+                <i class="bi bi-journal-arrow-up fs-2 d-block mb-2 text-muted"></i>
+                <p class="text-muted mb-0">No loans found.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- On-Time Tab Panel -->
+        <div class="tab-pane fade" id="panel-on-time" role="tabpanel">
+          <!-- Quick Stats -->
+          <section class="row g-3 mb-3">
+            <div class="col-6 col-md-4">
+              <div class="sb-card elevated text-center card-info">
+                <div class="sb-card-title"><i class="bi bi-journal-arrow-up"></i>Active</div>
+                <div class="sb-card-value" id="statActiveOnTime">0</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="sb-card elevated text-center card-danger">
+                <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue</div>
+                <div class="sb-card-value" id="statOverdueOnTime">0</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-4">
+              <div class="sb-card elevated text-center card-success">
+                <div class="sb-card-title"><i class="bi bi-check-circle"></i>On-Time</div>
+                <div class="sb-card-value" id="statOnTimeOnTime">0</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Loans table -->
+          <div class="table-card card">
+            <div class="card-header">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <span class="fw-semibold"><i class="bi bi-journal-text me-2"></i>Loans</span>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="dropdown">
+                    <button id="filterStatusBtnOnTime" class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown">
+                      <span id="filterStatusTextOnTime">All</span> <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="#" onclick="setFilterStatusOnTime(''); return false;">All</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterStatusOnTime('borrowed'); return false;">Borrowed</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterStatusOnTime('returned'); return false;">Returned</a></li>
+                    </ul>
+                  </div>
+                  <button id="btnRefreshOnTime" class="btn btn-sm btn-outline-light"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</button>
+                  <span class="badge bg-light text-dark" id="loanCountOnTime">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0" id="loansTableOnTime">
+                  <thead>
+                    <tr>
+                      <th>Student</th>
+                      <th>Book</th>
+                      <th>Borrowed On</th>
+                      <th>Due Date</th>
+                      <th>Status</th>
+                      <th class="text-end" style="width:180px">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="loanBodyOnTime"><!-- JS --></tbody>
+                </table>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+                <div class="text-muted small" id="pageInfoOnTime">Showing 1–10 of 0</div>
+                <nav><ul class="pagination pagination-sm mb-0" id="pagerOnTime"></ul></nav>
+              </div>
+
+              <div id="emptyStateOnTime" class="empty d-none text-center py-5">
+                <i class="bi bi-check-circle fs-2 d-block mb-2 text-muted"></i>
+                <p class="text-muted mb-0">No on-time loans found.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overdue Tab Panel -->
+        <div class="tab-pane fade" id="panel-overdue" role="tabpanel">
+          <!-- Quick Stats -->
+          <section class="row g-3 mb-3">
+            <div class="col-6 col-md-3">
+              <div class="sb-card elevated text-center card-danger">
+                <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue</div>
+                <div class="sb-card-value" id="statOverdueTotal">0</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="sb-card elevated text-center card-warning">
+                <div class="sb-card-title"><i class="bi bi-hourglass"></i>1–7 Days Late</div>
+                <div class="sb-card-value" id="statLateA">0</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="sb-card elevated text-center card-warning">
+                <div class="sb-card-title"><i class="bi bi-hourglass-split"></i>8–30 Days Late</div>
+                <div class="sb-card-value" id="statLateB">0</div>
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="sb-card elevated text-center card-info">
+                <div class="sb-card-title"><i class="bi bi-clock-history"></i>30+ Days Late</div>
+                <div class="sb-card-value" id="statLateC">0</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Overdue Table -->
+          <div class="table-card card">
+            <div class="card-header">
+              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <span class="fw-semibold"><i class="bi bi-exclamation-triangle me-2"></i>Overdue Loans</span>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="dropdown">
+                    <button id="filterLateBtn" class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown">
+                      <span id="filterLateText">Days Late: All</span> <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="#" onclick="setFilterLate(''); return false;">All</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterLate('1-7'); return false;">1–7 days late</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterLate('8-30'); return false;">8–30 days late</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterLate('over30'); return false;">Over 30 days late</a></li>
+                    </ul>
+                  </div>
+                  <div class="dropdown">
+                    <button id="filterDueBtn" class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown">
+                      <span id="filterDueText">Due Date: Any</span> <i class="bi bi-chevron-down ms-1"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                      <li><a class="dropdown-item" href="#" onclick="setFilterDue(''); return false;">Any</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterDue('thisweek'); return false;">Due this week</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterDue('lastweek'); return false;">Due last week</a></li>
+                      <li><a class="dropdown-item" href="#" onclick="setFilterDue('last30'); return false;">Due last 30 days</a></li>
+                    </ul>
+                  </div>
+                  <button id="btnRefreshOverdue" class="btn btn-sm btn-outline-light"><i class="bi bi-arrow-clockwise me-2"></i>Refresh</button>
+                  <span class="badge bg-light text-dark" id="loanCountOverdue">0</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0" id="loansTableOverdue">
+                  <thead>
+                    <tr>
+                      <th style="width:38px"><input class="form-check-input" type="checkbox" id="checkAllOverdue"></th>
+                      <th>Student</th>
+                      <th>Book</th>
+                      <th>Borrowed On</th>
+                      <th>Due Date</th>
+                      <th>Days Late</th>
+                      <th>Status</th>
+                      <th class="text-end" style="width:160px">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="loanBodyOverdue"><!-- JS --></tbody>
+                </table>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+                <div class="text-muted small" id="pageInfoOverdue">Showing 1–10 of 0</div>
+                <nav><ul class="pagination pagination-sm mb-0" id="pagerOverdue"></ul></nav>
+              </div>
+
+              <div id="emptyStateOverdue" class="empty d-none text-center py-5">
+                <i class="bi bi-check-circle fs-2 d-block mb-2 text-muted"></i>
+                <p class="text-muted mb-0">All clear! No overdue loans.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Loan Details Drawer -->
+  <div class="offcanvas offcanvas-end loan-drawer" tabindex="-1" id="loanDrawer" aria-labelledby="loanDrawerLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="loanDrawerLabel">Loan Details</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body" id="loanDrawerBody">
+      <!-- Content populated by JS -->
+    </div>
+  </div>
+
+  <!-- Return Book Confirmation Modal -->
+  <div class="modal fade" id="returnModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-body py-4 px-5">
+          <div class="return-confirm-icon mb-3">
+            <i class="bi bi-check-circle-fill"></i>
+        </div>
+          <h5 class="modal-title mb-2 fw-bold">Confirm Return</h5>
+          <p class="text-muted mb-4" id="returnModalMessage">Are you sure you want to mark this book as returned?</p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="min-width: 100px;">Cancel</button>
+            <button type="button" class="btn btn-success" id="btnConfirmReturn" style="min-width: 100px;">Mark as Returned</button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Extend Due Date Modal -->
+  <div class="modal fade" id="extendModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header" style="background:var(--sidebar-bg); color:#fff; border-bottom:0;">
+          <h5 class="modal-title" style="color:#fff;">Extend Due Date</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" style="filter:invert(1);"></button>
+        </div>
+        <div class="modal-body" style="padding:24px;">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">New Due Date <span class="text-danger">*</span></label>
+            <input type="date" id="newDueDate" class="form-control" style="border:1.5px solid var(--ui-border); border-radius:var(--border-radius-sm); padding:10px 14px;" required>
+          </div>
+        </div>
+        <div class="modal-footer border-0" style="padding:16px 24px;">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn" id="btnConfirmExtend" style="background:var(--brand-gold); color:#fff; border-color:var(--brand-gold);">Extend</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-LOANS-COMBINED-V4"></script>
+  <!-- Centralized Notifications -->
+  <script src="assets/js/notifications.js"></script>
+  <script>
+    let currentLoan = null;
+    let currentPage = {active: 1, 'on-time': 1, overdue: 1};
+    const pageSize = 20;
+    let allLoans = [];
+    let currentTab = 'active';
+    let currentFilterStatus = '';
+    let filterLate = '';
+    let filterDue = '';
+
+    const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const daysBetween = (from, to) => Math.max(0, Math.floor((new Date(to) - new Date(from)) / (1000*60*60*24)));
+    const todayStr = () => new Date().toISOString().slice(0,10);
+    const getDaysLate = (dueDate) => {
+      if (!dueDate) return 0;
+      const today = new Date();
+      const due = new Date(dueDate);
+      return Math.max(0, Math.floor((today - due) / (1000*60*60*24)));
+    };
+
+    // Initialize
+    (async () => {
+      const res = await fetch('/api/check-auth', {credentials:'include'});
+      if (!res.ok) { location.href = 'login.html'; return; }
+      const data = await res.json().catch(()=>null);
+      const role = (data?.user?.role || '').toLowerCase();
+      if (role !== 'librarian' && role !== 'admin') { location.href = 'dashboard.html'; return; }
+
+      renderSidebar('loans', role, false);
+      localStorage.setItem('userRole', role);
+      
+      // Load avatar in header if available
+      const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+      if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') {
+        headerAvatar.src = data.user.avatar;
+      }
+      
+      // Load user info and avatar
+      const me = data?.user;
+      if (me) {
+        const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
+        const whoChipEl = document.getElementById('whoChip');
+        if (whoChipEl) {
+          whoChipEl.innerHTML = `<span class="badge" style="background:#4a4a4a;color:#fff;font-weight:600;">${role.toUpperCase()}</span> ${fullName || me.email}`;
+        }
+      }
+      
+      document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+      
+      // Logout handler
+      document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+          localStorage.removeItem('userRole');
+        } catch {}
+        location.href = '/login';
+      });
+      
+      // Notifications are handled by centralized notifications.js
+      
+      // Filter status management for Active tab
+      window.setFilterStatus = function(status) {
+        currentFilterStatus = status;
+        const statusText = status === '' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1);
+        document.getElementById('filterStatusText').textContent = statusText;
+        currentPage.active = 1;
+        loadLoans();
+        bootstrap.Dropdown.getInstance('#filterStatusBtn')?.hide();
+      };
+      
+      // Filter status management for On-Time tab
+      window.setFilterStatusOnTime = function(status) {
+        currentFilterStatus = status;
+        const statusText = status === '' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1);
+        document.getElementById('filterStatusTextOnTime').textContent = statusText;
+        currentPage['on-time'] = 1;
+        loadLoans();
+        bootstrap.Dropdown.getInstance('#filterStatusBtnOnTime')?.hide();
+      };
+      
+      // Overdue filters
+      window.setFilterLate = function(value) {
+        filterLate = value;
+        const filterText = value === '' ? 'All' : 
+                          value === '1-7' ? '1–7 days late' :
+                          value === '8-30' ? '8–30 days late' :
+                          'Over 30 days late';
+        document.getElementById('filterLateText').textContent = `Days Late: ${filterText}`;
+        currentPage.overdue = 1;
+        loadLoans();
+        bootstrap.Dropdown.getInstance('#filterLateBtn')?.hide();
+      };
+      
+      window.setFilterDue = function(value) {
+        filterDue = value;
+        const filterText = value === '' ? 'Any' :
+                         value === 'thisweek' ? 'Due this week' :
+                         value === 'lastweek' ? 'Due last week' :
+                         'Due last 30 days';
+        document.getElementById('filterDueText').textContent = `Due Date: ${filterText}`;
+        currentPage.overdue = 1;
+        loadLoans();
+        bootstrap.Dropdown.getInstance('#filterDueBtn')?.hide();
+      };
+      
+      // Tab switching
+      document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', (e) => {
+          if (e.target.id === 'tab-active') currentTab = 'active';
+          else if (e.target.id === 'tab-on-time') currentTab = 'on-time';
+          else if (e.target.id === 'tab-overdue') currentTab = 'overdue';
+          loadLoans();
+        });
+      });
+      
+      // Refresh buttons
+      document.getElementById('btnRefresh')?.addEventListener('click', () => { loadLoans(); });
+      document.getElementById('btnRefreshOnTime')?.addEventListener('click', () => { loadLoans(); });
+      document.getElementById('btnRefreshOverdue')?.addEventListener('click', () => { loadLoans(); });
+      
+      // Search
+      document.getElementById('loanSearch')?.addEventListener('input', () => { 
+        currentPage.active = 1;
+        currentPage['on-time'] = 1;
+        currentPage.overdue = 1;
+        loadLoans(); 
+      });
+      
+      // Check all for overdue
+      document.getElementById('checkAllOverdue')?.addEventListener('change', (e) => {
+        document.querySelectorAll('#loanBodyOverdue .row-check').forEach(cb => cb.checked = e.target.checked);
+      });
+      
+      loadLoans();
+    })();
+
+    async function loadLoans() {
+      const q = document.getElementById('loanSearch')?.value.trim() || '';
+      const url = `/api/loans?page=1&pagesize=1000&active_only=1`;
+      
+      try {
+        const res = await fetch(url, {credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        if (!data.ok) { alert('Failed to load loans'); return; }
+        
+        allLoans = (data.items || []).filter(l => l.status !== 'returned' && !l.returned_at);
+        
+        // Filter by search query
+        if (q) {
+          allLoans = allLoans.filter(l => {
+            const searchText = `${l.student_name} ${l.student_no} ${l.book_title} ${l.isbn}`.toLowerCase();
+            return searchText.includes(q.toLowerCase());
+          });
+        }
+        
+        // Update all stats
+        updateAllStats();
+        
+        // Render based on current tab
+        if (currentTab === 'active') {
+          renderActive();
+        } else if (currentTab === 'on-time') {
+          renderOnTime();
+        } else if (currentTab === 'overdue') {
+          renderOverdue();
+        }
+      } catch (err) {
+        alert('Error loading loans: ' + err.message);
+      }
+    }
+
+    function updateAllStats() {
+      const today = todayStr();
+      let active = 0, overdue = 0, onTime = 0;
+      let overdueTotal = 0, late1to7 = 0, late8to30 = 0, late30plus = 0;
+      
+      allLoans.forEach(l => {
+        const dueDate = l.extended_due_at || l.due_at;
+        if (!dueDate) return;
+        
+        if (dueDate < today) {
+          overdue++;
+          overdueTotal++;
+          const daysLate = getDaysLate(dueDate);
+          if (daysLate >= 1 && daysLate <= 7) late1to7++;
+          else if (daysLate >= 8 && daysLate <= 30) late8to30++;
+          else if (daysLate > 30) late30plus++;
+        } else {
+          onTime++;
+        }
+        active++;
+      });
+      
+      // Update Active tab stats
+      document.getElementById('statActive')?.textContent = active;
+      document.getElementById('statOverdue')?.textContent = overdue;
+      document.getElementById('statOnTime')?.textContent = onTime;
+      
+      // Update On-Time tab stats
+      document.getElementById('statActiveOnTime')?.textContent = active;
+      document.getElementById('statOverdueOnTime')?.textContent = overdue;
+      document.getElementById('statOnTimeOnTime')?.textContent = onTime;
+      
+      // Update Overdue tab stats
+      document.getElementById('statOverdueTotal')?.textContent = overdueTotal;
+      document.getElementById('statLateA')?.textContent = late1to7;
+      document.getElementById('statLateB')?.textContent = late8to30;
+      document.getElementById('statLateC')?.textContent = late30plus;
+    }
+
+    function renderActive() {
+      const tbody = document.getElementById('loanBodyActive');
+      const empty = document.getElementById('emptyStateActive');
+      const pageInfo = document.getElementById('pageInfoActive');
+      
+      let filtered = allLoans;
+      
+      // Apply status filter
+      if (currentFilterStatus) {
+        filtered = filtered.filter(l => l.status === currentFilterStatus);
+      }
+      
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        empty?.classList.remove('d-none');
+        document.getElementById('loansTableActive')?.classList.add('d-none');
+        pageInfo.textContent = 'Showing 0 of 0';
+        document.getElementById('loanCountActive').textContent = '0';
+        return;
+      }
+      
+      empty?.classList.add('d-none');
+      document.getElementById('loansTableActive')?.classList.remove('d-none');
+      document.getElementById('loanCountActive').textContent = filtered.length;
+      
+      const start = (currentPage.active - 1) * pageSize;
+      const end = start + pageSize;
+      const pageLoans = filtered.slice(start, end);
+      
+      tbody.innerHTML = pageLoans.map(l => {
+        const statusBadge = l.loan_status === 'overdue' ? '<span class="badge text-bg-danger-soft">Overdue</span>'
+                         : '<span class="badge text-bg-success-soft">On-Time</span>';
+        
+        return `
+          <tr>
+            <td>
+              <div class="fw-medium">${esc(l.student_name)}</div>
+              <small class="text-muted">${esc(l.student_no || '—')}</small>
+            </td>
+            <td>
+              <div class="fw-medium">${esc(l.book_title)}</div>
+              <small class="text-muted">${esc(l.isbn || '—')}</small>
+            </td>
+            <td>${l.borrowed_at ? new Date(l.borrowed_at).toLocaleDateString() : '—'}</td>
+            <td>${l.due_at ? new Date(l.due_at).toLocaleDateString() : '—'}</td>
+            <td>${statusBadge}</td>
+            <td class="text-end">
+              <div class="d-flex align-items-center gap-2 justify-content-end">
+                <button class="btn btn-outline-secondary btn-sm" onclick="viewLoan(${l.loan_id})" title="View" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-outline-success btn-sm" onclick="markReturned(${l.loan_id})" title="Mark as Returned" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-box-arrow-in-left"></i>
+                </button>
+                <button class="btn btn-outline-warning btn-sm" onclick="showExtendModal(${l.loan_id})" title="Extend Due Date" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-calendar-plus"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      pageInfo.textContent = `Showing ${start + 1}–${Math.min(end, filtered.length)} of ${filtered.length}`;
+    }
+
+    function renderOnTime() {
+      const tbody = document.getElementById('loanBodyOnTime');
+      const empty = document.getElementById('emptyStateOnTime');
+      const pageInfo = document.getElementById('pageInfoOnTime');
+      
+      const today = todayStr();
+      let filtered = allLoans.filter(l => {
+        const dueDate = l.extended_due_at || l.due_at;
+        return dueDate && dueDate >= today;
+      });
+      
+      // Apply status filter
+      if (currentFilterStatus) {
+        filtered = filtered.filter(l => l.status === currentFilterStatus);
+      }
+      
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        empty?.classList.remove('d-none');
+        document.getElementById('loansTableOnTime')?.classList.add('d-none');
+        pageInfo.textContent = 'Showing 0 of 0';
+        document.getElementById('loanCountOnTime').textContent = '0';
+        return;
+      }
+      
+      empty?.classList.add('d-none');
+      document.getElementById('loansTableOnTime')?.classList.remove('d-none');
+      document.getElementById('loanCountOnTime').textContent = filtered.length;
+      
+      const start = (currentPage['on-time'] - 1) * pageSize;
+      const end = start + pageSize;
+      const pageLoans = filtered.slice(start, end);
+      
+      tbody.innerHTML = pageLoans.map(l => {
+        return `
+          <tr>
+            <td>
+              <div class="fw-medium">${esc(l.student_name)}</div>
+              <small class="text-muted">${esc(l.student_no || '—')}</small>
+            </td>
+            <td>
+              <div class="fw-medium">${esc(l.book_title)}</div>
+              <small class="text-muted">${esc(l.isbn || '—')}</small>
+            </td>
+            <td>${l.borrowed_at ? new Date(l.borrowed_at).toLocaleDateString() : '—'}</td>
+            <td>${l.due_at ? new Date(l.due_at).toLocaleDateString() : '—'}</td>
+            <td><span class="badge text-bg-success-soft">On-Time</span></td>
+            <td class="text-end">
+              <div class="d-flex align-items-center gap-2 justify-content-end">
+                <button class="btn btn-outline-secondary btn-sm" onclick="viewLoan(${l.loan_id})" title="View" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-outline-success btn-sm" onclick="markReturned(${l.loan_id})" title="Mark as Returned" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-box-arrow-in-left"></i>
+                </button>
+                <button class="btn btn-outline-warning btn-sm" onclick="showExtendModal(${l.loan_id})" title="Extend Due Date" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-calendar-plus"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      pageInfo.textContent = `Showing ${start + 1}–${Math.min(end, filtered.length)} of ${filtered.length}`;
+    }
+
+    function renderOverdue() {
+      const tbody = document.getElementById('loanBodyOverdue');
+      const empty = document.getElementById('emptyStateOverdue');
+      const pageInfo = document.getElementById('pageInfoOverdue');
+      
+      const today = todayStr();
+      let filtered = allLoans.filter(l => {
+        const dueDate = l.extended_due_at || l.due_at;
+        if (!dueDate || dueDate >= today) return false;
+        
+        // Filter by days late
+        if (filterLate) {
+          const daysLate = getDaysLate(dueDate);
+          if (filterLate === '1-7' && (daysLate < 1 || daysLate > 7)) return false;
+          if (filterLate === '8-30' && (daysLate < 8 || daysLate > 30)) return false;
+          if (filterLate === 'over30' && daysLate <= 30) return false;
+        }
+        
+        // Filter by due date
+        if (filterDue) {
+          const due = new Date(dueDate);
+          const now = new Date();
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          
+          if (filterDue === 'thisweek') {
+            const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+            weekStart.setHours(0,0,0,0);
+            if (due < weekStart || due > now) return false;
+          } else if (filterDue === 'lastweek') {
+            if (due < weekAgo || due > now) return false;
+          } else if (filterDue === 'last30') {
+            if (due < monthAgo || due > now) return false;
+          }
+        }
+        
+        return true;
+      });
+      
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        empty?.classList.remove('d-none');
+        document.getElementById('loansTableOverdue')?.classList.add('d-none');
+        pageInfo.textContent = 'Showing 0 of 0';
+        document.getElementById('loanCountOverdue').textContent = '0';
+        return;
+      }
+      
+      empty?.classList.add('d-none');
+      document.getElementById('loansTableOverdue')?.classList.remove('d-none');
+      document.getElementById('loanCountOverdue').textContent = filtered.length;
+      
+      const start = (currentPage.overdue - 1) * pageSize;
+      const end = start + pageSize;
+      const pageLoans = filtered.slice(start, end);
+      
+      tbody.innerHTML = pageLoans.map(l => {
+        const dueDate = l.extended_due_at || l.due_at;
+        const daysLate = getDaysLate(dueDate);
+        let lateBadge = '';
+        if (daysLate >= 1 && daysLate <= 7) lateBadge = '<span class="badge text-bg-warning-soft">1-7 Days</span>';
+        else if (daysLate >= 8 && daysLate <= 30) lateBadge = '<span class="badge text-bg-warning-soft">8-30 Days</span>';
+        else if (daysLate > 30) lateBadge = '<span class="badge text-bg-danger-soft">30+ Days</span>';
+        
+        return `
+          <tr>
+            <td><input class="form-check-input row-check" type="checkbox" value="${l.loan_id}"></td>
+            <td>
+              <div class="fw-medium">${esc(l.student_name)}</div>
+              <small class="text-muted">${esc(l.student_no || '—')}</small>
+            </td>
+            <td>
+              <div class="fw-medium">${esc(l.book_title)}</div>
+              <small class="text-muted">${esc(l.isbn || '—')}</small>
+            </td>
+            <td>${l.borrowed_at ? new Date(l.borrowed_at).toLocaleDateString() : '—'}</td>
+            <td>${dueDate ? new Date(dueDate).toLocaleDateString() : '—'}</td>
+            <td>${lateBadge || '<span class="text-muted">—</span>'}</td>
+            <td><span class="badge text-bg-danger-soft">Overdue</span></td>
+            <td class="text-end">
+              <div class="d-flex align-items-center gap-2 justify-content-end">
+                <button class="btn btn-outline-secondary btn-sm" onclick="viewLoan(${l.loan_id})" title="View" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-outline-success btn-sm" onclick="markReturned(${l.loan_id})" title="Mark as Returned" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-box-arrow-in-left"></i>
+                </button>
+                <button class="btn btn-outline-warning btn-sm" onclick="showExtendModal(${l.loan_id})" title="Extend Due Date" style="width:32px; height:32px; padding:0; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                  <i class="bi bi-calendar-plus"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      pageInfo.textContent = `Showing ${start + 1}–${Math.min(end, filtered.length)} of ${filtered.length}`;
+    }
+
+    async function viewLoan(loanId) {
+      const loan = allLoans.find(l => l.loan_id == loanId);
+      if (!loan) return;
+      
+      currentLoan = loan;
+      
+      const cover = loan.cover_url || 'assets/img/no-cover.png';
+      const statusBadge = loan.status === 'returned' ? '<span class="badge text-bg-secondary-soft">RETURNED</span>'
+                         : loan.loan_status === 'overdue' ? '<span class="badge text-bg-danger-soft">OVERDUE</span>'
+                         : '<span class="badge text-bg-success-soft">ON-TIME</span>';
+      
+      const body = `
+        <!-- Status Badge -->
+        <div class="mb-4 text-center">
+          ${statusBadge}
+        </div>
+        
+        <!-- Book Information -->
+        <div class="loan-section">
+          <div class="loan-section-title">
+            <i class="bi bi-book"></i> Book Information
+          </div>
+          <div class="book-info-card">
+            <div class="d-flex gap-3">
+              <img src="${cover}" alt="${esc(loan.book_title)}" class="book-cover-small" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+            <div class="flex-grow-1">
+                <div class="book-title">${esc(loan.book_title)}</div>
+                <div class="book-meta">
+                  <i class="bi bi-person"></i>
+                  <span>${esc(loan.author || '—')}</span>
+                </div>
+                <div class="book-meta">
+                  <i class="bi bi-tag"></i>
+                  <span>${esc(loan.category || '—')}</span>
+                </div>
+                <div class="book-meta">
+                  <i class="bi bi-upc-scan"></i>
+                  <span>ISBN: ${esc(loan.isbn || '—')}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Student Information -->
+        <div class="loan-section">
+          <div class="loan-section-title">
+            <i class="bi bi-person-circle"></i> Student Information
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-person-fill"></i> Name
+            </div>
+            <div class="info-value">${esc(loan.student_name)}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-person-vcard-fill"></i> Student No.
+            </div>
+            <div class="info-value">${esc(loan.student_no || '—')}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-mortarboard-fill"></i> Course
+            </div>
+            <div class="info-value">${esc(loan.course || '—')}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar3"></i> Year / Section
+            </div>
+            <div class="info-value">${esc((loan.year_level || '—') + ' / ' + (loan.section || '—'))}</div>
+          </div>
+        </div>
+        
+        <!-- Loan Information -->
+        <div class="loan-section">
+          <div class="loan-section-title">
+            <i class="bi bi-clock-history"></i> Loan Information
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar-check"></i> Borrowed On
+            </div>
+            <div class="info-value">${loan.borrowed_at ? new Date(loan.borrowed_at).toLocaleString() : '—'}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar-event"></i> Due Date
+            </div>
+            <div class="info-value">${loan.due_at ? new Date(loan.due_at).toLocaleDateString() : '—'}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-box-arrow-in-left"></i> Returned On
+            </div>
+            <div class="info-value">${loan.returned_at ? new Date(loan.returned_at).toLocaleString() : '—'}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-info-circle"></i> Status
+            </div>
+            <div class="info-value">${statusBadge}</div>
+          </div>
+        </div>
+      `;
+      
+      document.getElementById('loanDrawerLabel').textContent = `Loan Details – ${esc(loan.book_title)}`;
+      document.getElementById('loanDrawerBody').innerHTML = body;
+      bootstrap.Offcanvas.getOrCreateInstance('#loanDrawer').show();
+    }
+
+    async function markReturned(loanId) {
+      const loan = allLoans.find(l => l.loan_id == loanId);
+      if (!loan || loan.status === 'returned') return;
+      
+      // Show confirmation modal
+      document.getElementById('returnModalMessage').textContent = `Mark "${esc(loan.book_title)}" as returned?`;
+      const modal = new bootstrap.Modal('#returnModal');
+      modal.show();
+      
+      // Set up confirm button handler
+      document.getElementById('btnConfirmReturn').onclick = async function() {
+        try {
+          const fd = new FormData();
+          fd.set('loan_id', String(loanId));
+          
+          const res = await fetch('/api/loans/return', {
+            method: 'POST',
+            body: fd,
+            credentials: 'include'
+          });
+          
+          const data = await res.json().catch(() => null);
+          if (data?.ok) {
+            modal.hide();
+            bootstrap.Offcanvas.getInstance('#loanDrawer')?.hide();
+            alert('Book marked as returned successfully!');
+            loadLoans();
+          } else {
+            alert(data?.error || 'Failed to mark book as returned');
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      };
+    }
+
+    function showExtendModal(loanId) {
+      currentLoan = allLoans.find(l => l.loan_id == loanId);
+      if (!currentLoan || currentLoan.status === 'returned') return;
+      
+      const currentDueDate = currentLoan.due_at || new Date().toISOString().split('T')[0];
+      document.getElementById('newDueDate').value = currentDueDate;
+      document.getElementById('newDueDate').min = currentDueDate;
+      
+      const modal = new bootstrap.Modal('#extendModal');
+      modal.show();
+      
+      document.getElementById('btnConfirmExtend').onclick = async function() {
+        const newDate = document.getElementById('newDueDate').value;
+        if (!newDate) {
+          alert('Please select a new due date');
+          return;
+        }
+        
+        try {
+          const fd = new FormData();
+          fd.set('loan_id', String(loanId));
+          fd.set('new_due_date', newDate);
+          
+          const res = await fetch('/api/loans/extend', {
+            method: 'POST',
+            body: fd,
+            credentials: 'include'
+          });
+          
+          const data = await res.json().catch(() => null);
+          if (data?.ok) {
+            modal.hide();
+            bootstrap.Offcanvas.getInstance('#loanDrawer')?.hide();
+            alert('Due date extended successfully!');
+            loadLoans();
+          } else {
+            alert(data?.error || 'Failed to extend due date');
+          }
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      };
+    }
+
+    // Event listeners
+    document.getElementById('loanSearch').addEventListener('input', () => { currentPage = 1; loadLoans(); });
+    document.getElementById('btnRefresh').addEventListener('click', () => { loadLoans(); });
+
+    // Make functions global
+    window.viewLoan = viewLoan;
+    window.markReturned = markReturned;
+    window.showExtendModal = showExtendModal;
+  </script>
+</body>
+</html>
+
+

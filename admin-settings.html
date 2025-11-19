@@ -1,0 +1,494 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LibraTrack – System Settings</title>
+	<link rel="icon" href="assets/img/LibraTrack-logo.png">
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.css">
+	<link rel="stylesheet" href="assets/css/sidebar.css">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+	<style>
+		:root{
+			--gold:#a68604;
+			--gold-dark:#8d7003;
+			--sidebar-bg:#111;
+			--card-bg:#fff;
+			--card-border:#e5e7eb;
+			--text-primary:#212529;
+			--text-secondary:#6b7280;
+			--text-muted:#9ca3af;
+			--header-bg:#fff;
+			--table-header-bg:#f8f9fa;
+			--border-radius:12px;
+			--border-radius-sm:8px;
+			--border-radius-lg:16px;
+			--shadow-sm:0 2px 4px rgba(0,0,0,.04);
+			--shadow-md:0 4px 12px rgba(0,0,0,.08);
+			--shadow-lg:0 6px 18px rgba(0,0,0,.12);
+		}
+		
+		/* Consistent Header Design */
+		.admin-header-gold {
+			background: var(--header-bg) !important;
+			color: var(--text-primary) !important;
+			border-bottom:1px solid var(--card-border);
+			box-shadow:var(--shadow-sm);
+			padding:12px 0;
+		}
+		.admin-header-gold .fw-bold,
+		.admin-header-gold .h5,
+		.admin-header-gold #pageTitle {
+			color: var(--text-primary) !important;
+			font-weight:700;
+			font-size:1.25rem;
+			letter-spacing:0.01em;
+		}
+		.admin-header-gold .btn-link {
+			color: var(--text-primary) !important;
+			padding:8px 12px;
+			border-radius:var(--border-radius-sm);
+			transition:all 0.2s ease;
+		}
+		.admin-header-gold .btn-link:hover {
+			color: var(--text-primary) !important;
+			background-color:#f8f9fa;
+		}
+		
+		/* Consistent Search Bar Design */
+		.search-bar-custom {
+			height: 42px;
+		}
+		.search-bar-custom .input-group-text,
+		.search-bar-custom .form-control {
+			height: 42px;
+			padding: 10px 16px;
+			font-size:0.875rem;
+		}
+		.search-bar-custom .input-group-text {
+			border-top-left-radius: var(--border-radius-sm);
+			border-bottom-left-radius: var(--border-radius-sm);
+			background: var(--table-header-bg) !important;
+			border: 1px solid var(--card-border);
+			border-right: none !important;
+			outline: none !important;
+			color:var(--text-secondary);
+		}
+		.search-bar-custom .form-control {
+			border-top-right-radius: var(--border-radius-sm);
+			border-bottom-right-radius: var(--border-radius-sm);
+			background: var(--table-header-bg) !important;
+			border: 1px solid var(--card-border);
+			border-left: none !important;
+			color: var(--text-primary);
+			outline: none !important;
+			box-shadow: none !important;
+		}
+		.search-bar-custom .form-control:focus {
+			outline: none !important;
+			box-shadow: none !important;
+			border-color: var(--card-border) !important;
+		}
+		.search-bar-custom .form-control::placeholder {
+			color: var(--text-muted);
+		}
+		.search-bar-custom:focus-within {
+			box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15);
+			border-radius: var(--border-radius-sm);
+		}
+		.search-bar-custom:focus-within .input-group-text {
+			border-color: var(--gold);
+			border-right: none !important;
+			background: #fff !important;
+		}
+		.search-bar-custom:focus-within .form-control {
+			border-color: var(--gold);
+			border-left: none !important;
+			background: #fff !important;
+		}
+		
+		/* Consistent Admin Button - Avatar */
+		.admin-btn-custom {
+			padding: 0;
+			width: 44px;
+			height: 44px;
+			border-radius: var(--border-radius-sm);
+			border: 1px solid var(--card-border);
+			background: #fff;
+			transition: all 0.2s ease;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+		}
+		.admin-btn-custom:hover {
+			border-color: var(--gold);
+			box-shadow: 0 0 0 2px rgba(166, 134, 4, 0.1);
+		}
+		.admin-btn-custom:focus,
+		.admin-btn-custom:active,
+		.admin-btn-custom.show {
+			border-color: var(--gold) !important;
+			box-shadow: 0 0 0 0.2rem rgba(166, 134, 4, 0.25) !important;
+		}
+		.admin-btn-custom img {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			object-fit: cover;
+		}
+		
+		/* Notification Button */
+		.notification-btn{
+			color:var(--text-primary) !important;
+			padding:8px 12px;
+			border-radius:var(--border-radius-sm);
+			transition:all 0.2s ease;
+		}
+		.notification-btn:hover{
+			color:var(--text-primary) !important;
+			background-color:#f8f9fa;
+		}
+		.notification-badge{
+			font-size:0.6875rem;
+			padding:3px 7px;
+			font-weight:600;
+			background:var(--gold) !important;
+			color:#fff !important;
+		}
+		.notification-dropdown{
+			border-radius:var(--border-radius);
+			box-shadow:var(--shadow-lg);
+			border:1px solid var(--card-border);
+			margin-top:8px;
+		}
+		
+		/* Consistent Card Design */
+		.card{
+			border-radius:var(--border-radius-lg);
+			border:1px solid var(--card-border);
+			box-shadow:var(--shadow-sm);
+			overflow:hidden;
+		}
+		.card-header{
+			background:var(--sidebar-bg);
+			color:#fff;
+			border-bottom:0;
+			padding:16px 20px;
+			font-weight:600;
+			font-size:0.9375rem;
+		}
+		.card-body{
+			padding:24px;
+			background:#fff;
+		}
+		.form-label{
+			font-weight:600;
+			font-size:0.875rem;
+			color:#374151;
+			margin-bottom:8px;
+		}
+		.form-control,
+		.form-select{
+			padding:10px 14px;
+			font-size:0.9375rem;
+			border:1.5px solid #e5e7eb;
+			border-radius:var(--border-radius-sm);
+			background:#fff;
+			color:#111827;
+			transition:all 0.2s ease;
+		}
+		.form-control:focus,
+		.form-select:focus{
+			border-color:var(--gold);
+			box-shadow:0 0 0 3px rgba(166,134,4,0.1);
+			outline:none;
+		}
+		.btn-primary{
+			background:var(--gold) !important;
+			border-color:var(--gold) !important;
+			color:#fff !important;
+			border-radius:var(--border-radius-sm);
+			font-weight:600;
+			padding:10px 24px;
+		}
+		.btn-primary:hover{
+			background:var(--gold-dark) !important;
+			border-color:var(--gold-dark) !important;
+		}
+		.btn-outline-primary{
+			border-color:var(--gold);
+			color:var(--gold);
+			border-radius:var(--border-radius-sm);
+		}
+		.btn-outline-primary:hover{
+			background:var(--gold);
+			border-color:var(--gold);
+			color:#fff;
+		}
+		main.container-fluid{
+			padding:24px !important;
+		}
+		h3{
+			font-weight:700;
+			font-size:1.5rem;
+			color:var(--text-primary);
+			margin-bottom:8px;
+		}
+		small.text-secondary{
+			color:var(--text-secondary);
+			font-size:0.875rem;
+		}
+		.role-chip{
+			font-weight:600;
+			border-radius:999px;
+			padding:.2rem .6rem;
+			font-size:.75rem;
+		}
+		.role-chip.admin{
+			background:#4a4a4a;
+			color:#fff;
+		}
+		.role-chip.librarian{
+			background:#e7f1ff;
+			color:#0d6efd;
+			border:1px solid rgba(13,110,253,.2);
+		}
+		.role-chip.student{
+			background:#efe7ff;
+			color:#6f42c1;
+			border:1px solid rgba(111,66,193,.2);
+		}
+	</style>
+</head>
+<body class="sb-body sb-expanded">
+	<div id="sidebar-root"></div>
+
+	<div class="sb-wrapper">
+		<nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+			<div class="container-fluid">
+				<button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+					<i class="bi bi-list fs-4"></i>
+				</button>
+				<div class="fw-bold h5 mb-0" id="pageTitle">System Settings</div>
+
+				<div class="ms-auto d-flex align-items-center gap-2">
+					<form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+						<div class="input-group input-group-sm search-bar-custom">
+							<span class="input-group-text bg-light border-0 search-icon-wrapper"><i class="bi bi-search"></i></span>
+							<input class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search">
+						</div>
+					</form>
+
+					<div class="dropdown me-2">
+						<button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
+							<i class="bi bi-bell fs-5"></i>
+							<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
+						</button>
+						<ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
+							<li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
+							<li id="notificationList" class="px-3 py-2"><div class="text-muted small">No alerts</div></li>
+						</ul>
+					</div>
+
+					<div class="dropdown">
+						<button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:var(--border-radius-sm);">
+							<img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+						</button>
+						<ul class="dropdown-menu dropdown-menu-end">
+							<li class="px-3 py-2 small text-muted" id="whoChip">—</li>
+							<li><a class="dropdown-item" href="admin-profile.html"><i class="bi bi-gear me-2"></i>Profile</a></li>
+							<li><hr class="dropdown-divider"></li>
+							<li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</nav>
+
+		<main class="sb-content container-fluid">
+			<form id="settingsForm" class="row g-4">
+				<div class="col-lg-6">
+					<div class="card h-100">
+						<div class="card-header"><i class="bi bi-envelope me-2"></i>Email / SMTP Settings</div>
+						<div class="card-body">
+							<div class="mb-3">
+								<label class="form-label">SMTP Host</label>
+								<input type="text" class="form-control" name="smtp_host">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">SMTP Port</label>
+								<input type="number" class="form-control" name="smtp_port" value="587">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Username</label>
+								<input type="text" class="form-control" name="smtp_user">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Password</label>
+								<input type="password" class="form-control" name="smtp_pass">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">From Email</label>
+								<input type="email" class="form-control" name="smtp_from">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Encryption</label>
+								<select class="form-select" name="smtp_secure">
+									<option value="tls">TLS</option>
+									<option value="ssl">SSL</option>
+								</select>
+							</div>
+							<div class="d-flex gap-2">
+								<button type="button" id="btnTest" class="btn btn-outline-primary"><i class="bi bi-send me-2"></i>Test SMTP Connection</button>
+								<div id="smtpStatus" class="align-self-center small text-muted"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-6">
+					<div class="card mb-4">
+						<div class="card-header"><i class="bi bi-box-seam me-2"></i>Inventory Settings</div>
+						<div class="card-body">
+							<div class="mb-3">
+								<label class="form-label">Low-stock Threshold</label>
+								<input type="number" class="form-control" name="low_stock_threshold" value="3">
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Critical Threshold</label>
+								<input type="number" class="form-control" name="critical_threshold" value="1">
+							</div>
+						</div>
+					</div>
+					<div class="card">
+						<div class="card-header"><i class="bi bi-shield-lock me-2"></i>Password Policy</div>
+						<div class="card-body">
+							<div class="mb-3">
+								<label class="form-label">Minimum Password Length</label>
+								<input type="number" class="form-control" name="pwd_min" value="8">
+							</div>
+							<div class="form-check mb-2">
+								<input class="form-check-input" type="checkbox" name="pwd_upper" id="pwd_upper">
+								<label class="form-check-label" for="pwd_upper">Require Uppercase</label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" name="pwd_special" id="pwd_special">
+								<label class="form-check-label" for="pwd_special">Require Special Character</label>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-12">
+					<button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Save Settings</button>
+					<span id="saveMsg" class="small ms-2"></span>
+				</div>
+			</form>
+		</main>
+	</div>
+
+	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<script src="assets/js/sidebar.js?v=2025-11-17-unified"></script>
+	<script>
+		async function getMe() {
+			const authUrl = '/api/check-auth';
+			try {
+				const res = await fetch(authUrl, { credentials: 'include', headers: { 'Accept':'application/json' } });
+				if (res.status === 401) {
+					location.href = '/login';
+					return null;
+				}
+				if (!res.ok) return null;
+				const data = await res.json();
+				if (data && data.success === true && data.user) return data.user;
+				if (data && data.ok === true && data.user) return data.user;
+				location.href = '/login';
+				return null;
+			} catch (e) {
+				console.error('Auth check error:', e);
+				return null;
+			}
+		}
+
+		(async function(){
+			const me = await getMe();
+			if (!me) return;
+
+			const role = (me.role || '').toLowerCase();
+			renderSidebar('settings', role, false);
+			
+			// Cache role for sidebar
+			if (['admin', 'librarian', 'student'].includes(role)) {
+				localStorage.setItem('userRole', role);
+			}
+
+			// Load avatar in header if available
+			const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+			if (headerAvatar && me.avatar && me.avatar.trim() !== '') {
+				headerAvatar.src = me.avatar;
+			}
+
+			document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+				if (typeof toggleSidebar === 'function') toggleSidebar();
+				else document.body.classList.toggle('sb-expanded');
+			});
+
+			const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
+			document.getElementById('whoChip').innerHTML =
+				`<span class="badge role-chip ${role}">${role.toUpperCase()}</span> ${fullName || me.email}`;
+
+			document.getElementById('logoutLink')?.addEventListener('click', async e => {
+				e.preventDefault();
+				try { await fetch('/api/logout', { method:'POST', credentials:'include' }); } catch {}
+				location.href = '/login';
+			});
+
+			const form = document.getElementById('settingsForm');
+			const saveMsg = document.getElementById('saveMsg');
+			const smtpStatus = document.getElementById('smtpStatus');
+
+			function setForm(data){
+				for (const [k,v] of Object.entries(data || {})){
+					const el = form.querySelector(`[name="${k}"]`);
+					if (!el) continue;
+					if (el.type === 'checkbox') el.checked = !!Number(v || el.checked);
+					else el.value = v ?? '';
+				}
+			}
+
+			async function load(){
+				const res = await fetch('/api/settings').then(r=>r.json()).catch(()=>({}));
+				if (res?.success) setForm(res.settings || {});
+			}
+
+			form.addEventListener('submit', async (e)=>{
+				e.preventDefault();
+				const fd = new FormData(form);
+				const plain = {};
+				fd.forEach((v,k)=>{ plain[k] = v; });
+				plain.pwd_upper = form.pwd_upper.checked ? 1 : 0;
+				plain.pwd_special = form.pwd_special.checked ? 1 : 0;
+				const r = await fetch('/api/settings', { method:'POST', body: JSON.stringify(plain), headers:{'Content-Type':'application/json'} });
+				const data = await r.json().catch(()=>({success:false}));
+				saveMsg.textContent = data?.success ? 'Saved.' : (data?.error || 'Failed to save');
+				setTimeout(()=> saveMsg.textContent = '', 2500);
+			});
+
+			document.getElementById('btnTest').addEventListener('click', async ()=>{
+				smtpStatus.textContent = 'Testing...';
+				const fd = new FormData(form);
+				const plain = {};
+				fd.forEach((v,k)=>{ plain[k] = v; });
+				const r = await fetch('/api/settings/test-smtp', { method:'POST', body: JSON.stringify(plain), headers:{'Content-Type':'application/json'} });
+				const data = await r.json().catch(()=>({success:false}));
+				if (data?.success) smtpStatus.textContent = '✓ Configured';
+				else smtpStatus.textContent = '✗ Not Working: ' + (data?.error || 'Unknown error');
+			});
+
+			load();
+		})();
+	</script>
+</body>
+</html>

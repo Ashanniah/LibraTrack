@@ -107,7 +107,7 @@ $stmt = $conn->prepare($sql);
 if (!$stmt) jsonError('Prepare failed: '.$conn->error, 500);
 
 if (!$stmt->bind_param(
-  "sssssssssssss i",
+  "ssssssssssssi",
   $first,$middle,$last,$suffix,$email,$hash,$studno,$course,$year,$sect,$status,$notes,$schoolId
 )) {
   jsonError('Bind failed: '.$stmt->error, 500);

@@ -1,0 +1,62 @@
+:root{
+  --sb-gold:#c9a227;
+  --sb-width-collapsed:72px;
+  --sb-width-expanded:240px;
+}
+
+/* Global font */
+html, body, button, input, select, textarea,
+.navbar, .card, .dropdown-menu, .modal {
+  font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+}
+
+html{ background:#f3f6fb; }
+body{ background:transparent; }
+
+/* ---------- Sidebar ---------- */
+.sb-sidebar{
+  position:fixed; inset:0 auto 0 0;
+  width:var(--sb-width-collapsed);
+  background:#111; color:#fff; padding:10px 0; z-index:1030;
+  overflow-x:hidden; transition:width .25s ease;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  display:flex; flex-direction:column;
+}
+.sb-brand{
+  color:#fff; padding:.55rem .55rem; display:flex; align-items:center; gap:.55rem;
+  text-decoration:none!important; justify-content:center;
+}
+.sb-logo{ width:30px; height:30px; object-fit:contain; }
+.sb-text{ display:none; white-space:nowrap; font-size: 16px;}
+.sb-label{ display:none; color:#c9a227; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; padding:6px 12px; }
+.sb-menu{ padding:0 8px; }
+.sb-link{
+  display:flex; align-items:center; justify-content:center;
+  height:46px; margin:4px 6px; border-radius:12px; color:#ffffff; text-decoration:none!important;
+  transition:background .2s ease,color .2s ease;
+}
+.sb-link i{ font-size:16px; width:40px; min-width:40px; text-align:center; }
+.sb-link:hover{ background:#c9a227; color:#fff; }
+.sb-link.active{ background:#20263b; color:#fff; }
+
+/* Expanded (desktop) */
+.sb-expanded .sb-sidebar{ width:var(--sb-width-expanded); }
+.sb-expanded .sb-text,
+.sb-expanded .sb-label{ display:inline; }
+.sb-expanded .sb-brand{ justify-content:flex-start; }
+.sb-expanded .sb-link{ justify-content:flex-start; }
+
+/* Content shift */
+.sb-wrapper{ margin-left:var(--sb-width-collapsed); transition:margin-left .25s ease; }
+.sb-expanded .sb-wrapper{ margin-left:var(--sb-width-expanded); }
+
+/* Mobile slide-in */
+@media (max-width:991.98px){
+  .sb-wrapper{ margin-left:0; }
+  .sb-sidebar{ transform:translateX(-100%); transition:transform .2s ease,width .25s ease; }
+  .sb-toggled .sb-sidebar{ transform:none; }
+}
+
+/* Gold quick-action button look */
+.btn-gold{ background:var(--sb-gold); border-color:var(--sb-gold); color:#111; font-weight:700;}
+.btn-gold:hover{ filter:brightness(.97); color:#111; }

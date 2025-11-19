@@ -1,0 +1,24 @@
+<?php
+require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/auth.php';
+$u = require_role($conn, ['admin']);
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+  json_response(['success'=>false,'error'=>'Method not allowed'], 405);
+}
+
+$name = trim($_POST['name'] ?? '');
+if ($name === '') json_response(['success'=>false,'error'=>'Name is required'], 422);
+
+$stmt = $conn->prepare("INSERT INTO categories (name) VALUES (?)");
+if (!$stmt) json_response(['success'=>false,'error'=>'Prepare failed','detail'=>$conn->error], 500);
+$stmt->bind_param('s', $name);
+$ok = $stmt->execute();
+if (!$ok) json_response(['success'=>false,'error'=>'Execute failed','detail'=>$stmt->error], 500);
+$id = $stmt->insert_id;
+$stmt->close();
+
+json_response(['success'=>true,'id'=>$id]);
+
+
+

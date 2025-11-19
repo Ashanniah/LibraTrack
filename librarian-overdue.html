@@ -1,127 +1,163 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>LibraTrack - Borrow / Return</title>
+  <title>LibraTrack - Overdue Books</title>
 
-  <!-- Fonts / Icons / Bootstrap -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-
-  <!-- Shared + page styles -->
-  <link href="assets/css/sidebar.css" rel="stylesheet">
-  <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
-
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
-</head>
+  <style>
+    .loan-drawer { width: 480px; max-width: 90vw; }
+    .loan-drawer .offcanvas-body { padding: 1.5rem; }
+    .book-cover-small { width: 80px; height: 110px; object-fit: cover; border-radius: 8px; background: #f3f4f6; }
 
+    /* Header */
+    .page-title { font-weight: 700; font-size: 1.25rem; }
+    .page-subtitle { color: #6b7280; font-size: .9rem; margin-top: -6px; }
+
+    /* Themed cards */
+    .od-card { border: 1px solid #e5e7eb; border-left-width: 6px; border-radius: 12px; padding: 16px; background: #fff; }
+    .od-card .value { font-weight: 700; font-size: 1.4rem; }
+    .od-total { background: #FEE2E2; border-left-color: #ef4444; }
+    .od-1to7 { background: #FEF3C7; border-left-color: #f59e0b; }
+    .od-8to30 { background: #FFEDD5; border-left-color: #fb923c; }
+    .od-30plus { background: #E5E7EB; border-left-color: #1f2937; }
+
+    /* Filters bar */
+    .filter-bar { background: #F9FAFB; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px 16px; }
+    .filter-bar .form-select { border-radius: 10px; padding: 10px 12px; }
+
+    /* Table readability */
+    .table-overdue thead th { font-weight: 600; }
+    .table-overdue tbody tr { transition: background .15s ease; }
+    .table-overdue tbody tr:hover { background: #F9FAFA; }
+    .table-overdue tbody td { vertical-align: middle; padding-top: .8rem; padding-bottom: .8rem; }
+
+    .pill { display: inline-block; padding: 4px 10px; border-radius: 9999px; font-weight: 600; font-size: .8rem; }
+    .pill-late-a { background: #FEF3C7; color: #92400e; }
+    .pill-late-b { background: #FFEDD5; color: #9a3412; }
+    .pill-late-c { background: #FEE2E2; color: #991b1b; }
+
+    /* Empty state */
+    .empty-box { background: #F1F5F9; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 48px 16px; text-align: center; }
+    .empty-box h6 { color: #2563eb; font-weight: 700; }
+    .empty-box p { color: #64748b; margin: 0; }
+  </style>
+</head>
 <body class="sb-body">
-  <!-- Shared Sidebar -->
   <div id="sidebar-root"></div>
 
   <div class="sb-wrapper">
     <!-- Topbar -->
     <div class="topbar">
       <div class="page-head d-flex align-items-center justify-content-between flex-wrap gap-3">
-        <div class="d-flex align-items-center gap-2">
-          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
-            <i class="bi bi-list fs-4"></i>
-          </button>
-          <div class="page-title">Borrow / Return</div>
+        <div>
+          <div class="d-flex align-items-center gap-2">
+            <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+              <i class="bi bi-list fs-4"></i>
+            </button>
+            <div>
+              <div class="page-title">Overdue</div>
+              <div class="page-subtitle">Manage all overdue loans</div>
+            </div>
+          </div>
         </div>
 
         <div class="d-flex align-items-center gap-2 tools-wrap">
           <div class="search-wrap flex-grow-1">
             <i class="bi bi-search"></i>
-            <input id="txSearch" type="search" placeholder="Search member, book title, ISBN…">
+            <input id="loanSearch" type="search" placeholder="Search member, book title, ISBN…">
           </div>
-          <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#borrowModal">
-            <i class="bi bi-box-arrow-up-right"></i> New Borrow
-          </button>
+          <div class="btn-group">
+            <button id="btnExport" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+              <i class="bi bi-download"></i> Export CSV
+            </button>
+            <button id="btnBulkEmail" class="btn btn-primary d-flex align-items-center gap-2">
+              <i class="bi bi-envelope"></i> Send Email Reminders
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
     <main class="container-fluid py-4">
-      <!-- Quick Stats -->
+      <!-- Focused cards -->
       <section class="row g-3 mb-3">
         <div class="col-6 col-md-3">
-          <div class="card stat">
-            <div class="icon bg-primary-subtle text-primary"><i class="bi bi-journal-arrow-up"></i></div>
-            <div class="meta"><div class="label">Active Loans</div><div id="statActive" class="value">0</div></div>
+          <div class="od-card od-total">
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+              <span class="fw-semibold">Overdue</span>
+            </div>
+            <div class="value" id="statOverdue">0</div>
+            <div class="small text-muted">Total overdue loans</div>
           </div>
         </div>
         <div class="col-6 col-md-3">
-          <div class="card stat">
-            <div class="icon bg-danger-subtle text-danger"><i class="bi bi-exclamation-triangle"></i></div>
-            <div class="meta"><div class="label">Overdue</div><div id="statOverdue" class="value">0</div></div>
+          <div class="od-card od-1to7">
+            <div class="d-flex align-items-center gap-2 mb-1"><i class="bi bi-hourglass text-warning"></i><span class="fw-semibold">1–7 Days Late</span></div>
+            <div class="value" id="statLateA">0</div>
           </div>
         </div>
         <div class="col-6 col-md-3">
-          <div class="card stat">
-            <div class="icon bg-success-subtle text-success"><i class="bi bi-clipboard-check"></i></div>
-            <div class="meta"><div class="label">Returned (today)</div><div id="statReturnedToday" class="value">0</div></div>
+          <div class="od-card od-8to30">
+            <div class="d-flex align-items-center gap-2 mb-1"><i class="bi bi-hourglass-split text-warning"></i><span class="fw-semibold">8–30 Days Late</span></div>
+            <div class="value" id="statLateB">0</div>
           </div>
         </div>
         <div class="col-6 col-md-3">
-          <div class="card stat">
-            <div class="icon bg-warning-subtle text-warning"><i class="bi bi-hourglass-split"></i></div>
-            <div class="meta"><div class="label">Due Today</div><div id="statDueToday" class="value">0</div></div>
+          <div class="od-card od-30plus">
+            <div class="d-flex align-items-center gap-2 mb-1"><i class="bi bi-clock-history text-primary"></i><span class="fw-semibold">30+ Days Late</span></div>
+            <div class="value" id="statLateC">0</div>
           </div>
         </div>
       </section>
 
       <!-- Filters -->
-      <section class="card p-3 mb-3">
+      <section class="filter-bar mb-3">
         <div class="row g-2 align-items-end">
-          <div class="col-6 col-md-3">
-            <label class="form-label">Status</label>
-            <select id="filterStatus" class="form-select">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Days Late</label>
+            <select id="filterLate" class="form-select">
               <option value="">All</option>
-              <option value="borrowed">Borrowed</option>
-              <option value="overdue">Overdue</option>
-              <option value="returned">Returned</option>
+              <option value="1-7">1–7 days late</option>
+              <option value="8-30">8–30 days late</option>
+              <option value="over30">Over 30 days late</option>
             </select>
           </div>
-          <div class="col-6 col-md-3">
-            <label class="form-label">Date</label>
-            <select id="filterDate" class="form-select">
+          <div class="col-12 col-md-4">
+            <label class="form-label">Due Date</label>
+            <select id="filterDue" class="form-select">
               <option value="">Any</option>
-              <option value="today">Today</option>
-              <option value="thisweek">This Week</option>
-              <option value="thismonth">This Month</option>
+              <option value="thisweek">Due this week</option>
+              <option value="lastweek">Due last week</option>
+              <option value="last30">Due last 30 days</option>
             </select>
-          </div>
-          <div class="col-12 col-md-6 text-md-end">
-            <div class="btn-group">
-              <button id="btnExport" class="btn btn-outline-secondary"><i class="bi bi-download me-2"></i>Export CSV</button>
-              <button id="btnMarkReturned" class="btn btn-outline-success"><i class="bi bi-box-arrow-in-left me-1"></i>Return</button>
-              <button id="btnDelete" class="btn btn-outline-danger">Delete</button>
-            </div>
           </div>
         </div>
       </section>
 
-      <!-- Transactions table -->
+      <!-- Overdue Table -->
       <section class="card p-0">
         <div class="table-responsive">
-          <table class="table align-middle mb-0">
+          <table class="table table-overdue align-middle mb-0">
             <thead>
               <tr>
                 <th style="width:38px"><input class="form-check-input" type="checkbox" id="checkAll"></th>
                 <th>Member</th>
                 <th>Book</th>
-                <th class="d-none d-lg-table-cell">ISBN</th>
-                <th>Borrowed</th>
-                <th>Due</th>
-                <th>Returned</th>
+                <th>Borrowed On</th>
+                <th>Due Date</th>
+                <th>Days Late</th>
                 <th>Status</th>
-                <th class="text-end" style="width:140px">Actions</th>
+                <th class="text-end" style="width:160px">Actions</th>
               </tr>
             </thead>
-            <tbody id="txBody"><!-- JS --></tbody>
+            <tbody id="loanBody"><!-- JS --></tbody>
           </table>
         </div>
 
@@ -130,401 +166,252 @@
           <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
         </div>
 
-        <div id="emptyState" class="empty d-none">
-          <i class="bi bi-journal-arrow-up fs-2 d-block mb-2"></i>
-          No transactions found.
+        <div id="emptyState" class="empty-box d-none">
+          <h6><i class="bi bi-check-circle me-2"></i>All clear!</h6>
+          <p>No overdue loans. All books are returned on time. 🎉</p>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- Borrow Modal -->
-  <div class="modal fade" id="borrowModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <form id="borrowForm" class="modal-content" novalidate>
-        <div class="modal-header">
-          <h5 class="modal-title">Record Borrow</h5>
-          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <div class="row g-3">
-            <div class="col-12 col-md-6">
-              <label class="form-label">Member</label>
-              <input id="bMember" type="text" class="form-control" placeholder="Juan Dela Cruz (2025-12345)" required>
-              <div class="invalid-feedback">Member is required.</div>
-            </div>
-            <div class="col-12 col-md-6">
-              <label class="form-label">Book (Title – ISBN)</label>
-              <input id="bBook" type="text" class="form-control" placeholder="Clean Code — 978-0132350884" required>
-              <div class="invalid-feedback">Book is required.</div>
-            </div>
-            <div class="col-6 col-md-4">
-              <label class="form-label">Borrowed Date</label>
-              <input id="bBorrowed" type="date" class="form-control" required>
-            </div>
-            <div class="col-6 col-md-4">
-              <label class="form-label">Due Date</label>
-              <input id="bDue" type="date" class="form-control" required>
-            </div>
-            <div class="col-12 col-md-4">
-              <label class="form-label">Notes</label>
-              <input id="bNotes" type="text" class="form-control" placeholder="Optional…">
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
-          <button id="btnSaveBorrow" class="btn btn-primary" type="submit">Save</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Return Modal -->
+  <!-- Return Book Confirmation Modal -->
   <div class="modal fade" id="returnModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-md modal-dialog-centered">
-      <form id="returnForm" class="modal-content" novalidate>
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Record Return</h5>
-          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title">Confirm Return</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <p class="small text-muted mb-2">Confirm the return date for the selected transaction.</p>
-          <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label">Return Date</label>
-              <input id="rReturned" type="date" class="form-control" required>
-            </div>
-            <div class="col-12">
-              <label class="form-label">Condition / Notes</label>
-              <input id="rNotes" type="text" class="form-control" placeholder="Good condition, etc.">
-            </div>
-            <input id="rTxId" type="hidden">
-          </div>
+          <p id="returnModalMessage">Are you sure you want to mark this loan as returned?</p>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-light" type="button" data-bs-dismiss="modal">Cancel</button>
-          <button id="btnSaveReturn" class="btn btn-success" type="submit">Mark as Returned</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- View Details Modal (Field / Details) -->
-  <div class="modal fade" id="viewTxModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content txview">
-        <div class="modal-header border-0 pb-0">
-          <h5 class="modal-title">Transaction Details</h5>
-          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body pt-0">
-          <div class="tv-head">
-            <div class="tv-icon"><i class="bi bi-journal-bookmark"></i></div>
-            <div class="tv-id">
-              <div class="tv-title" id="vtBook">—</div>
-              <div class="tv-sub small text-muted" id="vtMember">—</div>
-              <div class="tv-chips">
-                <span id="vtStatus" class="chip chip-status">Borrowed</span>
-                <span id="vtIsbn" class="chip chip-neutral">ISBN —</span>
-              </div>
-            </div>
-            <div class="tv-actions">
-              <button class="btn btn-outline-success btn-sm" id="vtReturnBtn"><i class="bi bi-box-arrow-in-left me-1"></i>Return</button>
-            </div>
-          </div>
-
-          <div class="tv-sheet">
-            <div class="tv-row tv-headrow">
-              <div class="tv-col tv-field"><i class="bi bi-info-circle me-2"></i> Field</div>
-              <div class="tv-col tv-value"><i class="bi bi-clipboard-check me-2"></i> Details</div>
-            </div>
-
-            <div class="tv-row"><div class="tv-col tv-field"><i class="bi bi-calendar-plus"></i> Borrowed</div><div class="tv-col tv-value" id="vfBorrowed">—</div></div>
-            <div class="tv-row"><div class="tv-col tv-field"><i class="bi bi-hourglass-split"></i> Due</div><div class="tv-col tv-value" id="vfDue">—</div></div>
-            <div class="tv-row"><div class="tv-col tv-field"><i class="bi bi-calendar-check"></i> Returned</div><div class="tv-col tv-value" id="vfReturned">—</div></div>
-            <div class="tv-row"><div class="tv-col tv-field"><i class="bi bi-bookmark"></i> Notes</div><div class="tv-col tv-value" id="vfNotes">—</div></div>
-          </div>
-        </div>
-        <div class="modal-footer border-0 pt-0">
-          <button class="btn btn-light" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" id="btnConfirmReturn">Mark as Returned</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Scripts -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script>
-    // Sidebar + highlight
-    renderSidebar('borrowreturn');
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
-
-    // ===== Demo Data (hook to PHP later) =====
-    // books referenced by title/isbn to make UI realistic
-    const books = [
-      {isbn:"978-0132350884", title:"Clean Code"},
-      {isbn:"978-0135957059", title:"The Pragmatic Programmer"},
-      {isbn:"978-1408855652", title:"Harry Potter and the Philosopher's Stone"}
-    ];
-    const members = [
-      {studNo:"2025-12345", name:"Juan Dela Cruz"},
-      {studNo:"2025-10322", name:"Ana Santos"},
-      {studNo:"2024-88231", name:"Mark Reyes"}
-    ];
-    let AUTOINC = 5;
-    // transaction model: {id, memberName, memberNo, bookTitle, isbn, borrowedAt, dueAt, returnedAt?, notes}
-    let tx = [
-      {id:1, memberName:"Juan Dela Cruz", memberNo:"2025-12345", bookTitle:"Clean Code", isbn:"978-0132350884", borrowedAt:"2025-09-08", dueAt:"2025-09-15", notes:""},
-      {id:2, memberName:"Ana Santos", memberNo:"2025-10322", bookTitle:"The Pragmatic Programmer", isbn:"978-0135957059", borrowedAt:"2025-09-10", dueAt:"2025-09-17", returnedAt:"2025-09-12", notes:""},
-      {id:3, memberName:"Mark Reyes", memberNo:"2024-88231", bookTitle:"Harry Potter and the Philosopher's Stone", isbn:"978-1408855652", borrowedAt:"2025-09-01", dueAt:"2025-09-05", notes:"Follow up email sent"}
-    ];
-
-    // ===== Elements =====
-    const txBody = document.getElementById('txBody');
-    const empty = document.getElementById('emptyState');
-    const search = document.getElementById('txSearch');
-    const fStatus = document.getElementById('filterStatus');
-    const fDate = document.getElementById('filterDate');
-    const checkAll = document.getElementById('checkAll');
-    const pageInfo = document.getElementById('pageInfo');
-    const pager = document.getElementById('pager');
-
-    const statActive = document.getElementById('statActive');
-    const statOverdue = document.getElementById('statOverdue');
-    const statReturnedToday = document.getElementById('statReturnedToday');
-    const statDueToday = document.getElementById('statDueToday');
-
-    // modals
-    const borrowModal = new bootstrap.Modal('#borrowModal');
-    const returnModal = new bootstrap.Modal('#returnModal');
-    const viewTxModal = new bootstrap.Modal('#viewTxModal');
-
-    // forms
-    const borrowForm = document.getElementById('borrowForm');
-    const bMember = document.getElementById('bMember');
-    const bBook = document.getElementById('bBook');
-    const bBorrowed = document.getElementById('bBorrowed');
-    const bDue = document.getElementById('bDue');
-    const bNotes = document.getElementById('bNotes');
-
-    const returnForm = document.getElementById('returnForm');
-    const rReturned = document.getElementById('rReturned');
-    const rNotes = document.getElementById('rNotes');
-    const rTxId = document.getElementById('rTxId');
-
-    // view refs
-    const vtBook = document.getElementById('vtBook');
-    const vtMember = document.getElementById('vtMember');
-    const vtStatus = document.getElementById('vtStatus');
-    const vtIsbn = document.getElementById('vtIsbn');
-    const vtReturnBtn = document.getElementById('vtReturnBtn');
-    const vfBorrowed = document.getElementById('vfBorrowed');
-    const vfDue = document.getElementById('vfDue');
-    const vfReturned = document.getElementById('vfReturned');
-    const vfNotes = document.getElementById('vfNotes');
-
-    // ===== Helpers =====
-    const pageSize = 10;
+    let allLoans = [];
     let currentPage = 1;
+    const pageSize = 20;
 
+    const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    const daysBetween = (from, to) => Math.max(0, Math.floor((new Date(to) - new Date(from)) / (1000*60*60*24)));
     const todayStr = () => new Date().toISOString().slice(0,10);
-    function isOverdue(rec){ return !rec.returnedAt && rec.dueAt < todayStr(); }
-    function statusOf(rec){
-      if(rec.returnedAt) return 'returned';
-      if(isOverdue(rec)) return 'overdue';
-      return 'borrowed';
+
+    (async () => {
+      const res = await fetch('/api/check-auth', {credentials:'include'});
+      if (!res.ok) { location.href = 'login.html'; return; }
+      const data = await res.json().catch(()=>null);
+      const role = (data?.user?.role || '').toLowerCase();
+      if (role !== 'librarian' && role !== 'admin') { location.href = 'dashboard.html'; return; }
+
+      renderSidebar('overdue', role);
+      document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+
+      // Events
+      document.getElementById('loanSearch').addEventListener('input', ()=>{ currentPage=1; render(); });
+      document.getElementById('filterLate').addEventListener('change', ()=>{ currentPage=1; render(); });
+      document.getElementById('filterDue').addEventListener('change', ()=>{ currentPage=1; render(); });
+      document.getElementById('checkAll').addEventListener('change', (e)=>{
+        document.querySelectorAll('.row-check').forEach(cb => cb.checked = e.target.checked);
+      });
+      document.getElementById('btnExport').addEventListener('click', exportCsv);
+      document.getElementById('btnBulkEmail').addEventListener('click', sendBulkEmails);
+
+      await loadLoans();
+    })();
+
+    async function loadLoans(){
+      const url = `/api/loans?active_only=1&overdue_only=1&page=1&pagesize=1000`;
+      const res = await fetch(url, {credentials:'include'});
+      const data = await res.json().catch(()=>({ok:false}));
+      if (!data.ok) { alert('Failed to load overdue loans'); return; }
+      allLoans = (data.items||[]).map(l => ({
+        ...l,
+        days_late: l.due_at ? daysBetween(l.due_at, todayStr()) : 0
+      }));
+      updateCards();
+      render();
     }
-    function inDateRange(rec, filter){
-      const d = rec.borrowedAt;
-      const now = new Date();
-      const weekStart = new Date(now); weekStart.setDate(now.getDate()-now.getDay());
-      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      if(filter==='today') return d === todayStr();
-      if(filter==='thisweek') return new Date(d) >= weekStart;
-      if(filter==='thismonth') return new Date(d) >= monthStart;
-      return true;
+
+    function updateCards(){
+      const total = allLoans.length;
+      const a = allLoans.filter(l => l.days_late >=1 && l.days_late <=7).length;
+      const b = allLoans.filter(l => l.days_late >=8 && l.days_late <=30).length;
+      const c = allLoans.filter(l => l.days_late > 30).length;
+      document.getElementById('statOverdue').textContent = total;
+      document.getElementById('statLateA').textContent = a;
+      document.getElementById('statLateB').textContent = b;
+      document.getElementById('statLateC').textContent = c;
     }
 
     function applyFilters(){
-      const q = (search.value||"").toLowerCase().trim();
-      const st = fStatus.value;
-      const dr = fDate.value;
+      const q = (document.getElementById('loanSearch').value||'').toLowerCase().trim();
+      const fLate = document.getElementById('filterLate').value;
+      const fDue = document.getElementById('filterDue').value;
 
-      return tx.filter(t=>{
-        const hit = (t.memberName+" "+t.memberNo+" "+t.bookTitle+" "+t.isbn).toLowerCase().includes(q);
-        const stOk = st ? statusOf(t)===st : true;
-        const drOk = inDateRange(t, dr);
-        return hit && stOk && drOk;
+      return allLoans.filter(l => {
+        const hit = (`${l.student_name} ${l.student_no||''} ${l.book_title} ${l.isbn||''}`).toLowerCase().includes(q);
+        let lateOk = true;
+        if (fLate === '1-7') lateOk = l.days_late >=1 && l.days_late <=7;
+        else if (fLate === '8-30') lateOk = l.days_late >=8 && l.days_late <=30;
+        else if (fLate === 'over30') lateOk = l.days_late > 30;
+
+        let dueOk = true;
+        if (fDue) {
+          const due = l.due_at ? new Date(l.due_at) : null;
+          if (!due) dueOk = false;
+          else {
+            const now = new Date();
+            const startOfWeek = new Date(now); startOfWeek.setDate(now.getDate()-now.getDay());
+            const endOfWeek = new Date(startOfWeek); endOfWeek.setDate(startOfWeek.getDate()+6);
+            if (fDue === 'thisweek') dueOk = due >= startOfWeek && due <= endOfWeek;
+            else if (fDue === 'lastweek') {
+              const ls = new Date(startOfWeek); ls.setDate(ls.getDate()-7);
+              const le = new Date(endOfWeek); le.setDate(le.getDate()-7);
+              dueOk = due >= ls && due <= le;
+            } else if (fDue === 'last30') {
+              const last30 = new Date(now); last30.setDate(last30.getDate()-30);
+              dueOk = due >= last30 && due <= now;
+            }
+          }
+        }
+        return hit && lateOk && dueOk;
       });
     }
 
     function render(){
       const list = applyFilters();
+      const tbody = document.getElementById('loanBody');
+      const empty = document.getElementById('emptyState');
+      const pageInfo = document.getElementById('pageInfo');
+      const pager = document.getElementById('pager');
 
-      // stats
-      const active = list.filter(r=>statusOf(r)==='borrowed').length;
-      const overdue = list.filter(r=>statusOf(r)==='overdue').length;
-      const returnedToday = list.filter(r=>r.returnedAt===todayStr()).length;
-      const dueToday = list.filter(r=>!r.returnedAt && r.dueAt===todayStr()).length;
-      statActive.textContent = active;
-      statOverdue.textContent = overdue;
-      statReturnedToday.textContent = returnedToday;
-      statDueToday.textContent = dueToday;
+      if (!list.length){
+        tbody.innerHTML='';
+        empty.classList.remove('d-none');
+        pageInfo.textContent = 'Showing 0 of 0';
+        pager.innerHTML = '';
+        return;
+      }
+      empty.classList.add('d-none');
 
-      // paging
       const total = list.length;
       const pages = Math.max(1, Math.ceil(total/pageSize));
-      if(currentPage>pages) currentPage = pages;
+      if (currentPage > pages) currentPage = pages;
       const start = (currentPage-1)*pageSize;
-      const end = Math.min(start+pageSize,total);
-      const slice = list.slice(start,end);
+      const end = Math.min(start+pageSize, total);
+      const slice = list.slice(start, end);
 
-      empty.classList.toggle('d-none', !!slice.length);
-      txBody.innerHTML = slice.map(rowHtml).join('');
+      tbody.innerHTML = slice.map(rowHtml).join('');
       pageInfo.textContent = `Showing ${total? start+1:0}–${end} of ${total}`;
 
       pager.innerHTML = '';
-      const addItem=(label, page, disabled=false, active=false)=>{
-        const li = document.createElement('li');
-        li.className = `page-item ${disabled?'disabled':''} ${active?'active':''}`;
-        li.innerHTML = `<a class="page-link" href="#">${label}</a>`;
-        li.onclick = (e)=>{e.preventDefault(); if(!disabled){ currentPage=page; render(); }};
+      const addP = (lbl,p,dis=false,act=false)=>{
+        const li=document.createElement('li');
+        li.className=`page-item ${dis?'disabled':''} ${act?'active':''}`;
+        li.innerHTML=`<a class="page-link" href="#">${lbl}</a>`;
+        li.onclick=(e)=>{e.preventDefault(); if(!dis){currentPage=p; render();}};
         pager.appendChild(li);
       };
-      addItem('«',1,currentPage===1); addItem('‹',Math.max(1,currentPage-1),currentPage===1);
-      for(let p=1;p<=pages;p++) addItem(p,p,false,p===currentPage);
-      addItem('›',Math.min(pages,currentPage+1),currentPage===pages); addItem('»',pages,currentPage===pages);
-
-      checkAll.checked = false;
+      addP('«',1,currentPage===1);
+      addP('‹',Math.max(1,currentPage-1),currentPage===1);
+      for(let p=1;p<=pages;p++) addP(p,p,false,p===currentPage);
+      addP('›',Math.min(pages,currentPage+1),currentPage===pages);
+      addP('»',pages,currentPage===pages);
     }
 
-    function rowHtml(r){
-      const st = statusOf(r);
-      const badge = st==='returned'
-        ? `<span class="badge text-bg-success-soft">Returned</span>`
-        : st==='overdue'
-          ? `<span class="badge text-bg-danger-soft">Overdue</span>`
-          : `<span class="badge text-bg-primary-soft">Borrowed</span>`;
+    function rowHtml(l){
+      const borrowed = l.borrowed_at ? new Date(l.borrowed_at).toLocaleDateString() : '—';
+      const due = l.due_at ? new Date(l.due_at).toLocaleDateString() : '—';
+      let sevClass = 'pill-late-a';
+      if (l.days_late >=1 && l.days_late <=7) sevClass = 'pill-late-a';
+      else if (l.days_late >=8 && l.days_late <=30) sevClass = 'pill-late-b';
+      else if (l.days_late > 30) sevClass = 'pill-late-c';
       return `
-      <tr>
-        <td><input class="form-check-input row-check" type="checkbox" value="${r.id}"></td>
-        <td><div class="fw-medium">${escape(r.memberName)}</div><div class="small text-muted">${escape(r.memberNo)}</div></td>
-        <td>${escape(r.bookTitle)}</td>
-        <td class="d-none d-lg-table-cell">${escape(r.isbn)}</td>
-        <td>${r.borrowedAt}</td>
-        <td>${r.dueAt}</td>
-        <td>${r.returnedAt || '—'}</td>
-        <td>${badge}</td>
-        <td class="text-end">
-          <div class="btn-group btn-group-sm">
-            <button class="btn btn-outline-secondary" title="View" onclick="viewTx(${r.id})"><i class="bi bi-eye"></i></button>
-            ${st!=='returned' ? `<button class="btn btn-outline-success" title="Return" onclick="openReturn(${r.id})"><i class="bi bi-box-arrow-in-left"></i></button>`:''}
-            <button class="btn btn-outline-danger" title="Delete" onclick="deleteTx(${r.id})"><i class="bi bi-trash3"></i></button>
-          </div>
-        </td>
-      </tr>`;
+        <tr>
+          <td><input class="form-check-input row-check" type="checkbox" value="${l.loan_id}"></td>
+          <td>
+            <div class="fw-semibold">${esc(l.student_name)}</div>
+            <div class="small text-muted">${esc(l.student_no || '—')}</div>
+          </td>
+          <td>
+            <div class="fw-semibold">${esc(l.book_title)}</div>
+            <div class="small text-muted">${esc(l.isbn || '—')}</div>
+          </td>
+          <td>${borrowed}</td>
+          <td>${due}</td>
+          <td><span class="pill ${sevClass}">${l.days_late}</span></td>
+          <td><span class="badge text-bg-secondary-soft">Overdue</span></td>
+          <td class="text-end">
+            <div class="d-inline-flex gap-1">
+              <button class="btn btn-outline-primary btn-sm" title="View" onclick="viewLoan(${l.loan_id})"><i class="bi bi-eye"></i></button>
+              <button class="btn btn-outline-success btn-sm" title="Return" onclick="markReturned(${l.loan_id})"><i class="bi bi-box-arrow-in-left"></i></button>
+              <button class="btn btn-outline-secondary btn-sm" title="Email Reminder" onclick="sendReminder(${l.loan_id})"><i class="bi bi-envelope"></i></button>
+            </div>
+          </td>
+        </tr>
+      `;
     }
-    const escape = s => String(s??'').replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
 
-    // ===== Events =====
-    search.addEventListener('input', ()=>{ currentPage=1; render(); });
-    fStatus.addEventListener('change', ()=>{ currentPage=1; render(); });
-    fDate.addEventListener('change', ()=>{ currentPage=1; render(); });
-    checkAll.addEventListener('change', ()=>{ document.querySelectorAll('.row-check').forEach(cb=>cb.checked=checkAll.checked); });
+    function exportCsv(){
+      const rows = applyFilters().map(l => [
+        l.loan_id, l.student_name, l.student_no||'', l.book_title, l.isbn||'',
+        l.borrowed_at||'', l.due_at||'', l.days_late
+      ]);
+      const csv = ["loan_id,member,studentNo,book,isbn,borrowed,due,days_late", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download='overdue.csv'; a.click(); URL.revokeObjectURL(a.href);
+    }
 
-    document.getElementById('btnMarkReturned').onclick = ()=>{
-      const ids = selectedIds(); if(!ids.length) return alert('Select transactions first.');
-      const first = tx.find(t=>ids.includes(t.id) && !t.returnedAt);
-      if(!first) return alert('Selected transactions are already returned.');
-      // open modal prefilled with today for the first one
-      rTxId.value = first.id; rReturned.value = todayStr(); rNotes.value="";
-      returnModal.show();
-    };
-    document.getElementById('btnDelete').onclick = ()=>{
-      const ids = selectedIds(); if(!ids.length) return alert('Select transactions first.');
-      if(!confirm('Delete selected transactions?')) return;
-      tx = tx.filter(t=>!ids.includes(t.id)); render();
-    };
-    document.getElementById('btnExport').onclick = ()=>{
-      const rows = applyFilters().map(r=>[r.id,r.memberName,r.memberNo,r.bookTitle,r.isbn,r.borrowedAt,r.dueAt,r.returnedAt||"",statusOf(r),r.notes||""]);
-      const csv = ["id,member,studentNo,book,isbn,borrowed,due,returned,status,notes", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-      a.download = "transactions.csv"; a.click(); URL.revokeObjectURL(a.href);
-    };
-
-    // Borrow form
-    document.getElementById('borrowModal').addEventListener('shown.bs.modal', ()=>{
-      // defaults
-      bBorrowed.value = todayStr();
-      const d = new Date(); d.setDate(d.getDate()+7); bDue.value = d.toISOString().slice(0,10);
-    });
-    borrowForm.addEventListener('submit', (e)=>{
-      e.preventDefault(); borrowForm.classList.add('was-validated'); if(!borrowForm.checkValidity()) return;
-      // very light parsing: "Name (StudNo)"
-      const memRaw = bMember.value.trim();
-      const match = memRaw.match(/(.+)\s+\((.+)\)$/);
-      const memberName = match ? match[1] : memRaw;
-      const memberNo = match ? match[2] : "";
-      // "Title — ISBN"
-      const bookRaw = bBook.value.trim();
-      const parts = bookRaw.split("—");
-      const bookTitle = parts[0].trim();
-      const isbn = (parts[1]||"").trim();
-
-      const rec = {
-        id: AUTOINC++,
-        memberName, memberNo,
-        bookTitle, isbn,
-        borrowedAt: bBorrowed.value,
-        dueAt: bDue.value,
-        notes: bNotes.value.trim()
+    async function markReturned(loanId){
+      const loan = allLoans.find(l => l.loan_id == loanId);
+      if (!loan) return;
+      
+      // Show confirmation modal
+      const bookTitle = loan.book_title || 'this book';
+      document.getElementById('returnModalMessage').textContent = `Mark "${esc(bookTitle)}" as returned?`;
+      const modal = new bootstrap.Modal('#returnModal');
+      modal.show();
+      
+      // Set up confirm button handler
+      document.getElementById('btnConfirmReturn').onclick = async function() {
+        const fd = new FormData(); 
+        fd.set('loan_id', String(loanId));
+        const res = await fetch('/api/loans/return', {method:'POST', body:fd, credentials:'include'});
+        const data = await res.json().catch(()=>({ok:false}));
+        modal.hide();
+        if (data.ok){ 
+          await loadLoans(); 
+        } else {
+          alert(data.error || 'Failed to mark returned');
+        }
       };
-      tx.unshift(rec);
-      borrowModal.hide(); borrowForm.reset(); borrowForm.classList.remove('was-validated'); currentPage=1; render();
-    });
+    }
 
-    // Return form
-    returnForm.addEventListener('submit', (e)=>{
-      e.preventDefault(); returnForm.classList.add('was-validated'); if(!returnForm.checkValidity()) return;
-      const id = Number(rTxId.value);
-      tx = tx.map(t => t.id===id ? {...t, returnedAt:rReturned.value, notes: (t.notes? t.notes+" | ":"") + (rNotes.value.trim()||"")} : t);
-      returnModal.hide(); returnForm.reset(); returnForm.classList.remove('was-validated'); render();
-    });
+    function sendReminder(loanId){
+      alert('Email reminder queued for loan #' + loanId + '. (Hook up backend send-mail when ready)');
+    }
+    function sendBulkEmails(){
+      const ids = []; document.querySelectorAll('.row-check:checked').forEach(cb => ids.push(Number(cb.value)));
+      if (!ids.length){ alert('Select at least one overdue loan.'); return; }
+      alert(`Email reminders queued for ${ids.length} loan(s). (Hook up backend send-mail when ready)`);
+    }
 
-    // View & Return helpers
-    window.viewTx = function(id){
-      const t = tx.find(x=>x.id===id); if(!t) return;
-      vtBook.textContent = t.bookTitle;
-      vtMember.textContent = `${t.memberName} • ${t.memberNo||"—"}`;
-      vtIsbn.textContent = `ISBN ${t.isbn||"—"}`;
-      const st = statusOf(t);
-      vtStatus.textContent = st.charAt(0).toUpperCase()+st.slice(1);
-      vtStatus.className = 'chip chip-status ' + (st==='overdue'?'danger': st==='returned'?'success':'');
-      vfBorrowed.textContent = t.borrowedAt;
-      vfDue.textContent = t.dueAt;
-      vfReturned.textContent = t.returnedAt || '—';
-      vfNotes.textContent = t.notes || '—';
-      if(st==='returned'){ vtReturnBtn.classList.add('d-none'); }
-      else { vtReturnBtn.classList.remove('d-none'); vtReturnBtn.onclick = ()=>{ openReturn(id); viewTxModal.hide(); }; }
-      viewTxModal.show();
-    };
-    window.openReturn = function(id){
-      const t = tx.find(x=>x.id===id); if(!t) return;
-      rTxId.value = t.id; rReturned.value = todayStr(); rNotes.value="";
-      returnModal.show();
-    };
-    window.deleteTx = function(id){
-      if(!confirm('Delete this transaction?')) return;
-      tx = tx.filter(t=>t.id!==id); render();
-    };
+    function viewLoan(id){
+      const l = allLoans.find(x=>x.loan_id==id); if(!l) return;
+      alert(`${l.book_title}\nMember: ${l.student_name}\nBorrowed: ${l.borrowed_at||'—'}\nDue: ${l.due_at||'—'}\nDays late: ${l.days_late}`);
+    }
 
-    function selectedIds(){ const ids=[]; document.querySelectorAll('.row-check:checked').forEach(cb=>ids.push(Number(cb.value))); return ids; }
-
-    // Init
-    render();
+    window.viewLoan = viewLoan;
+    window.markReturned = markReturned;
+    window.sendReminder = sendReminder;
+    window.sendBulkEmails = sendBulkEmails;
   </script>
 </body>
 </html>

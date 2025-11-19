@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -14,22 +14,1060 @@
   <link href="assets/css/sidebar.css" rel="stylesheet">
   <link href="assets/css/librarian-add-book.css" rel="stylesheet">
   <link href="assets/css/books.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
 
-  <script src="assets/js/sidebar.js?v=2025-10-29-1"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
 
   <!-- Small inline overrides -->
   <style>
-    .cover-drop{
-      width:100%;
-      border:2px dashed #dfe5ef;border-radius:16px;
-      padding:16px;min-height:220px;cursor:pointer;transition:.2s;
-      display:flex;align-items:center;justify-content:center;background:#fff;
+    :root{
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --card-border:#e5e7eb;
+      --table-header-bg:#f8f9fa;
     }
-    .cover-drop:hover{ background:#f7f9fc }
-    .cover-drop.ring{ outline:2px solid var(--bs-primary); outline-offset:2px; }
-    .cover-drop.compact{ min-height:auto; padding:12px; display:inline-flex; width:auto; max-width:100% }
-    #coverPreview{ max-width:100%; height:auto; max-height:300px; object-fit:contain; border-radius:12px; background:#f3f4f6 }
+    
+    /* Consistent Header Design */
+    .admin-header-gold {
+      background: #fff !important;
+      color: var(--text-primary) !important;
+      border-bottom:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      padding:12px 0;
+    }
+    .admin-header-gold .fw-bold,
+    .admin-header-gold .h5,
+    .admin-header-gold #pageTitle {
+      color: var(--text-primary) !important;
+      font-weight:700;
+      font-size:1.25rem;
+      letter-spacing:0.01em;
+    }
+    
+    /* Consistent Search Bar Design */
+    .search-bar-custom {
+      height: 42px;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+    }
+    .search-bar-custom .input-group-text {
+      border-top-left-radius: var(--border-radius-sm);
+      border-bottom-left-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-right: none !important;
+      color:var(--text-secondary);
+    }
+    .search-bar-custom .form-control {
+      border-top-right-radius: var(--border-radius-sm);
+      border-bottom-right-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-left: none !important;
+      color: var(--text-primary);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15);
+      border-radius: var(--border-radius-sm);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      border-color: var(--brand-gold);
+      background: #fff !important;
+    }
+    .search-bar-custom:focus-within .form-control {
+      border-color: var(--brand-gold);
+      background: #fff !important;
+    }
+    
+    /* Main content search bar - Match other pages */
+    .search-bar-custom {
+      height: 42px;
+      border-radius: var(--border-radius-sm);
+      overflow: hidden;
+    }
+    .search-bar-custom .input-group-text {
+      height: 42px;
+      padding: 10px 16px;
+      font-size: 0.875rem;
+      border-top-left-radius: var(--border-radius-sm) !important;
+      border-bottom-left-radius: var(--border-radius-sm) !important;
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-right: none !important;
+      color: var(--text-secondary);
+    }
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size: 0.875rem;
+      border-top-right-radius: var(--border-radius-sm) !important;
+      border-bottom-right-radius: var(--border-radius-sm) !important;
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-left: none !important;
+      color: var(--text-primary);
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .search-bar-custom .form-control:focus {
+      outline: none !important;
+      box-shadow: none !important;
+      border-color: var(--brand-gold) !important;
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15) !important;
+      border-radius: var(--border-radius-sm);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      border-color: var(--brand-gold) !important;
+      background: #fff !important;
+      color: var(--text-primary) !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .search-bar-custom:focus-within .form-control {
+      border-color: var(--brand-gold) !important;
+      background: #fff !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    
+    /* Notification button styling */
+    .notification-btn{
+      color:var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .notification-btn:hover{
+      color:var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    .notification-badge{
+      font-size:0.6875rem;
+      padding:3px 7px;
+      font-weight:600;
+      background:var(--brand-gold) !important;
+      color:#fff !important;
+    }
+    .admin-btn-custom {
+      padding:0 !important;
+      width:44px !important;
+      height:44px !important;
+      border-radius:var(--border-radius-sm) !important;
+      border:1px solid var(--card-border) !important;
+      background:#fff !important;
+      display:flex !important;
+      align-items:center !important;
+      justify-content:center !important;
+    }
+    .admin-btn-custom:hover {
+      background:#f8f9fa !important;
+    }
+    .admin-btn-custom:focus,
+    .admin-btn-custom:active,
+    .admin-btn-custom.show {
+      background: var(--brand-gold) !important;
+      border-color: var(--brand-gold) !important;
+      color: #fff !important;
+      box-shadow: 0 0 0 0.2rem rgba(166, 134, 4, 0.25) !important;
+    }
+    .avatar-32 {
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+    
+    /* Gold Star Ratings */
+    .stars .bi-star-fill,
+    .stars .bi-star-half{
+      color:#a68604 !important;
+    }
+    .stars .bi-star{
+      color:#d3d3d3 !important;
+    }
+    
+    /* Tabs - Black with white text */
+    .tabs-container {
+      padding: 0 0 20px 0;
+    }
+    .nav-pills .nav-link {
+      border-radius: var(--border-radius-sm);
+      padding: 10px 20px;
+      font-weight: 600;
+      color: #fff !important;
+      transition: all 0.2s ease;
+      border: none;
+      background: #111 !important;
+      margin-right: 8px;
+    }
+    .nav-pills .nav-link:hover {
+      color: #fff !important;
+      background-color: #333 !important;
+    }
+    .nav-pills .nav-link.active {
+      background-color: #111 !important;
+      color: #fff !important;
+      border: none;
+    }
+    
+    /* Add Book Form Styling - Modern Design */
+    .add-edit-section {
+      padding: 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+      background: transparent;
+      min-height: 100vh;
+    }
+    .add-edit-section .page-header {
+      margin-bottom: 40px;
+      padding: 0;
+    }
+    .add-edit-section #pageHeaderTitle {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+    
+    /* Form Card Container - Extended Panel */
+    .add-edit-section form {
+      background: #fff;
+      border-radius: 20px;
+      border: 1px solid rgba(229, 231, 235, 0.8);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04);
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .add-edit-section form::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--brand-gold) 0%, #d4af37 100%);
+    }
+    
+    /* Cover Card - Modern Design */
+    .cover-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+      border: 1px solid rgba(229, 231, 235, 0.6);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+      height: fit-content;
+      position: sticky;
+      top: 32px;
+      transition: all 0.3s ease;
+    }
+    .cover-card:hover {
+      box-shadow: 0 12px 32px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06);
+      transform: translateY(-2px);
+    }
+    .cover-card .section-header {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #fff;
+      margin-bottom: 24px;
+      padding: 10px 18px;
+      background: #111;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+    }
+    .cover-card .section-header i {
+      color: #fff;
+      font-size: 0.875rem;
+      margin-right: 10px;
+    }
+    .cover-drop-area {
+      width: 100%;
+      min-height: 320px;
+      aspect-ratio: 3/4;
+      border: 2.5px dashed rgba(166, 134, 4, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 50%, #f0f4f8 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .cover-drop-area::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(166, 134, 4, 0.08) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .cover-drop-area:hover {
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #e8f0f4 100%);
+      border-color: var(--brand-gold);
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 12px 32px rgba(166, 134, 4, 0.2), 0 4px 16px rgba(166, 134, 4, 0.1);
+    }
+    .cover-drop-area:hover::before {
+      opacity: 1;
+    }
+    .cover-drop-area:focus {
+      outline: 4px solid rgba(166, 134, 4, 0.2);
+      border-color: var(--brand-gold);
+      box-shadow: 0 0 0 4px rgba(166, 134, 4, 0.15);
+    }
+    .cover-drop-area .drop-hint i {
+      font-size: 3rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      opacity: 0.6;
+    }
+    .cover-drop-area .drop-hint .fw-medium {
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .cover-drop-area .drop-hint small {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+    .cover-preview {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: var(--border-radius);
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: block;
+      margin: 0 auto;
+    }
+    .drop-hint {
+      color: var(--text-secondary);
+      z-index: 1;
+      position: relative;
+    }
+    .cover-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .cover-actions .btn {
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 10px 20px;
+      flex: 1;
+      transition: all 0.2s ease;
+    }
+    .cover-actions .btn-outline-secondary {
+      background: #f3f4f6;
+      border-color: #e5e7eb;
+      color: var(--text-secondary);
+    }
+    .cover-actions .btn-outline-secondary:hover {
+      background: #e5e7eb;
+      border-color: #d1d5db;
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+    
+    /* Back to Books button styling - Match Back to Discover */
+    .back-button {
+      background: #f3f4f6 !important;
+      border: 1px solid #e5e7eb !important;
+      color: var(--text-secondary) !important;
+      font-weight: 600 !important;
+      padding: 10px 20px !important;
+      border-radius: var(--border-radius-sm) !important;
+      transition: all 0.2s ease !important;
+    }
+    .back-button:hover {
+      background: #e5e7eb !important;
+      border-color: #d1d5db !important;
+      color: var(--text-primary) !important;
+    }
+    .back-button:active {
+      background: #d1d5db !important;
+    }
+    .cover-actions .btn-outline-danger {
+      background: #dc3545;
+      border-color: #dc3545;
+      color: #fff;
+    }
+    .cover-actions .btn-outline-danger:hover {
+      background: #c82333;
+      border-color: #c82333;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    
+    /* Form Container */
+    .form-container {
+      background: transparent;
+    }
+    .form-section {
+      margin-bottom: 48px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid #e5e7eb;
+      position: relative;
+    }
+    .form-section:last-of-type {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .form-section .section-header {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #fff;
+      margin-bottom: 28px;
+      padding: 10px 18px;
+      background: #111;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+    }
+    .form-section .section-header i {
+      color: #fff;
+      font-size: 0.9375rem;
+      margin-right: 10px;
+    }
+    
+    /* Form Controls - Modern Style */
+    .form-control-enhanced {
+      border: 1.5px solid rgba(229, 231, 235, 0.8);
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 0.9375rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background: #fff;
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .form-control-enhanced::placeholder {
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+    .form-control-enhanced:hover {
+      border-color: rgba(166, 134, 4, 0.3);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .form-control-enhanced:focus {
+      border-color: var(--brand-gold);
+      box-shadow: 0 0 0 4px rgba(166, 134, 4, 0.12), 0 4px 12px rgba(166, 134, 4, 0.1);
+      outline: none;
+      background: #fff;
+      transform: translateY(-1px);
+    }
+    .form-control-enhanced:disabled {
+      background: #f8f9fa;
+      cursor: not-allowed;
+    }
+    
+    /* Date picker dropdown positioning */
+    input[type="date"] {
+      position: relative;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.6;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+    /* Force date picker dropdown to appear below */
+    input[type="date"]:focus {
+      z-index: 1;
+    }
+    /* For Firefox */
+    input[type="date"]::-moz-calendar-picker-indicator {
+      cursor: pointer;
+    }
+    /* Select Dropdown - Single Chevron Icon */
+    .form-select.form-control-enhanced,
+    select.form-control-enhanced {
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      -moz-appearance: none !important;
+      -ms-appearance: none !important;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+      background-repeat: no-repeat !important;
+      background-position: right 12px center !important;
+      background-size: 16px 12px !important;
+      border: 1.5px solid rgba(229, 231, 235, 0.8);
+      border-radius: 12px;
+      padding: 14px 40px 14px 18px;
+      font-size: 0.9375rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background-color: #fff !important;
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    /* Remove any Bootstrap default select styling */
+    .form-select.form-control-enhanced::before,
+    .form-select.form-control-enhanced::after {
+      display: none !important;
+    }
+    .form-select.form-control-enhanced:focus {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23a68604' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+      border-color: var(--brand-gold);
+      box-shadow: 0 0 0 4px rgba(166, 134, 4, 0.12), 0 4px 12px rgba(166, 134, 4, 0.1);
+      outline: none;
+      background-color: #fff;
+      transform: translateY(-1px);
+    }
+    .form-select.form-control-enhanced:hover {
+      border-color: rgba(166, 134, 4, 0.3);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    
+    /* Sort dropdown button - Black styling */
+    .sort-dropdown {
+      background: #111 !important;
+      border: 1px solid #111 !important;
+      color: #fff !important;
+    }
+    .sort-dropdown:hover {
+      background: #333 !important;
+      border-color: #333 !important;
+      color: #fff !important;
+    }
+    .sort-dropdown:focus {
+      background: #111 !important;
+      border-color: var(--brand-gold) !important;
+      color: #fff !important;
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15) !important;
+    }
+    .sort-dropdown option {
+      background: #fff;
+      color: var(--text-primary);
+    }
+    .form-label {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .form-label .text-danger {
+      color: #dc3545;
+      margin-left: 4px;
+      font-weight: 700;
+    }
+    .invalid-feedback {
+      font-size: 0.8125rem;
+      color: #dc3545;
+      margin-top: 6px;
+      display: none; /* Hide by default */
+    }
+    /* Only show invalid feedback when form is validated and field is invalid */
+    .was-validated .form-control-enhanced:invalid ~ .invalid-feedback,
+    .was-validated .form-select.form-control-enhanced:invalid ~ .invalid-feedback,
+    .was-validated .form-control-enhanced.is-invalid ~ .invalid-feedback,
+    .was-validated .form-select.form-control-enhanced.is-invalid ~ .invalid-feedback {
+      display: block;
+    }
+    .form-control-enhanced.is-invalid,
+    .was-validated .form-control-enhanced:invalid {
+      border-color: #dc3545;
+    }
+    .form-control-enhanced.is-invalid:focus,
+    .was-validated .form-control-enhanced:invalid:focus {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+    }
+    
+    /* Status Badge */
+    .status-display {
+      padding-top: 8px;
+    }
+    .status-display .badge {
+      font-size: 0.875rem;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-display .badge.bg-success {
+      background-color: #22c55e !important;
+      color: #fff !important;
+    }
+    .status-display small {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      display: block;
+    }
+    
+    /* Book Details Drawer - Similar to Borrow Request Panel */
+    .request-drawer { 
+      width: 520px; 
+      max-width: 90vw; 
+    }
+    .request-drawer .offcanvas-header {
+      background: var(--sidebar-bg);
+      color: #fff;
+      border-bottom: none;
+      padding: 24px;
+    }
+    .request-drawer .offcanvas-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    .request-drawer .offcanvas-header .btn-close {
+      filter: invert(1) grayscale(1);
+      opacity: 0.8;
+    }
+    .request-drawer .offcanvas-body { 
+      padding: 24px;
+      background: #fff;
+    }
+    .book-cover-small { 
+      width: 100px; 
+      height: 140px; 
+      object-fit: cover; 
+      border-radius: var(--border-radius-sm);
+      background: #f3f4f6;
+      box-shadow: var(--shadow-sm);
+    }
+    .request-section {
+      margin-bottom: 28px;
+    }
+    .request-section:last-child {
+      margin-bottom: 0;
+    }
+    .request-section-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--sidebar-bg);
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+    }
+    .request-section-title i {
+      color: #fff;
+      font-size: 1rem;
+    }
+    .book-info-card {
+      background: #f8f9fa;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      border: 1px solid #eef0f3;
+    }
+    .book-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .book-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .book-meta i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-row {
+      display: flex;
+      padding: 12px 0;
+      border-bottom: 1px solid #eef0f3;
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .info-label i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-value {
+      color: var(--text-primary);
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 24px;
+      align-items: center;
+    }
+    .action-buttons .btn {
+      padding: 12px 24px;
+      font-weight: 600;
+      border-radius: var(--border-radius-sm);
+      transition: all 0.2s ease;
+      width: auto;
+      min-width: 200px;
+      max-width: 280px;
+    }
+    .action-buttons .btn-success {
+      background: var(--brand-gold);
+      border-color: var(--brand-gold);
+      color: #fff;
+    }
+    .action-buttons .btn-success:hover {
+      background: var(--gold-dark);
+      border-color: var(--gold-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(166,134,4,0.3);
+    }
+    .action-buttons .btn-secondary {
+      background: #6c757d;
+      border-color: #6c757d;
+      color: #fff;
+    }
+    .action-buttons .btn-secondary:hover {
+      background: #5a6268;
+      border-color: #5a6268;
+    }
+    
+    /* Form Actions - Modern Buttons */
+    .form-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      margin-top: 48px;
+      padding-top: 36px;
+      border-top: 1px solid #e5e7eb;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .form-actions .btn-primary {
+      background: var(--brand-gold);
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: 12px;
+      transition: transform 0.2s ease;
+      font-size: 0.9375rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: 0.02em;
+    }
+    .form-actions .btn-primary:hover {
+      background: var(--gold-dark);
+      transform: translateY(-2px);
+    }
+    .form-actions .btn-primary:active {
+      transform: translateY(0);
+    }
+    .form-actions .btn-ghost {
+      background: #f3f4f6;
+      border: 1px solid #e5e7eb;
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 16px 36px;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      font-size: 0.9375rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .form-actions .btn-ghost:hover {
+      background: #e5e7eb;
+      border-color: #d1d5db;
+      color: var(--text-primary);
+    }
+    .form-actions .btn-ghost:active {
+      background: #d1d5db;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 991px) {
+      .add-edit-section form {
+        padding: 24px;
+      }
+      .cover-card {
+        position: static;
+        margin-bottom: 32px;
+      }
+      .cover-drop-area {
+        min-height: 280px;
+      }
+      .form-section {
+        margin-bottom: 32px;
+        padding-bottom: 24px;
+      }
+    }
+    
+    /* Category Chips - Active State Black */
+    .chips-container .chip.active {
+      background: #111 !important;
+      color: #fff !important;
+      border-color: #111 !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+    }
+    
+    /* Image error handling */
+    img[src*="cover"], img[src*="uploads"]{
+      object-fit:cover;
+      background:#f0f0f0;
+    }
+    img[src*="cover"]:not([src*="default"]):not([src*="avatar"]):not([src*="book"]){
+      background:linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+    }
+    
+    /* All Books Modal - Center content and reduce margins */
+    #allBooksModal .modal-body {
+      padding: 20px !important;
+    }
+    #allBooksModal .book-grid {
+      justify-content: center !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    #allBooksModal .chips-container {
+      justify-content: center !important;
+    }
+    #allBooksModal .nav-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e5e7eb !important;
+    }
+    #allBooksModal .nav-tabs .nav-link {
+      background: transparent !important;
+      color: var(--text-secondary) !important;
+      border: none !important;
+      border-bottom: 3px solid transparent !important;
+      padding: 12px 20px !important;
+      font-weight: 600 !important;
+      font-size: 0.9375rem !important;
+      transition: all 0.2s ease;
+      margin-bottom: -2px;
+    }
+    #allBooksModal .nav-tabs .nav-link:hover {
+      color: var(--text-primary) !important;
+      border-bottom-color: rgba(166, 134, 4, 0.3) !important;
+    }
+    #allBooksModal .nav-tabs .nav-link.active {
+      color: var(--text-primary) !important;
+      border-bottom-color: var(--brand-gold) !important;
+      background: transparent !important;
+    }
+    #allBooksModal .tab-content {
+      min-height: 300px;
+    }
+
+    /* Borrow Modal Styling - Matching Add Student Modal */
+    #borrowModal .modal-content{
+      border-radius:var(--border-radius-lg);
+      border:none;
+      box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+      overflow:visible !important;
+    }
+    #borrowModal .modal-header-dark{
+      background:var(--sidebar-bg) !important;
+      color:#fff !important;
+      border-bottom:none !important;
+      border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
+      padding:24px 32px !important;
+      min-height:64px !important;
+    }
+    #borrowModal .modal-header-dark .modal-title{
+      color:#fff !important;
+      font-weight:700 !important;
+      font-size:1.25rem;
+      letter-spacing:-0.01em;
+    }
+    #borrowModal .modal-header-dark .btn-close{
+      filter:invert(1) grayscale(1);
+      opacity:0.7;
+      transition:opacity 0.2s ease;
+      padding:8px;
+    }
+    #borrowModal .modal-header-dark .btn-close:hover{
+      opacity:1;
+    }
+
+    /* Modern Form Styling */
+    #borrowModal .modal-body{
+      padding:32px !important;
+      background:#fff;
+      overflow:visible !important;
+    }
+    #borrowModal .modal-content{
+      overflow:visible !important;
+    }
+    #borrowModal .modal-dialog{
+      overflow:visible !important;
+    }
+    #borrowModal .form-label{
+      font-weight:600;
+      font-size:0.875rem;
+      color:#374151;
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      gap:4px;
+    }
+    #borrowModal .form-control,
+    #borrowModal .form-select{
+      padding:10px 14px;
+      font-size:0.9375rem;
+      border:1.5px solid #e5e7eb;
+      border-radius:8px;
+      background:#fff;
+      color:#111827;
+      transition:all 0.2s ease;
+    }
+    #borrowModal .form-control:focus,
+    #borrowModal .form-select:focus{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 3px rgba(166,134,4,0.1);
+      outline:none;
+    }
+    #borrowModal .form-control:hover:not(:focus),
+    #borrowModal .form-select:hover:not(:focus){
+      border-color:#d1d5db;
+    }
+    #borrowModal .form-control::placeholder{
+      color:#9ca3af;
+      font-size:0.875rem;
+    }
+    #borrowModal .form-control.is-invalid,
+    #borrowModal .form-select.is-invalid{
+      border-color:#dc3545;
+      background-color:#fef2f2;
+    }
+    #borrowModal .form-control.is-invalid:focus,
+    #borrowModal .form-select.is-invalid:focus{
+      border-color:#dc3545;
+      box-shadow:0 0 0 3px rgba(220,53,69,0.1);
+    }
+    #borrowModal .modal-footer{
+      padding:20px 32px;
+      border-top:1px solid #e5e7eb;
+      background:#f9fafb;
+      border-radius:0 0 var(--border-radius-lg) var(--border-radius-lg);
+      display:flex;
+      justify-content:flex-end;
+      gap:12px;
+    }
+    #borrowModal .modal-footer .btn{
+      border-radius:8px;
+      font-weight:600;
+      font-size:0.9375rem;
+      padding:10px 24px;
+      min-width:100px;
+      transition:all 0.2s ease;
+      border-width:1.5px;
+    }
+    #borrowModal .modal-footer .btn-light,
+    #borrowModal .modal-footer .btn-secondary{
+      background:#fff !important;
+      border-color:#d1d5db !important;
+      color:#374151 !important;
+    }
+    #borrowModal .modal-footer .btn-light:hover,
+    #borrowModal .modal-footer .btn-secondary:hover{
+      background:#f9fafb !important;
+      border-color:#9ca3af !important;
+      color:#111827 !important;
+      transform:translateY(-1px);
+      box-shadow:0 2px 4px rgba(0,0,0,0.05);
+    }
+    #borrowModal .modal-footer .btn-primary{
+      background:var(--brand-gold) !important;
+      border-color:var(--brand-gold) !important;
+      color:#fff !important;
+      box-shadow:0 2px 4px rgba(166,134,4,0.2);
+    }
+    #borrowModal .modal-footer .btn-primary:hover{
+      background:var(--gold-dark) !important;
+      border-color:var(--gold-dark) !important;
+      color:#fff !important;
+      transform:translateY(-1px);
+      box-shadow:0 4px 8px rgba(166,134,4,0.3);
+    }
+    #borrowModal .modal-footer .btn:active{
+      transform:translateY(0);
+    }
+    /* Book Info Display Styling */
+    #borrowModal .book-info-item{
+      margin-bottom:20px;
+    }
+    #borrowModal .book-info-item .info-label{
+      font-size:0.75rem;
+      color:#6b7280;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      font-weight:600;
+      margin-bottom:6px;
+    }
+    #borrowModal .book-info-item .info-value{
+      font-size:0.9375rem;
+      color:#111827;
+      font-weight:500;
+    }
+    #borrowModal .book-info-item .info-value.fw-semibold{
+      font-weight:600;
+      color:#111827;
+    }
   </style>
 </head>
 
@@ -37,143 +1075,411 @@
 <div id="sidebar-root"></div>
 
 <div class="sb-wrapper">
-  <div class="topbar">
-    <div class="page-head d-flex align-items-center gap-2">
-      <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+  <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+    <div class="container-fluid">
+      <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
         <i class="bi bi-list fs-4"></i>
       </button>
-      <div class="page-title">Books</div>
+      <div class="fw-bold h5 mb-0" id="pageTitle">Books</div>
+
+      <div class="ms-auto d-flex align-items-center gap-2">
+        <div class="dropdown me-2">
+          <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
+            <i class="bi bi-bell fs-5"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
+            <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
+            <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
+          </ul>
     </div>
+
+        <div class="dropdown">
+          <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
+            <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
+            <li><a class="dropdown-item" href="student-profile.html"><i class="bi bi-gear me-2"></i>Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+          </ul>
   </div>
-
-  <main class="container-fluid py-4">
-    <div class="d-flex gap-3 mb-3 border-bottom">
-      <button id="tabDiscover" class="btn btn-link tab-btn active px-0">Discover</button>
-      <button id="tabAdd" class="btn btn-link tab-btn px-0">Add</button>
+      </div>
     </div>
+  </nav>
 
+  <main class="sb-content container-fluid py-4" style="padding:24px!important;">
     <!-- DISCOVER -->
-    <section id="panelDiscover" class="card p-3">
-      <div class="row g-2 align-items-center">
+    <section id="panelDiscover" class="card" style="border-radius:var(--border-radius-lg); box-shadow:var(--shadow-sm); border:1px solid var(--card-border);">
+      <div class="card-body p-4">
+    <!-- Tabs with Icons -->
+    <div class="tabs-container mb-4">
+      <div class="nav nav-pills" role="tablist">
+        <button id="tabDiscover" class="nav-link active" role="tab" aria-selected="true">
+          <i class="bi bi-book me-2"></i> Discover
+        </button>
+        <button id="tabAdd" class="nav-link" role="tab" aria-selected="false">
+          <i class="bi bi-plus-circle me-2"></i> Add Book
+        </button>
+      </div>
+    </div>
+      <!-- Search and Sort Bar -->
+      <div class="row g-3 align-items-center mb-4">
         <div class="col-lg-6">
-          <div class="position-relative" style="max-width:620px">
-            <i class="bi bi-search position-absolute" style="left:10px;top:50%;transform:translateY(-50%);opacity:.5"></i>
-            <input id="q" class="form-control ps-5" placeholder="Search your favourite books">
+          <div class="input-group search-bar-custom" style="max-width:520px;">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input id="q" class="form-control" placeholder="Search title, author, ISBN…">
           </div>
         </div>
-        <div class="col d-flex justify-content-end small text-muted">
-          <span id="countInfo"></span>
+        <div class="col-lg-6 d-flex justify-content-end align-items-center gap-3 flex-wrap">
+          <div class="d-flex align-items-center gap-2 flex-nowrap">
+            <label class="text-muted small mb-0 fw-semibold" style="color:var(--text-secondary); white-space:nowrap;">
+              <i class="bi bi-arrow-down-up me-1"></i>Sort by:
+            </label>
+            <select id="sortBy" class="form-select form-select-sm sort-dropdown" style="min-width:160px;border-radius:var(--border-radius-sm); border:1px solid #111; background:#111; color:#fff; font-size:0.875rem; padding:8px 32px 8px 12px;">
+              <option value="title_asc">Title (A–Z)</option>
+              <option value="author_asc">Author</option>
+              <option value="borrowed_desc">Most Borrowed</option>
+              <option value="newest">Newest Added</option>
+            </select>
+            <span class="badge px-3 py-2" style="background:var(--brand-gold); color:#fff; font-size:0.875rem; font-weight:600; border-radius:999px; white-space:nowrap;" id="countInfo">0 total</span>
+          </div>
         </div>
       </div>
 
-      <div class="d-flex align-items-center justify-content-between mt-4 mb-2">
-        <h6 class="m-0 fw-semibold">Recommended</h6>
-        <button id="seeAll" class="btn btn-link btn-sm p-0">See All</button>
+      <!-- Recommendation Section -->
+      <div class="section-spacing">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <span class="badge" style="background:var(--brand-gold); color:#fff; padding:8px 16px; font-size:0.875rem; font-weight:600; border-radius:999px;">
+            Recommendation
+          </span>
+          <button id="seeAll" class="btn btn-link btn-sm p-0 d-flex align-items-center gap-1" style="color:var(--brand-gold); text-decoration:none; font-weight:600; transition:all 0.2s ease;">
+            <span>See All</span>
+            <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+        <div id="recStrip" class="h-scroll gap-3"></div>
       </div>
-      <div id="recStrip" class="h-scroll gap-3"></div>
 
-      <h6 class="mt-4 mb-2 fw-semibold">Categories</h6>
-      <div id="catChips" class="chips flex-wrap gap-2"></div>
+      <!-- Categories Section -->
+      <div class="section-spacing">
+        <hr style="border:none; border-top:1px solid var(--card-border); margin:24px 0;">
+        <div class="mb-3">
+          <span class="badge" style="background:var(--brand-gold); color:#fff; padding:8px 16px; font-size:0.875rem; font-weight:600; border-radius:999px;">Categories</span>
+        </div>
+        <div id="catChips" class="chips-container"></div>
+      </div>
 
-      <!-- Grid -->
-      <div id="grid" class="mt-1 d-flex flex-wrap gap-3"></div>
+      <!-- Book Grid Section -->
+      <div class="section-spacing">
+        <div class="mb-3">
+          <span class="badge" style="background:var(--brand-gold); color:#fff; padding:8px 16px; font-size:0.875rem; font-weight:600; border-radius:999px;">Book List Grid</span>
+        </div>
+        <div id="grid" class="book-grid"></div>
+      </div>
 
-      <div class="d-flex justify-content-between align-items-center mt-3">
+      <div class="d-flex justify-content-between align-items-center mt-4 pt-3" style="border-top:1px solid var(--card-border);">
         <div class="small text-muted" id="pageInfo"></div>
         <div class="btn-group">
-          <button id="prev" class="btn btn-outline-secondary btn-sm"><i class="bi bi-chevron-left"></i></button>
-          <button id="next" class="btn btn-outline-secondary btn-sm"><i class="bi bi-chevron-right"></i></button>
+          <button id="prev" class="btn btn-outline-secondary btn-sm" style="border-radius:var(--border-radius-sm); border-color:var(--card-border);"><i class="bi bi-chevron-left"></i></button>
+          <button id="next" class="btn btn-outline-secondary btn-sm" style="border-radius:var(--border-radius-sm); border-color:var(--card-border);"><i class="bi bi-chevron-right"></i></button>
+        </div>
         </div>
       </div>
     </section>
 
-    <!-- ADD (librarian only) -->
-    <section id="panelAdd" class="card p-3 p-md-4 mt-3 d-none">
+    <!-- ADD/EDIT (librarian only) -->
+    <section id="panelAdd" class="add-edit-section d-none">
       <form id="bookForm" novalidate enctype="multipart/form-data">
-        <div class="row g-4">
+        <!-- Title Bar Inside Form -->
+      <div class="page-header mb-4">
+          <div>
+        <h4 class="mb-0 fw-bold" id="pageHeaderTitle">Add New Book</h4>
+            <p class="text-muted mb-0 mt-2" style="font-size: 0.9375rem;">Fill in the details below to add a new book to the library</p>
+      </div>
+        </div>
+        <div class="row g-5">
+          <!-- Left Column: Cover -->
           <div class="col-12 col-lg-4">
-            <h6 class="section-title">Cover</h6>
-            <div id="dropArea" class="cover-drop" role="button" tabindex="0">
-              <input id="coverInput" name="cover" type="file" accept="image/*" class="d-none">
-              <img id="coverPreview" alt="" class="d-none">
-              <div id="dropHint" class="text-center">
-                <i class="bi bi-image fs-1 d-block mb-2"></i>
-                <div class="fw-medium">Click to choose or drop an image</div>
-                <small class="text-muted d-block">Max 5 MB · JPG/PNG/WebP/GIF</small>
+            <div class="cover-card">
+              <h6 class="section-header mb-3">
+                <i class="bi bi-image me-2"></i> Cover
+              </h6>
+              <div id="dropArea" class="cover-drop-area" role="button" tabindex="0">
+                <input id="coverInput" name="cover" type="file" accept="image/*" class="d-none">
+                <img id="coverPreview" alt="" class="cover-preview d-none">
+                <div id="dropHint" class="drop-hint text-center">
+                  <i class="bi bi-image fs-1 d-block mb-2 text-muted"></i>
+                  <div class="fw-medium">Click to choose or drop an image</div>
+                  <small class="text-muted d-block mt-1">Max 5 MB · JPG/PNG/WebP/GIF</small>
+                </div>
               </div>
-            </div>
-            <div class="d-flex gap-2 mt-2">
-              <button type="button" id="btnChangeImage" class="btn btn-outline-primary flex-grow-1">
-                <i class="bi bi-upload me-1"></i> Change
-              </button>
-              <button type="button" id="btnRemoveImage" class="btn btn-outline-secondary flex-grow-1">
-                <i class="bi bi-x-lg me-1"></i> Remove
-              </button>
+              <div class="cover-actions mt-3">
+                <button type="button" id="btnChangeImage" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-upload me-1"></i> Change
+                </button>
+                <button type="button" id="btnRemoveImage" class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-x-lg me-1"></i> Remove
+                </button>
+              </div>
             </div>
           </div>
 
+          <!-- Right Column: Form -->
           <div class="col-12 col-lg-8">
-            <h6 class="section-title">Details</h6>
-            <div class="row g-3">
-              <div class="col-12">
-                <label class="form-label">Title <span class="text-danger">*</span></label>
-                <input id="title" name="title" type="text" class="form-control" required>
-                <div class="invalid-feedback">Title is required.</div>
+            <div class="form-container">
+              <!-- Book Information Section -->
+              <div class="form-section">
+                <h6 class="section-header mb-3">
+                  <i class="bi bi-journal-text me-2"></i> Book Information
+                </h6>
+                <div class="row g-3">
+                  <div class="col-12">
+                    <label class="form-label fw-medium">Title</label>
+                    <input id="title" name="title" type="text" class="form-control form-control-enhanced" placeholder="Enter book title" required>
+                    <div class="invalid-feedback">Title is required.</div>
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-medium">Author</label>
+                    <input id="author" name="author" type="text" class="form-control form-control-enhanced" placeholder="Enter author name" required>
+                    <div class="invalid-feedback">Author is required.</div>
+                  </div>
+
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-medium">ISBN</label>
+                    <input id="isbn" name="isbn" type="text" class="form-control form-control-enhanced" placeholder="e.g., 978-0-123456-78-9" required>
+                    <div class="invalid-feedback">ISBN is required.</div>
+                  </div>
+
+                  <div class="col-12 col-md-8">
+                    <label class="form-label fw-medium">Category</label>
+                    <select id="category" name="category" class="form-select form-control-enhanced" required style="max-width: 100%;">
+                      <option value="" selected disabled>Select category</option>
+                      <option>Action and Adventure</option>
+                      <option>Biography</option>
+                      <option>Children's Books</option>
+                      <option>Computer Science</option>
+                      <option>Fantasy</option>
+                      <option>History</option>
+                      <option>Mystery</option>
+                      <option>Romance</option>
+                      <option>Science</option>
+                    </select>
+                    <div class="invalid-feedback">Category is required.</div>
+                  </div>
+                </div>
               </div>
 
-              <div class="col-12 col-md-6">
-                <label class="form-label">ISBN <span class="text-danger">*</span></label>
-                <input id="isbn" name="isbn" type="text" class="form-control" required>
-              </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label">Author <span class="text-danger">*</span></label>
-                <input id="author" name="author" type="text" class="form-control" required>
-              </div>
-
-              <div class="col-12 col-md-6">
-                <label class="form-label">Category <span class="text-danger">*</span></label>
-                <select id="category" name="category" class="form-select" required>
-                  <option value="" selected disabled>Select category</option>
-                  <option>Action and Adventure</option><option>Biography</option><option>Children's Books</option>
-                  <option>Computer Science</option><option>Fantasy</option><option>History</option>
-                  <option>Mystery</option><option>Romance</option><option>Science</option>
-                </select>
-              </div>
-
-              <div class="col-6 col-md-3">
-                <label class="form-label">Quantity <span class="text-danger">*</span></label>
-                <input id="quantity" name="quantity" type="number" min="1" step="1" class="form-control" required>
+              <!-- Publishing Details Section -->
+              <div class="form-section">
+                <h6 class="section-header mb-3">
+                  <i class="bi bi-file-earmark-text me-2"></i> Publishing Details
+                </h6>
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-medium">Publisher</label>
+                    <input id="publisher" name="publisher" type="text" class="form-control form-control-enhanced" placeholder="Enter publisher name" required>
+                    <div class="invalid-feedback">Publisher is required.</div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-medium">Date Published</label>
+                    <input id="publishedAt" name="date_published" type="date" class="form-control form-control-enhanced">
+                  </div>
+                </div>
               </div>
 
-              <div class="col-12 col-md-6">
-                <label class="form-label">Publisher <span class="text-danger">*</span></label>
-                <input id="publisher" name="publisher" type="text" class="form-control" required>
+              <!-- Inventory Section -->
+              <div class="form-section">
+                <h6 class="section-header mb-3">
+                  <i class="bi bi-box-seam me-2"></i> Inventory
+                </h6>
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-medium">Quantity</label>
+                    <input id="quantity" name="quantity" type="number" min="1" step="1" class="form-control form-control-enhanced" placeholder="Enter quantity" required>
+                    <div class="invalid-feedback">Quantity is required.</div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label class="form-label fw-medium">Status</label>
+                    <div class="status-display">
+                      <span class="badge bg-success" id="statusBadge">
+                        <i class="bi bi-check-circle me-1"></i> In Stock
+                      </span>
+                      <small class="text-muted d-block mt-1">Auto-calculated based on quantity</small>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="col-12 col-md-6">
-                <label class="form-label">Date Published</label>
-                <input id="publishedAt" name="date_published" type="date" class="form-control">
-              </div>
-            </div>
 
-            <hr class="my-4">
-            <div class="d-flex flex-wrap gap-2">
-              <button id="btnSave" type="submit" class="btn btn-primary">
-                <i class="bi bi-save me-1"></i> <span id="btnSaveText">Save Book</span>
-              </button>
-              <button type="button" id="btnGoDiscover" class="btn btn-light">Back to Discover</button>
+              <!-- Form Actions -->
+              <div class="form-actions mt-4 pt-3 border-top">
+                <button id="btnSave" type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-save me-2"></i> <span id="btnSaveText">Save Book</span>
+                </button>
+                <button type="button" id="btnGoDiscover" class="btn btn-ghost btn-lg">
+                  <i class="bi bi-arrow-left me-2"></i> Back to Books
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </form>
     </section>
 
+    <!-- Cover Preview Modal -->
+    <div class="modal fade" id="coverPreviewModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title">Cover Preview</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center p-4">
+            <img id="coverPreviewFull" src="" alt="Book cover preview" class="img-fluid rounded shadow" style="max-height: 600px;">
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Book details offcanvas -->
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="bookDetails" aria-labelledby="bookDetailsLabel">
+    <div class="offcanvas offcanvas-end request-drawer" tabindex="-1" id="bookDetails" aria-labelledby="bookDetailsLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="bookDetailsLabel">Book</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
       </div>
       <div class="offcanvas-body" id="detailsBody"></div>
+    </div>
+
+    <!-- All Books Modal -->
+    <div class="modal fade" id="allBooksModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="border-radius:var(--border-radius-lg);">
+          <div class="modal-header" style="background:var(--sidebar-bg); color:#fff; border-bottom:0; padding:20px 24px;">
+            <h5 class="modal-title" style="color:#fff; font-weight:700;">All Books</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" style="padding:24px; max-height:85vh; overflow-y:auto;">
+            <!-- Categories Section -->
+            <div class="mb-4">
+              <div class="mb-3">
+                <span class="badge" style="background:var(--brand-gold); color:#fff; padding:8px 16px; font-size:0.875rem; font-weight:600; border-radius:999px;">Categories</span>
+              </div>
+              <div id="modalCatChips" class="chips-container"></div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs mb-4" id="allBooksTabs" role="tablist" style="justify-content:center; gap:24px; border-bottom:2px solid #e5e7eb;">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="recommendation-tab" data-bs-toggle="tab" data-bs-target="#recommendation-pane" type="button" role="tab" aria-controls="recommendation-pane" aria-selected="true">
+                  Recommendation
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="booklist-tab" data-bs-toggle="tab" data-bs-target="#booklist-pane" type="button" role="tab" aria-controls="booklist-pane" aria-selected="false">
+                  Book List Grid
+                </button>
+              </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content" id="allBooksTabContent">
+              <!-- Recommendation Tab Pane -->
+              <div class="tab-pane fade show active" id="recommendation-pane" role="tabpanel" aria-labelledby="recommendation-tab" tabindex="0">
+                <div id="modalRecStrip" class="book-grid" style="gap:16px; justify-content:center;"></div>
+              </div>
+
+              <!-- Book List Grid Tab Pane -->
+              <div class="tab-pane fade" id="booklist-pane" role="tabpanel" aria-labelledby="booklist-tab" tabindex="0">
+                <div id="modalBookGrid" class="book-grid" style="gap:16px; justify-content:center;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Borrow Request Modal (Student only) -->
+    <div class="modal fade" id="borrowModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header modal-header-dark">
+            <h5 class="modal-title">Request to Borrow Book</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="book-info-item">
+              <div class="info-label">Book</div>
+              <div class="info-value fw-semibold" id="borrowBookTitle">—</div>
+            </div>
+            <div class="book-info-item">
+              <div class="info-label">Author</div>
+              <div class="info-value" id="borrowBookAuthor">—</div>
+            </div>
+            <div class="book-info-item">
+              <div class="info-label">Quantity Available</div>
+              <div class="info-value" id="borrowBookQuantity">—</div>
+            </div>
+            <div class="book-info-item">
+              <label class="form-label">Borrow Duration</label>
+              <select id="borrowDuration" class="form-select" required>
+                <option value="3">3 days</option>
+                <option value="7" selected>7 days</option>
+                <option value="14">14 days</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary" id="btnConfirmBorrow">Confirm Borrow</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <div class="mb-3">
+              <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+            </div>
+            <h5 class="modal-title mb-3" id="successModalTitle">Success!</h5>
+            <p class="mb-0" id="successModalMessage">Operation completed successfully.</p>
+          </div>
+          <div class="modal-footer border-0 justify-content-center">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body text-center py-4">
+            <div class="mb-3">
+              <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 4rem;"></i>
+            </div>
+            <h5 class="modal-title mb-3" id="errorModalTitle">Error</h5>
+            <p class="mb-0" id="errorModalMessage">An error occurred.</p>
+          </div>
+          <div class="modal-footer border-0 justify-content-center">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Toast -->
@@ -229,7 +1535,7 @@
 <script>
 async function getMe(){
   try{
-    const res = await fetch('backend/check-auth.php', {credentials:'include'});
+    const res = await fetch('/api/check-auth', {credentials:'include'});
     if (!res.ok) return null;
     const data = await res.json().catch(()=>null);
     return data?.user || null;
@@ -251,11 +1557,11 @@ async function getMe(){
 })();
 
 function initBooks(role){
-  const API_LIST     = 'backend/books-list.php';
-  const API_CREATE   = 'backend/add-book.php';
-  const API_EDIT     = 'backend/edit-book.php';
-  const API_DELETE   = 'backend/delete-book.php';
-  const API_FAVORITE = 'backend/favorite-toggle.php';
+  const API_LIST     = '/api/books';
+  const API_CREATE   = '/api/books';
+  const API_EDIT     = '/api/books';
+  const API_DELETE   = '/api/books';
+  const API_FAVORITE = '/api/favorites/toggle';
 
   const canManage = () => role === 'librarian';
 
@@ -267,22 +1573,182 @@ function initBooks(role){
 
   if (!canManage()) tabAdd.classList.add('d-none');
 
-  function showDiscover(){ tabDiscover.classList.add('active'); tabAdd.classList.remove('active'); panelDiscover.classList.remove('d-none'); panelAdd.classList.add('d-none'); }
-  function showAdd(){ if (!canManage()) return; tabAdd.classList.add('active'); tabDiscover.classList.remove('active'); panelAdd.classList.remove('d-none'); panelDiscover.classList.add('d-none'); }
-  tabDiscover.onclick = showDiscover; tabAdd.onclick = showAdd; btnGoDiscover && (btnGoDiscover.onclick = showDiscover);
+  function showDiscover(){ 
+    tabDiscover.classList.add('active'); 
+    tabAdd.classList.remove('active'); 
+    panelDiscover.classList.remove('d-none'); 
+    panelAdd.classList.add('d-none'); 
+    tabDiscover.setAttribute('aria-selected', 'true');
+    tabAdd.setAttribute('aria-selected', 'false');
+  }
+  function showAdd(){ 
+    if (!canManage()) return; 
+    tabAdd.classList.add('active'); 
+    tabDiscover.classList.remove('active'); 
+    panelAdd.classList.remove('d-none'); 
+    panelDiscover.classList.add('d-none'); 
+    tabAdd.setAttribute('aria-selected', 'true');
+    tabDiscover.setAttribute('aria-selected', 'false');
+    
+    // Clear validation state when switching to Add mode
+    const form = document.getElementById('bookForm');
+    if (form) {
+      form.classList.remove('was-validated');
+      // Remove is-invalid classes from all fields
+      form.querySelectorAll('.is-invalid').forEach(el => {
+        el.classList.remove('is-invalid');
+      });
+    }
+    
+    // Reset header for new book
+    if (!editingId) {
+      document.getElementById('pageHeaderTitle').textContent = 'Add New Book';
+      const pageHeaderSubtitle = document.querySelector('.page-header p.text-muted');
+      if (pageHeaderSubtitle) {
+        pageHeaderSubtitle.textContent = 'Fill in the details below to add a new book to the library';
+      }
+      document.getElementById('statusBadge').className = 'badge bg-success';
+      document.getElementById('statusBadge').innerHTML = '<i class="bi bi-check-circle me-1"></i> In Stock';
+    }
+  }
+  
+  // Make showDiscover available globally
+  window.showDiscover = showDiscover;
+  tabDiscover.onclick = showDiscover; 
+  tabAdd.onclick = showAdd; 
+  btnGoDiscover && (btnGoDiscover.onclick = showDiscover);
 
   const qInput    = document.getElementById('q');
   const recStrip  = document.getElementById('recStrip');
   const grid      = document.getElementById('grid');
   const catChips  = document.getElementById('catChips');
 
-  const state = { page:1, pagesize:12, q:'', cat:'' };
-  const ALL_CATS = ["All","Action and Adventure","Biography","Children's Books","Computer Science","Fantasy","History","Mystery","Romance","Science"];
+  const state = { page:1, pagesize:12, q:'', cat:'', sort:'newest' };
+  let ALL_CATS = ["All"]; // Will be populated from API
   const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+  // Default fallback categories (used if API fails or returns empty)
+  const DEFAULT_CATEGORIES = [
+    "Action and Adventure",
+    "Biography",
+    "Children's Books",
+    "Computer Science",
+    "Fantasy",
+    "History",
+    "Mystery",
+    "Romance",
+    "Science",
+    "Thriller"
+  ];
+
+  // Load categories from API
+  async function loadCategories() {
+    try {
+      const res = await fetch('/api/categories', { credentials: 'include' });
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      if (data.success && data.categories && Array.isArray(data.categories)) {
+        // Extract category names from API
+        const apiCategoryNames = data.categories.map(cat => cat.name || cat).filter(Boolean);
+        
+        // Merge API categories with defaults (API categories take priority, defaults fill gaps)
+        // Create a Set to avoid duplicates (case-insensitive)
+        const categorySet = new Set();
+        const lowerToOriginal = new Map();
+        
+        // Add API categories first (these are admin-added, so they take priority)
+        apiCategoryNames.forEach(name => {
+          const lower = name.toLowerCase();
+          categorySet.add(lower);
+          lowerToOriginal.set(lower, name);
+        });
+        
+        // Add default categories that aren't already in the set
+        DEFAULT_CATEGORIES.forEach(name => {
+          const lower = name.toLowerCase();
+          if (!categorySet.has(lower)) {
+            categorySet.add(lower);
+            lowerToOriginal.set(lower, name);
+          }
+        });
+        
+        // Convert back to array of original names, sorted
+        const categoriesToUse = Array.from(categorySet)
+          .map(lower => lowerToOriginal.get(lower))
+          .sort();
+        
+        ALL_CATS = ["All", ...categoriesToUse];
+        
+        // Update category dropdown in add book form
+        const categorySelect = document.getElementById('category');
+        if (categorySelect) {
+          const currentValue = categorySelect.value;
+          categorySelect.innerHTML = '<option value="" selected disabled>Select category</option>' +
+            categoriesToUse.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join('');
+          if (currentValue) {
+            categorySelect.value = currentValue;
+          }
+        }
+        
+        // Re-render chips if they exist (wait for DOM to be ready)
+        setTimeout(() => {
+          if (catChips || document.getElementById('catChips')) {
+            renderChips();
+          }
+        }, 100);
+        
+        return true;
+      } else {
+        console.warn('Categories API returned unexpected format:', data);
+        // Fallback to defaults
+        useDefaultCategories();
+        return false;
+      }
+    } catch (e) {
+      console.error('Failed to load categories:', e);
+      // Fallback to defaults on error
+      useDefaultCategories();
+      return false;
+    }
+  }
+
+  // Helper function to use default categories
+  function useDefaultCategories() {
+    ALL_CATS = ["All", ...DEFAULT_CATEGORIES];
+    
+    const categorySelect = document.getElementById('category');
+    if (categorySelect) {
+      const currentValue = categorySelect.value;
+      categorySelect.innerHTML = '<option value="" selected disabled>Select category</option>' +
+        DEFAULT_CATEGORIES.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join('');
+      if (currentValue) {
+        categorySelect.value = currentValue;
+      }
+    }
+    
+    setTimeout(() => {
+      if (catChips || document.getElementById('catChips')) {
+        renderChips();
+      }
+    }, 100);
+  }
 
   const renderStars = (rating=0)=>{
     const r = Math.max(0, Math.min(5, Math.round(Number(rating)||0)));
-    return Array.from({length:5},(_,i)=>`<i class="bi ${i<r?'bi-star-fill text-warning':'bi-star text-secondary'}"></i>`).join('');
+    return Array.from({length:5},(_,i)=>`<i class="bi ${i<r?'bi-star-fill':'bi-star'}"></i>`).join('');
+  };
+  
+  // Helper function to fix cover URLs
+  const fixCoverUrl = (url) => {
+    if (!url) return 'assets/img/no-cover.png';
+    // If already a full URL or starts with /, use as-is
+    if (url.startsWith('http') || url.startsWith('/')) {
+      return url;
+    }
+    // Otherwise, assume it's a filename and prepend the path
+    return '/uploads/covers/' + url;
   };
   const renderHeart = (book)=>{
     if (role!=='student') return '';
@@ -293,11 +1759,12 @@ function initBooks(role){
   };
 
   function renderChips(){
-    catChips.innerHTML = ALL_CATS.map(c=>{
+    const container = document.getElementById('catChips') || catChips;
+    container.innerHTML = ALL_CATS.map(c=>{
       const v = c==='All' ? '' : c;
       return `<button class="chip ${state.cat===v?'active':''}" data-cat="${v}">${c}</button>`;
     }).join('');
-    catChips.querySelectorAll('.chip').forEach(btn=>{
+    container.querySelectorAll('.chip').forEach(btn=>{
       btn.addEventListener('click',()=>{ state.cat = btn.dataset.cat||''; state.page=1; loadGrid(); renderChips(); });
     });
   }
@@ -307,7 +1774,7 @@ function initBooks(role){
     const data = await fetch(url,{credentials:'include'}).then(r=>r.json()).catch(()=>({ok:false}));
     if (!data.ok){ recStrip.innerHTML = `<div class="empty w-100">Failed to load.</div>`; return; }
     recStrip.innerHTML = data.items.map(b=>{
-      const cover = b.cover_url || 'assets/img/no-cover.png';
+      const cover = fixCoverUrl(b.cover_url);
       const t = esc(b.title||''), a = esc(b.author||'');
       return `
         <div class="rec-card p-2">
@@ -325,20 +1792,39 @@ function initBooks(role){
     bindFavoriteButtons();
   }
 
+  // Sort items based on state.sort
+  function sortItems(items) {
+    const sorted = [...items];
+    switch(state.sort) {
+      case 'title_asc':
+        return sorted.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+      case 'author_asc':
+        return sorted.sort((a, b) => (a.author || '').localeCompare(b.author || ''));
+      case 'borrowed_desc':
+        return sorted.sort((a, b) => (b.borrowed || 0) - (a.borrowed || 0));
+      case 'newest':
+      default:
+        return sorted.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    }
+  }
+
   async function loadGrid(){
     const url = `${API_LIST}?page=${state.page}&pagesize=${state.pagesize}&q=${encodeURIComponent(state.q)}&category=${encodeURIComponent(state.cat)}`;
     const data = await fetch(url,{credentials:'include'}).then(r=>r.json()).catch(()=>({ok:false}));
     if (!data.ok){ grid.innerHTML = `<div class="empty w-100">Failed to load.</div>`; return; }
-    const items = data.items||[];
+    let items = data.items||[];
+    
+    // Apply sorting
+    items = sortItems(items);
 
     grid.innerHTML = items.length ? items.map(b=>{
-      const cover = b.cover_url || 'assets/img/no-cover.png';
+      const cover = fixCoverUrl(b.cover_url);
       const t = esc(b.title||''), a = esc(b.author||''), c = esc(b.category||''), i = esc(b.isbn||'');
       return `
         <div class="grid-item">
           <div class="book-card p-2">
             <div class="cover-wrap position-relative" role="button" onclick='showDetails(${JSON.stringify(b).replace(/'/g,"&#39;")})'>
-              <img class="thumb-lg" src="${cover}" alt="${t}">
+              <img class="thumb-lg" src="${cover}" alt="${t}" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
               ${renderHeart(b)}
             </div>
             <div class="p-2">
@@ -348,7 +1834,7 @@ function initBooks(role){
             </div>
             ${canManage() ? `
             <div class="card-actions">
-              <button class="icon-btn btn-edit" data-id="${b.id}" title="Edit"><i class="bi bi-pencil-square"></i></button>
+              <button class="icon-btn btn-edit" data-id="${b.id}" title="Edit"><i class="bi bi-pencil-square" style="font-size:18px;"></i></button>
               <button class="icon-btn btn-delete" data-id="${b.id}" data-title="${t}" title="Delete"><i class="bi bi-trash3"></i></button>
             </div>` : ''}
           </div>
@@ -369,9 +1855,12 @@ function initBooks(role){
     document.querySelectorAll(`.btn-fav[data-id="${bookId}"]`).forEach(b=>{
       const icon = b.querySelector('i');
       if (!icon) return;
-      icon.classList.toggle('bi-heart-fill', favorited);
-      icon.classList.toggle('bi-heart', !favorited);
-      icon.classList.toggle('text-danger', favorited);
+      // Directly set classes instead of toggling to avoid border heart flash
+      if (favorited) {
+        icon.className = 'bi bi-heart-fill text-danger';
+      } else {
+        icon.className = 'bi bi-heart';
+      }
       b.title = favorited ? 'Remove from favorites' : 'Add to favorites';
     });
   }
@@ -382,53 +1871,69 @@ function initBooks(role){
 btn.onclick = async (e)=>{
   e.stopPropagation();
   const id = btn.dataset.id;
-
-  try{
-    const fd = new FormData();
-    fd.set('book_id', id);
-
-    const res  = await fetch(API_FAVORITE, {
-      method: 'POST',
-      body: fd,
-      credentials: 'include'
-    });
-
-    // Always try to parse JSON, but keep a readable fallback
-    const text = await res.text();
-    let data;
-    try { data = JSON.parse(text); } catch { data = null; }
-
-    if (!res.ok || !data || !data.ok) {
-      const msg = (data && data.error) ? data.error : (`HTTP ${res.status} ${res.statusText}\n${text}`);
-      alert(msg || 'Failed to update favorites.');
-      return;
-    }
-
-    const icon = btn.querySelector('i');
-    icon.classList.toggle('bi-heart-fill', data.favorited);
-    icon.classList.toggle('bi-heart', !data.favorited);
-    icon.classList.toggle('text-danger', data.favorited);
-    btn.title = data.favorited ? 'Remove from favorites' : 'Add to favorites';
-  }catch(err){
-    alert('Network error: ' + err.message);
-  }
-};
-      btn.onclick = async (e)=>{
-        e.stopPropagation();
-        const id = btn.dataset.id;
+        const icon = btn.querySelector('i');
+        if (!icon) return;
+        
+        // Optimistically update UI immediately (before API call)
+        const isCurrentlyFavorited = icon.classList.contains('bi-heart-fill');
+        const willBeFavorited = !isCurrentlyFavorited;
+        
+        // Directly set classes instead of toggling to avoid border heart flash
+        if (willBeFavorited) {
+          icon.className = 'bi bi-heart-fill text-danger';
+        } else {
+          icon.className = 'bi bi-heart';
+        }
+        btn.title = willBeFavorited ? 'Remove from favorites' : 'Add to favorites';
+        
+        // Disable button during request to prevent double-clicks
+        btn.disabled = true;
+        
         try{
           const res = await fetch(API_FAVORITE,{
-            method:'POST', credentials:'include',
+            method:'POST', 
+            credentials:'include',
             headers:{'Content-Type':'application/json'},
             body: JSON.stringify({book_id: id})
           });
-          const data = await res.json().catch(()=>null);
-          if (data?.ok){
-            setFavStateForId(id, data.favorited);
-          }else{
-            alert(data?.error || 'Failed to update favorites.');
+          
+          // Check if response is ok
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
           }
-        }catch{ alert('Network error.'); }
+          
+          // Try to parse JSON response
+          let data;
+          try {
+            const text = await res.text();
+            data = text ? JSON.parse(text) : null;
+          } catch (parseErr) {
+            console.error('Failed to parse JSON response:', parseErr);
+            throw new Error('Invalid response from server');
+          }
+          
+          // Check if response indicates success
+          if (data && data.ok === true && typeof data.favorited === 'boolean') {
+            // Success - update all instances of this book's heart icon
+            setFavStateForId(id, data.favorited);
+          } else {
+            // API returned error
+            const errorMsg = data?.error || 'Failed to update favorites';
+            console.error('API error:', errorMsg, data);
+            
+            // Revert on error
+            setFavStateForId(id, isCurrentlyFavorited);
+            alert(errorMsg);
+          }
+        }catch(err){
+          // Network or other error - revert
+          console.error('Favorite toggle error:', err);
+          setFavStateForId(id, isCurrentlyFavorited);
+          alert('Network error: ' + (err.message || 'Unable to update favorites. Please try again.'));
+        } finally {
+          // Re-enable button
+          btn.disabled = false;
+        }
       };
     });
   }
@@ -503,6 +2008,14 @@ btn.onclick = async (e)=>{
     const form = document.getElementById('bookForm');
     form.classList.remove('was-validated');
 
+    // Update header
+    document.getElementById('pageHeaderTitle').textContent = `Editing Book: ${b.title || 'Untitled'}`;
+    const pageHeaderSubtitle = document.querySelector('.page-header p.text-muted');
+    if (pageHeaderSubtitle) {
+      pageHeaderSubtitle.textContent = 'Update the book details below';
+    }
+
+    // Populate form fields
     document.getElementById('title').value       = b.title || '';
     document.getElementById('isbn').value        = b.isbn || '';
     document.getElementById('author').value      = b.author || '';
@@ -511,46 +2024,286 @@ btn.onclick = async (e)=>{
     document.getElementById('publisher').value   = b.publisher || '';
     document.getElementById('publishedAt').value = (b.published_at || '').slice(0,10);
 
+    // Update status badge
+    const qty = b.quantity ?? 0;
+    const statusBadge = document.getElementById('statusBadge');
+    if (qty > 5) {
+      statusBadge.className = 'badge bg-success';
+      statusBadge.innerHTML = '<i class="bi bi-check-circle me-1"></i> In Stock';
+    } else if (qty > 0) {
+      statusBadge.className = 'badge bg-warning';
+      statusBadge.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i> Low Stock';
+    } else {
+      statusBadge.className = 'badge bg-danger';
+      statusBadge.innerHTML = '<i class="bi bi-x-circle me-1"></i> Out of Stock';
+    }
+
+    // Update cover preview
     const coverPreview = document.getElementById('coverPreview');
     const dropHint     = document.getElementById('dropHint');
     const dropArea     = document.getElementById('dropArea');
     if (b.cover_url){
-      coverPreview.src = b.cover_url;
+      const coverUrl = fixCoverUrl(b.cover_url);
+      coverPreview.src = coverUrl;
       coverPreview.classList.remove('d-none');
       dropHint.classList.add('d-none');
-      dropArea.classList.add('compact');
+      // Make cover clickable for preview
+      coverPreview.style.cursor = 'pointer';
+      coverPreview.onerror = function() {
+        this.src = 'assets/img/no-cover.png';
+        this.onerror = null;
+      };
+      coverPreview.onclick = () => {
+        const coverPreviewFull = document.getElementById('coverPreviewFull');
+        if (coverPreviewFull) {
+          coverPreviewFull.src = coverUrl;
+          coverPreviewFull.onerror = function() {
+            this.src = 'assets/img/no-cover.png';
+            this.onerror = null;
+          };
+        }
+        bootstrap.Modal.getOrCreateInstance('#coverPreviewModal').show();
+      };
     }else{
       coverPreview.classList.add('d-none');
       dropHint.classList.remove('d-none');
-      dropArea.classList.remove('compact');
     }
 
     document.getElementById('btnSaveText').textContent = 'Update Book';
   }
 
+  // Sort handler
+  const sortSelect = document.getElementById('sortBy');
+  if (sortSelect) {
+    sortSelect.value = state.sort;
+    sortSelect.addEventListener('change', (e) => {
+      state.sort = e.target.value;
+      loadGrid();
+    });
+  }
+
   // paging/search
   document.getElementById('prev').onclick = ()=>{ state.page=Math.max(1,state.page-1); loadGrid(); };
   document.getElementById('next').onclick = ()=>{ state.page+=1; loadGrid(); };
-  document.getElementById('seeAll').onclick = ()=>{ state.q=''; state.page=1; loadGrid(); };
+  // Modal state for filtering
+  let modalState = { category: '' };
+    let modalAllBooks = [];
+
+  // Load all books into modal
+  async function loadAllBooksModal() {
+    const modalRecStrip = document.getElementById('modalRecStrip');
+    const modalBookGrid = document.getElementById('modalBookGrid');
+    const modalCatChips = document.getElementById('modalCatChips');
+    
+    // Render category chips
+    renderModalChips();
+    
+    // Load recommended books
+    try {
+      const recUrl = `${API_LIST}?page=1&pagesize=100&q=&category=`;
+      const recData = await fetch(recUrl, {credentials:'include'}).then(r=>r.json()).catch(()=>({ok:false}));
+      if (recData.ok && recData.items) {
+        modalRecStrip.innerHTML = recData.items.map(b=>{
+          const cover = fixCoverUrl(b.cover_url);
+          const t = esc(b.title||''), a = esc(b.author||'');
+          return `
+            <div class="grid-item">
+              <div class="book-card p-2">
+                <div class="cover-wrap position-relative" role="button" onclick='showDetails(${JSON.stringify(b).replace(/'/g,"&#39;")}); bootstrap.Modal.getInstance("#allBooksModal")?.hide();'>
+                  <img class="thumb-lg" src="${cover}" alt="${t}" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+                  ${renderHeart(b)}
+                </div>
+                <div class="p-2">
+                  <div class="title text-truncate" title="${t}">${t}</div>
+                  <div class="meta text-truncate">${a||'Unknown author'}</div>
+                  <div class="meta">${esc(b.category||'')}${b.category&&b.isbn?' • ':''}${b.isbn?('ISBN: '+esc(b.isbn)) : ''}</div>
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+        bindFavoriteButtons();
+      } else {
+        modalRecStrip.innerHTML = '<div class="empty w-100">No recommended books found.</div>';
+      }
+    } catch (e) {
+      modalRecStrip.innerHTML = '<div class="empty w-100">Failed to load recommended books.</div>';
+    }
+
+    // Load all books
+    try {
+      const allUrl = `${API_LIST}?page=1&pagesize=1000&q=&category=`;
+      const allData = await fetch(allUrl, {credentials:'include'}).then(r=>r.json()).catch(()=>({ok:false}));
+      if (allData.ok && allData.items) {
+        modalAllBooks = allData.items;
+        renderModalBooks();
+        bindFavoriteButtons();
+      } else {
+        modalBookGrid.innerHTML = '<div class="empty w-100">No books found.</div>';
+      }
+    } catch (e) {
+      modalBookGrid.innerHTML = '<div class="empty w-100">Failed to load books.</div>';
+    }
+  }
+
+  function renderModalBooks() {
+    const modalBookGrid = document.getElementById('modalBookGrid');
+    let filtered = modalAllBooks;
+    if (modalState.category) {
+      filtered = modalAllBooks.filter(b => b.category === modalState.category);
+    }
+    
+    if (filtered.length === 0) {
+      modalBookGrid.innerHTML = '<div class="empty w-100">No books found.</div>';
+      return;
+    }
+    
+    modalBookGrid.innerHTML = filtered.map(b=>{
+      const cover = fixCoverUrl(b.cover_url);
+      const t = esc(b.title||''), a = esc(b.author||'');
+      const c = esc(b.category||''), i = esc(b.isbn||'');
+      return `
+        <div class="grid-item">
+          <div class="book-card p-2">
+            <div class="cover-wrap position-relative" role="button" onclick='showDetails(${JSON.stringify(b).replace(/'/g,"&#39;")}); bootstrap.Modal.getInstance("#allBooksModal")?.hide();'>
+              <img class="thumb-lg" src="${cover}" alt="${t}" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+              ${renderHeart(b)}
+            </div>
+            <div class="p-2">
+              <div class="title text-truncate" title="${t}">${t}</div>
+              <div class="meta text-truncate">${a||'Unknown author'}</div>
+              <div class="meta">${c}${c&&i?' • ':''}${i?('ISBN: '+i):''}</div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+    bindFavoriteButtons();
+  }
+
+  function renderModalChips() {
+    const modalCatChips = document.getElementById('modalCatChips');
+    if (!modalCatChips) return;
+    // Ensure categories are loaded
+    if (ALL_CATS.length === 1) {
+      loadCategories().then(() => {
+        renderModalChips();
+      });
+      return;
+    }
+    modalCatChips.innerHTML = ALL_CATS.map(c=>{
+      const v = c==='All' ? '' : c;
+      return `<button class="chip ${modalState.category===v?'active':''}" data-cat="${v}">${c}</button>`;
+    }).join('');
+    modalCatChips.querySelectorAll('.chip').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        modalState.category = btn.dataset.cat||'';
+        filterModalBooks();
+      });
+    });
+  }
+
+  function filterModalBooks() {
+    renderModalBooks();
+    renderModalChips();
+  }
+
+  document.getElementById('seeAll').onclick = async ()=>{
+    const allBooksModal = new bootstrap.Modal('#allBooksModal');
+    await loadAllBooksModal();
+    allBooksModal.show();
+  };
   qInput.addEventListener('input', e=>{ state.q=e.target.value.trim(); state.page=1; loadGrid(); });
 
   // details offcanvas
   window.showDetails = function(b){
-    const cover = b.cover_url || 'assets/img/no-cover.png';
+    const cover = fixCoverUrl(b.cover_url);
+    const quantityStatus = (b.quantity ?? 0) > 5 ? 'success' : (b.quantity ?? 0) > 0 ? 'warning' : 'danger';
+    const quantityText = (b.quantity ?? 0) > 5 ? 'In Stock' : (b.quantity ?? 0) > 0 ? 'Low Stock' : 'Out of Stock';
+    
+    const borrowButton = role === 'student' ? `
+      <div class="action-buttons">
+        <button class="btn ${(b.quantity ?? 0) > 0 ? 'btn-success' : 'btn-secondary'}" id="btnBorrow" data-book-id="${b.id}" data-book-title="${esc(b.title||'')}" ${(b.quantity ?? 0) === 0 ? 'disabled' : ''}>
+          <i class="bi bi-book me-2"></i> ${(b.quantity ?? 0) > 0 ? 'Borrow' : 'Not Available'}
+        </button>
+      </div>` : '';
+    
     const body = `
-      <div class="d-flex gap-3">
-        <img src="${cover}" alt="${esc(b.title)}" style="width:110px;height:150px;object-fit:cover;border-radius:8px;background:#f3f4f6">
-        <div>
-          <div class="fw-semibold">${esc(b.title||'')}</div>
-          <div class="text-muted">${esc(b.author||'')}</div>
-          <div class="small text-muted mt-1">${esc(b.category||'')}${b.category&&b.isbn?' • ':''}${b.isbn?('ISBN: '+esc(b.isbn)) : ''}</div>
-          <div class="small mt-1">Qty: <span class="badge text-bg-light">${b.quantity??0}</span></div>
-          <div class="small mt-1">Published: ${b.published_at||''}</div>
-          <div class="small mt-1">Publisher: ${esc(b.publisher||'')}</div>
+      <!-- Book Information -->
+      <div class="request-section">
+        <div class="request-section-title">
+          <i class="bi bi-journal-text"></i> Book Information
         </div>
-      </div>`;
+        <div class="book-info-card">
+          <div class="d-flex gap-3 mb-3">
+            <img src="${cover}" alt="${esc(b.title)}" class="book-cover-small" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+            <div class="flex-grow-1">
+              <div class="book-title">${esc(b.title||'')}</div>
+              <div class="book-meta">
+                <i class="bi bi-person"></i> ${esc(b.author||'—')}
+      </div>
+              <div class="book-meta">
+                <i class="bi bi-tag"></i> ${esc(b.category||'—')}
+              </div>
+              ${b.isbn ? `<div class="book-meta">
+                <i class="bi bi-upc-scan"></i> ISBN: ${esc(b.isbn)}
+              </div>` : ''}
+              <div class="mt-2">
+                <span class="badge" style="background:${quantityStatus === 'success' ? '#d1fae5' : quantityStatus === 'warning' ? '#fef3c7' : '#fee2e2'}; color:${quantityStatus === 'success' ? '#065f46' : quantityStatus === 'warning' ? '#92400e' : '#991b1b'}; font-weight:600; padding:6px 12px;">
+                  <i class="bi bi-box-seam me-1"></i>Quantity: ${b.quantity??0} (${quantityText})
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Publishing Details -->
+      <div class="request-section">
+        <div class="request-section-title">
+          <i class="bi bi-info-circle"></i> Publishing Details
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-calendar3"></i> Published
+          </div>
+          <div class="info-value">${b.published_at ? new Date(b.published_at).toLocaleDateString() : '—'}</div>
+        </div>
+        <div class="info-row">
+          <div class="info-label">
+            <i class="bi bi-building"></i> Publisher
+          </div>
+          <div class="info-value">${esc(b.publisher||'—')}</div>
+        </div>
+      </div>
+      
+      ${borrowButton}`;
     document.getElementById('bookDetailsLabel').textContent = b.title || 'Book';
     document.getElementById('detailsBody').innerHTML = body;
+    
+    // Bind borrow button click handler if it exists
+    if (role === 'student') {
+      const btnBorrow = document.getElementById('btnBorrow');
+      if (btnBorrow) {
+        btnBorrow.onclick = function() {
+          const bookId = btnBorrow.dataset.bookId;
+          const bookTitle = btnBorrow.dataset.bookTitle;
+          
+          // Populate borrow modal
+          document.getElementById('borrowBookTitle').textContent = bookTitle;
+          document.getElementById('borrowBookAuthor').textContent = b.author || '—';
+          document.getElementById('borrowBookQuantity').textContent = (b.quantity ?? 0) + ' available';
+          document.getElementById('borrowDuration').value = '7'; // Reset to default
+          
+          // Store book data for submit
+          const borrowModal = new bootstrap.Modal('#borrowModal');
+          borrowModal.show();
+          
+          // Store book ID for the confirm handler
+          const modalEl = document.getElementById('borrowModal');
+          modalEl.dataset.currentBookId = bookId;
+        };
+      }
+    }
+    
     bootstrap.Offcanvas.getOrCreateInstance('#bookDetails').show();
   };
 
@@ -576,7 +2329,12 @@ btn.onclick = async (e)=>{
         coverPreview.src=r.result;
         coverPreview.classList.remove('d-none');
         dropHint.classList.add('d-none');
-        dropArea.classList.add('compact');
+        // Make preview clickable
+        coverPreview.style.cursor = 'pointer';
+        coverPreview.onclick = () => {
+          document.getElementById('coverPreviewFull').src = r.result;
+          bootstrap.Modal.getOrCreateInstance('#coverPreviewModal').show();
+        };
       };
       r.readAsDataURL(f);
     });
@@ -586,7 +2344,7 @@ btn.onclick = async (e)=>{
       coverPreview.classList.add('d-none');
       dropHint.classList.remove('d-none');
       coverInput.value='';
-      dropArea.classList.remove('compact');
+      coverPreview.onclick = null;
     });
     coverInput && (coverInput.onchange = ()=>{
       const f=coverInput.files?.[0]; if (!f) return;
@@ -596,10 +2354,34 @@ btn.onclick = async (e)=>{
         coverPreview.src=r.result;
         coverPreview.classList.remove('d-none');
         dropHint.classList.add('d-none');
-        dropArea.classList.add('compact');
+        // Make preview clickable
+        coverPreview.style.cursor = 'pointer';
+        coverPreview.onclick = () => {
+          document.getElementById('coverPreviewFull').src = r.result;
+          bootstrap.Modal.getOrCreateInstance('#coverPreviewModal').show();
+        };
       };
       r.readAsDataURL(f);
     });
+    
+    // Update status badge on quantity change
+    const quantityInput = document.getElementById('quantity');
+    if (quantityInput) {
+      quantityInput.addEventListener('input', (e) => {
+        const qty = parseInt(e.target.value) || 0;
+        const statusBadge = document.getElementById('statusBadge');
+        if (qty > 5) {
+          statusBadge.className = 'badge bg-success';
+          statusBadge.innerHTML = '<i class="bi bi-check-circle me-1"></i> In Stock';
+        } else if (qty > 0) {
+          statusBadge.className = 'badge bg-warning';
+          statusBadge.innerHTML = '<i class="bi bi-exclamation-triangle me-1"></i> Low Stock';
+        } else {
+          statusBadge.className = 'badge bg-danger';
+          statusBadge.innerHTML = '<i class="bi bi-x-circle me-1"></i> Out of Stock';
+        }
+      });
+    }
 
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
@@ -628,7 +2410,16 @@ btn.onclick = async (e)=>{
 
         form.reset(); form.classList.remove('was-validated');
         coverPreview.src=''; coverPreview.classList.add('d-none'); dropHint.classList.remove('d-none');
-        dropArea.classList.remove('compact');
+        coverPreview.onclick = null;
+        
+        // Reset header
+        document.getElementById('pageHeaderTitle').textContent = 'Add New Book';
+        const pageHeaderSubtitle = document.querySelector('.page-header p.text-muted');
+        if (pageHeaderSubtitle) {
+          pageHeaderSubtitle.textContent = 'Fill in the details below to add a new book to the library';
+        }
+        document.getElementById('statusBadge').className = 'badge bg-success';
+        document.getElementById('statusBadge').innerHTML = '<i class="bi bi-check-circle me-1"></i> In Stock';
 
         tabDiscover.click();
         state.page=1; await loadGrid(); await loadRecommended();
@@ -636,7 +2427,78 @@ btn.onclick = async (e)=>{
     });
   }
 
-  renderChips(); loadRecommended(); loadGrid(); showDiscover();
+  // Modal helper functions
+  function showSuccess(message, title = 'Success!') {
+    document.getElementById('successModalTitle').textContent = title;
+    document.getElementById('successModalMessage').textContent = message;
+    const modal = new bootstrap.Modal('#successModal');
+    modal.show();
+  }
+
+  function showError(message, title = 'Error') {
+    document.getElementById('errorModalTitle').textContent = title;
+    document.getElementById('errorModalMessage').textContent = message;
+    const modal = new bootstrap.Modal('#errorModal');
+    modal.show();
+  }
+
+  // Borrow request handler (student only)
+  if (role === 'student') {
+    const btnConfirmBorrow = document.getElementById('btnConfirmBorrow');
+    if (btnConfirmBorrow) {
+      btnConfirmBorrow.addEventListener('click', async function() {
+        const modalEl = document.getElementById('borrowModal');
+        const bookId = modalEl?.dataset.currentBookId;
+        if (!bookId) return;
+        
+        const duration = parseInt(document.getElementById('borrowDuration').value);
+        if (!duration || duration < 1) {
+          showError('Please select a valid borrow duration.');
+          return;
+        }
+        
+        try {
+          const fd = new FormData();
+          fd.set('book_id', bookId);
+          fd.set('duration_days', String(duration));
+          
+          const res = await fetch('/api/borrow-requests', {
+            method: 'POST',
+            body: fd,
+            credentials: 'include'
+          });
+          
+          const data = await res.json().catch(() => null);
+          if (data?.ok) {
+            bootstrap.Modal.getInstance('#borrowModal')?.hide();
+            bootstrap.Offcanvas.getInstance('#bookDetails')?.hide();
+            showSuccess('Borrow request submitted successfully! The librarian will review your request.');
+          } else {
+            showError(data?.error || 'Failed to submit borrow request.');
+          }
+        } catch (err) {
+          showError('Network error: ' + err.message);
+        }
+      });
+    }
+  }
+  
+  // Load categories on page load, then initialize page
+  loadCategories().then(() => {
+    // After categories are loaded, render chips and load content
+    if (catChips || document.getElementById('catChips')) {
+      renderChips();
+    }
+    loadRecommended();
+    loadGrid();
+    showDiscover();
+  }).catch(() => {
+    // If categories fail to load, still show the page with default categories
+    renderChips();
+    loadRecommended();
+    loadGrid();
+    showDiscover();
+  });
 }
 </script>
 </body>

@@ -1,0 +1,18 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # IMPORTANT: Route .html files FIRST (before checking if file exists)
+    # This forces all .html requests through Laravel
+    RewriteCond %{REQUEST_URI} \.html$ [NC]
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+    
+    # Route API requests through Laravel
+    RewriteCond %{REQUEST_URI} ^/api/ [NC]
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+    
+    # Route all other non-file/non-directory requests through Laravel
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+</IfModule>
+

@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <meta http-equiv="Pragma" content="no-cache"/>
+  <meta http-equiv="Expires" content="0"/>
   <title>LibraTrack – Dashboard</title>
 
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
@@ -10,32 +13,478 @@
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet"/>
   <link href="assets/css/sidebar.css" rel="stylesheet"/>
+  <link href="assets/css/responsive.css" rel="stylesheet"/>
 
   <style>
-    .sb-card{position:relative;background:#fff;border:1px solid #eee;border-radius:14px;padding:16px}
-    .sb-card .sb-card-title{font-size:.85rem;color:#6b7280}
-    .sb-card .sb-card-value{font-weight:700;font-size:1.6rem}
+    :root{
+      --pri:#1D4ED8; --warn:#F59E0B; --danger:#DC2626; --succ:#10B981; --muted:#6B7280;
+      --gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --card-bg:#fff;
+      --card-border:#e5e7eb;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --text-muted:#9ca3af;
+      --header-bg:#fff;
+      --table-header-bg:#f8f9fa;
+      --table-hover:#f8f9fa;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --bg-dark:#101719;
+      --bg-dark-surface:#1a1f21;
+    }
+    
+    /* Consistent Card Design */
+    .sb-card{
+      position:relative;
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:var(--border-radius-lg);
+      padding:20px;
+      color:var(--text-secondary);
+      cursor:default;
+      transition:all 0.2s ease;
+    }
+    .sb-card:hover{
+      box-shadow:var(--shadow-md);
+      transform:translateY(-2px);
+    }
+    .sb-card.elevated{
+      box-shadow:var(--shadow-md);
+    }
+    .sb-card .sb-card-title{
+      font-size:0.875rem;
+      color:var(--text-secondary);
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:12px;
+      letter-spacing:0.01em;
+    }
+    .sb-card .sb-card-title i{
+      color:var(--text-secondary);
+      font-size:1.1rem;
+      width:20px;
+      text-align:center;
+    }
+    .sb-card .sb-card-value{
+      font-weight:700;
+      font-size:1.875rem;
+      color:var(--text-secondary);
+      line-height:1.2;
+    }
+    
+    /* Color-coded cards */
+    .sb-card.card-danger .sb-card-title,
+    .sb-card.card-danger .sb-card-title i,
+    .sb-card.card-danger .sb-card-value{
+      color:#dc2626 !important;
+    }
+    .sb-card.card-warning .sb-card-title,
+    .sb-card.card-warning .sb-card-title i,
+    .sb-card.card-warning .sb-card-value{
+      color:#f59e0b !important;
+    }
+    .sb-card.card-success .sb-card-title,
+    .sb-card.card-success .sb-card-title i,
+    .sb-card.card-success .sb-card-value{
+      color:#10b981 !important;
+    }
+    .sb-card.card-info .sb-card-title,
+    .sb-card.card-info .sb-card-title i,
+    .sb-card.card-info .sb-card-value{
+      color:#3b82f6 !important;
+    }
+    .sb-card.card-orange .sb-card-title,
+    .sb-card.card-orange .sb-card-title i,
+    .sb-card.card-orange .sb-card-value{
+      color:#f97316 !important;
+    }
+    .sb-card .sb-card-value.small-text{
+      font-size:1.125rem;
+      font-weight:600;
+    }
     .pill{display:inline-flex;align-items:center;gap:.4rem;padding:.15rem .5rem;border-radius:999px;font-size:.75rem}
     .pill .dot{width:.4rem;height:.4rem;border-radius:50%;display:inline-block}
     .pill-info{background:#e8f2ff;color:#0d6efd}.pill-info .dot{background:#0d6efd}
     .pill-success{background:#eaf7ef;color:#198754}.pill-success .dot{background:#198754}
     .pill-danger{background:#fdecec;color:#dc3545}.pill-danger .dot{background:#dc3545}
     .pill-returned{background:#eef7ff;color:#0d6efd}.pill-returned .dot{background:#0d6efd}
-    .table-card .card-header{background:#111827;border-bottom:0;color:#fff}
+    /* Consistent Table Design */
+    .table-card{
+      border-radius:var(--border-radius-lg);
+      overflow:hidden;
+      box-shadow:var(--shadow-sm);
+    }
+    .table-card .card-header{
+      background:var(--sidebar-bg);
+      border-bottom:0;
+      color:#fff;
+      font-size:0.9375rem;
+      font-weight:600;
+      padding:16px 20px;
+      letter-spacing:0.01em;
+    }
+    .table-modern{
+      border-collapse:separate;
+      border-spacing:0;
+      width:100%;
+    }
+    .table-modern thead th{
+      background:var(--table-header-bg);
+      color:var(--text-secondary);
+      font-weight:600;
+      font-size:0.75rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      padding:14px 20px;
+      border-bottom:2px solid var(--card-border);
+      border-top:none;
+      white-space:nowrap;
+    }
+    .table-modern tbody td{
+      padding:16px 20px;
+      border-bottom:1px solid #f0f0f0;
+      color:var(--text-primary);
+      font-size:0.875rem;
+      vertical-align:middle;
+    }
+    .table-modern tbody tr{
+      transition:background-color 0.2s ease;
+    }
+    .table-modern tbody tr:hover{
+      background-color:var(--table-hover);
+    }
+    .table-modern tbody tr:last-child td{
+      border-bottom:none;
+    }
     .th-tight{width:1%;white-space:nowrap}
     .empty{color:#9ca3af}
     .role-chip{font-weight:600}
-    .role-chip.admin{background:#eee}
+    .role-chip.admin{background:#4a4a4a;color:#fff}
     .role-chip.librarian{background:#e7f1ff;color:#0d6efd}
     .role-chip.student{background:#efe7ff;color:#6f42c1}
-    body.loading main,body.loading #sidebarToggle{visibility:hidden}
+    /* Badge Styling */
+    .text-bg-success-soft {
+      background: #d1fae5 !important;
+      color: #065f46 !important;
+      padding: 6px 12px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-danger-soft {
+      background: #fee2e2 !important;
+      color: #991b1b !important;
+      padding: 6px 12px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-info-soft {
+      background: #dbeafe !important;
+      color: #1e40af !important;
+      padding: 6px 12px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    .text-bg-warning-soft {
+      background: #fef3c7 !important;
+      color: #92400e !important;
+      padding: 6px 12px;
+      border-radius: var(--border-radius-sm);
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    body.loading main{visibility:hidden}
+    /* Sidebar should always be visible, never hidden during loading */
+    #sidebar-root, #sidebar{visibility:visible !important; opacity:1 !important;}
+    /* Redesigned Shortcuts - Horizontal Bar */
+    .qa-bar{
+      background:linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+      border:1px solid var(--card-border);
+      border-radius:var(--border-radius-lg);
+      padding:16px 20px;
+      box-shadow:var(--shadow-sm);
+      margin-bottom:24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+    .qa-bar h5{
+      color:var(--text-primary);
+      font-weight:600;
+      font-size:0.9375rem;
+      margin:0;
+      letter-spacing:0.01em;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .qa-bar h5::before{
+      content:"";
+      width:3px;
+      height:20px;
+      background:var(--gold);
+      border-radius:2px;
+    }
+    .qa-bar .shortcuts-group{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .btn-shortcut{
+      background:#fff !important;
+      border:1px solid var(--card-border) !important;
+      color:var(--text-primary) !important;
+      border-radius:var(--border-radius-sm) !important;
+      padding:8px 16px !important;
+      font-size:0.8125rem !important;
+      font-weight:500 !important;
+      transition:all 0.2s ease !important;
+      box-shadow:none !important;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .btn-shortcut:hover{
+      background:var(--gold) !important;
+      border-color:var(--gold) !important;
+      color:#fff !important;
+      transform:translateY(-1px);
+      box-shadow:var(--shadow-sm) !important;
+    }
+    .btn-shortcut:active{
+      transform:translateY(0);
+    }
+    .btn-shortcut i{
+      font-size:0.875rem;
+    }
+    /* Table Header Action Links - White Pills */
+    .table-card .card-header .link-light{
+      font-size:0.8125rem;
+      font-weight:500;
+      opacity:0.9;
+      transition:all 0.2s ease;
+      text-decoration:none !important;
+      background:#fff !important;
+      color:#000 !important;
+      padding:6px 14px !important;
+      border-radius:50px !important;
+      display:inline-flex;
+      align-items:center;
+      border:1px solid transparent;
+    }
+    .table-card .card-header .link-light:hover,
+    .table-card .card-header button.link-light:hover{
+      opacity:1;
+      text-decoration:none !important;
+      background:#f8f9fa !important;
+      color:#000 !important;
+      border-color:var(--card-border);
+    }
+    /* Consistent Notification Button */
+    .notification-btn{
+      color:var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .notification-btn:hover{
+      color:var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    .notification-badge{
+      font-size:0.6875rem;
+      padding:3px 7px;
+      font-weight:600;
+      background:var(--gold) !important;
+      color:#fff !important;
+    }
+    .notification-dropdown{
+      border-radius:var(--border-radius);
+      box-shadow:var(--shadow-lg);
+      border:1px solid var(--card-border);
+      margin-top:8px;
+    }
+    .notification-dropdown .dropdown-item{
+      padding:12px 16px;
+      border-bottom:1px solid #f0f0f0;
+      transition:background-color 0.2s ease;
+    }
+    .notification-dropdown .dropdown-item:last-child{
+      border-bottom:none;
+    }
+    .notification-dropdown .dropdown-item:hover{
+      background-color:var(--table-hover);
+    }
+    /* Consistent Panel Layout */
+    .panel-equal{
+      min-height:420px;
+      display:flex;
+      flex-direction:column;
+    }
+    .panel-equal .table-responsive{
+      flex:1;
+      overflow:auto;
+    }
+    .alert-card{
+      background:#FFFBEB;
+      border:1px solid #FACC15;
+      border-left:4px solid #F59E0B;
+      border-radius:var(--border-radius-lg);
+      padding:16px 20px;
+      box-shadow:var(--shadow-sm);
+    }
+    
+    /* Consistent Spacing */
+    .row.g-3{
+      margin-bottom:0;
+    }
+    .row.g-3.mb-3{
+      margin-bottom:24px;
+    }
+    
+    /* Consistent Header Design */
+    .admin-header-gold {
+      background: var(--header-bg) !important;
+      color: var(--text-primary) !important;
+      border-bottom:1px solid var(--card-border);
+      box-shadow:var(--shadow-sm);
+      padding:12px 0;
+    }
+    .admin-header-gold .fw-bold,
+    .admin-header-gold .h5,
+    .admin-header-gold #pageTitle {
+      color: var(--text-primary) !important;
+      font-weight:700;
+      font-size:1.25rem;
+      letter-spacing:0.01em;
+    }
+    .admin-header-gold .btn-link {
+      color: var(--text-primary) !important;
+      padding:8px 12px;
+      border-radius:var(--border-radius-sm);
+      transition:all 0.2s ease;
+    }
+    .admin-header-gold .btn-link:hover {
+      color: var(--text-primary) !important;
+      background-color:#f8f9fa;
+    }
+    
+    /* Consistent Search Bar Design */
+    .search-bar-custom {
+      height: 42px;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+    }
+    .search-bar-custom .input-group-text {
+      border-top-left-radius: var(--border-radius-sm);
+      border-bottom-left-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-right: none !important;
+      outline: none !important;
+      color:var(--text-secondary);
+    }
+    .search-bar-custom .form-control {
+      border-top-right-radius: var(--border-radius-sm);
+      border-bottom-right-radius: var(--border-radius-sm);
+      background: var(--table-header-bg) !important;
+      border: 1px solid var(--card-border);
+      border-left: none !important;
+      color: var(--text-primary);
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .search-bar-custom .form-control:focus {
+      outline: none !important;
+      box-shadow: none !important;
+      border-color: var(--card-border) !important;
+    }
+    .search-bar-custom .form-control::placeholder {
+      color: var(--text-muted);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15);
+      border-radius: var(--border-radius-sm);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      border-color: var(--gold);
+      border-right: none !important;
+      background: #fff !important;
+    }
+    .search-bar-custom:focus-within .form-control {
+      border-color: var(--gold);
+      border-left: none !important;
+      background: #fff !important;
+    }
+    .search-bar-custom:focus-within .search-icon-wrapper {
+      background: #fff !important;
+      color: var(--text-primary) !important;
+      border-color: var(--gold);
+    }
+    .search-bar-custom:focus-within .search-input-custom {
+      background: #fff !important;
+      border-color: var(--gold);
+    }
+    
+    /* Consistent Admin Button - Avatar */
+    .admin-btn-custom {
+      padding: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: #fff;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .admin-btn-custom:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px rgba(166, 134, 4, 0.1);
+    }
+    .admin-btn-custom:focus,
+    .admin-btn-custom:active,
+    .admin-btn-custom.show {
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 0 0.2rem rgba(166, 134, 4, 0.25) !important;
+    }
+    .admin-btn-custom img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    /* Dropdown pill - the ADMIN badge next to Libra - ensure darker gray */
+    .dropdown-menu .badge.role-chip.admin {
+      background: #4a4a4a !important;
+      color: #fff !important;
+    }
   </style>
 </head>
 <body class="sb-body loading">
   <div id="sidebar-root"></div>
 
   <div class="sb-wrapper">
-    <nav class="sb-topbar navbar navbar-expand bg-white sticky-top">
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
       <div class="container-fluid">
         <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
           <i class="bi bi-list fs-4"></i>
@@ -43,16 +492,27 @@
         <div class="fw-bold h5 mb-0" id="pageTitle">Dashboard</div>
 
         <div class="ms-auto d-flex align-items-center gap-2">
-          <form class="d-none d-md-flex" role="search" style="max-width:420px;width:100%;">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-              <input class="form-control border-0 bg-light" type="search" placeholder="Search">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group input-group-sm search-bar-custom">
+              <span class="input-group-text bg-light border-0 search-icon-wrapper"><i class="bi bi-search"></i></span>
+              <input class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search">
             </div>
           </form>
 
+          <div class="dropdown me-2">
+            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
+              <i class="bi bi-bell fs-5"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
+              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
+              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">Loading...</div></li>
+            </ul>
+          </div>
+
           <div class="dropdown">
-            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" data-bs-toggle="dropdown" id="userBtn">
-              <i class="bi bi-person-gear me-2"></i><span id="whoAmI">User</span>
+            <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
+              <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
               <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
@@ -96,7 +556,7 @@
             <div class="table-card card h-100 w-100">
               <div class="card-header d-flex align-items-center justify-content-between">
                 <span class="fw-semibold"><i class="bi bi-ui-checks-grid me-2"></i>Top Categories</span>
-                <a href="analytics.html" class="link-light small text-decoration-underline">View all</a>
+                <a href="admin-categories.html" class="link-light small">View all</a>
               </div>
               <div class="table-responsive">
                 <table class="table table-modern align-middle mb-0">
@@ -119,7 +579,7 @@
             <div class="table-card card h-100 w-100">
               <div class="card-header d-flex align-items-center justify-content-between">
                 <span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Recent Activity</span>
-                <a href="#" class="link-light small text-decoration-underline">See history</a>
+                <a href="admin-logs.html" class="link-light small">See history</a>
               </div>
               <div class="table-responsive">
                 <table class="table table-modern align-middle mb-0">
@@ -138,7 +598,7 @@
             <div class="table-card card h-100 w-100">
               <div class="card-header d-flex align-items-center justify-content-between">
                 <span class="fw-semibold"><i class="bi bi-bell me-2"></i>Pending Requests</span>
-                <a href="#" class="link-light small text-decoration-underline">Manage</a>
+                <a href="librarian-borrow-requests.html" class="link-light small">Manage</a>
               </div>
               <ul class="list-group list-group-flush flex-fill">
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -161,17 +621,19 @@
         </div>
       </section>
 
-      <!-- Librarian and Student sections left intact -->
+      <!-- Librarian -->
       <section id="librarianSection" class="d-none"></section>
       <section id="studentSection" class="d-none"></section>
     </main>
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/js/sidebar.js?v=2025-10-29-1"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-NO-OVERDUE-V3"></script>
+  <!-- Centralized Notifications -->
+  <script src="assets/js/notifications.js"></script>
   <script>
     async function getMe() {
-      const authUrl = '/libratrack/backend/check-auth.php';
+      const authUrl = '/api/check-auth';
       try {
         // Optional: keep this while debugging
         try {
@@ -184,7 +646,7 @@
         // Only treat explicit 401 as "not logged in"
         if (res.status === 401) {
           console.warn('Auth 401. Back to login.');
-          location.href = '/libratrack/login.html';
+          location.href = '/login';
           return null;
         }
   
@@ -206,7 +668,7 @@
   
         // Anything else: treat as unauthenticated
         console.warn('Auth said not authenticated. Back to login.');
-        location.href = '/libratrack/login.html';
+        location.href = '/login';
         return null;
   
       } catch (e) {
@@ -218,31 +680,462 @@
   
     (async () => {
       const me = await getMe();
-      if (!me) return; // we already handled redirect / message
+      if (!me) {
+        console.error('Dashboard: No user data, redirecting to login');
+        return; // we already handled redirect / message
+      }
   
+      console.log('Dashboard: User data received:', me);
       const role = (me.role || '').toLowerCase();
-      renderSidebar('dashboard', role);
+      console.log('Dashboard: Detected role:', role);
+      
+      // Cache role for sidebar (so it renders immediately on next page)
+      if (['admin', 'librarian', 'student'].includes(role)) {
+        localStorage.setItem('userRole', role);
+      }
+      
+      if (!role) {
+        console.error('Dashboard: No role detected, showing error');
+        document.body.innerHTML = '<div class="container mt-5"><div class="alert alert-danger">Error: Unable to determine user role. Please contact support.</div></div>';
+        return;
+      }
+      
+      // Render sidebar without forcing rerender (prevents flicker)
+      renderSidebar('dashboard', role, false);
       document.getElementById('sidebarToggle')?.addEventListener('click', () => {
         if (typeof toggleSidebar === 'function') toggleSidebar();
         else document.body.classList.toggle('sb-collapsed');
       });
   
       const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
-      document.getElementById('whoAmI').textContent = role.charAt(0).toUpperCase()+role.slice(1);
-      document.getElementById('whoChip').innerHTML =
-        `<span class="badge role-chip ${role}">${role.toUpperCase()}</span> ${fullName || me.email}`;
+      
+      // Load avatar in header if available
+      const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+      if (headerAvatar && me.avatar && me.avatar.trim() !== '') {
+        headerAvatar.src = me.avatar;
+      }
+      
+      const whoAmIEl = document.getElementById('whoAmI');
+      if (whoAmIEl) {
+        whoAmIEl.textContent = role.charAt(0).toUpperCase()+role.slice(1);
+      }
+      const whoChipEl = document.getElementById('whoChip');
+      if (whoChipEl) {
+        whoChipEl.innerHTML = `<span class="badge role-chip ${role}">${role.toUpperCase()}</span> ${fullName || me.email}`;
+      }
   
       const map = { admin:'adminSection', librarian:'librarianSection', student:'studentSection' };
-      document.getElementById(map[role] || 'studentSection').classList.remove('d-none');
-      document.getElementById('pageTitle').textContent = role.charAt(0).toUpperCase()+role.slice(1)+' Dashboard';
+      const targetSection = document.getElementById(map[role] || 'studentSection');
+      
+      if (!targetSection) {
+        console.error('Dashboard: Target section not found for role:', role);
+        document.body.innerHTML = '<div class="container mt-5"><div class="alert alert-danger">Error: Dashboard section not found. Please refresh the page.</div></div>';
+        return;
+      }
+      
+      console.log('Dashboard: Showing section:', map[role]);
+      targetSection.classList.remove('d-none');
+      
+      if (role === 'student') {
+        initStudentDashboard(targetSection);
+      } else if (role === 'librarian') {
+        initLibrarianDashboard(targetSection);
+      } else if (role === 'admin') {
+        initAdminDashboard(targetSection);
+      }
+      
+      const pageTitleEl = document.getElementById('pageTitle');
+      if (pageTitleEl) {
+        pageTitleEl.textContent = role.charAt(0).toUpperCase()+role.slice(1)+' Dashboard';
+      }
   
       document.body.classList.remove('loading');
+      console.log('Dashboard: Initialization complete');
     })();
   
     document.getElementById('logoutLink')?.addEventListener('click', async e => {
       e.preventDefault();
-      try { await fetch('/libratrack/backend/logout.php', { method:'POST', credentials:'include' }); } catch {}
-      location.href = '/libratrack/login.html';
+        try { await fetch('/api/logout', { method:'POST', credentials:'include' }); } catch {}
+      location.href = '/login';
     });
   </script>
-  
+  <script>
+    function initLibrarianDashboard(section){
+      section.innerHTML = `
+        <div class="row g-3 mb-3">
+          <!-- Circulation -->
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-info"><div class="sb-card-title"><i class="bi bi-journal-arrow-up"></i>Active Loans</div><div class="sb-card-value" id="lbActive">0</div></div></div>
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-danger"><div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue Loans</div><div class="sb-card-value" id="lbOverdue">0</div></div></div>
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-warning"><div class="sb-card-title"><i class="bi bi-calendar-event"></i>Due Today</div><div class="sb-card-value" id="lbDueToday">0</div></div></div>
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-success"><div class="sb-card-title"><i class="bi bi-box-arrow-in-left"></i>Returned Today</div><div class="sb-card-value" id="lbReturnedToday">0</div></div></div>
+        </div>
+        <div class="row g-3 mb-3">
+          <!-- Inventory -->
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-warning"><div class="sb-card-title"><i class="bi bi-box-seam"></i>Low Stock Titles</div><div class="sb-card-value" id="lbLowStock">0</div></div></div>
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-danger"><div class="sb-card-title"><i class="bi bi-exclamation-triangle-fill"></i>Critical Stock (0–1)</div><div class="sb-card-value" id="lbCritical">0</div></div></div>
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-info"><div class="sb-card-title"><i class="bi bi-journal-text"></i>Total Books</div><div class="sb-card-value" id="lbTotalBooks">0</div></div></div>
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-info"><div class="sb-card-title"><i class="bi bi-tags"></i>Total Categories</div><div class="sb-card-value" id="lbCategories">0</div></div></div>
+        </div>
+        <div class="row g-3 mb-3">
+          <!-- Members -->
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-success"><div class="sb-card-title"><i class="bi bi-people"></i>Total Students</div><div class="sb-card-value" id="lbStudents">0</div></div></div>
+          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-success"><div class="sb-card-title"><i class="bi bi-person-plus"></i>Registered Today</div><div class="sb-card-value" id="lbStudentsToday">0</div></div></div>
+        </div>
+        <div class="qa-bar mb-3">
+          <h5 class="fw-semibold">Quick Actions</h5>
+          <div class="shortcuts-group">
+            <a href="borrow-return.html" class="btn btn-shortcut"><i class="bi bi-box-arrow-up-right"></i>New Borrow</a>
+            <a href="librarian-add-book.html" class="btn btn-shortcut"><i class="bi bi-journal-plus"></i>Add Book</a>
+            <a href="librarian-users.html" class="btn btn-shortcut"><i class="bi bi-person-plus"></i>Add Student</a>
+            <a href="librarian-overdue.html" class="btn btn-shortcut"><i class="bi bi-envelope"></i>Email Reminders</a>
+            <a href="librarian-lowstock.html" class="btn btn-shortcut"><i class="bi bi-bag-plus"></i>Restock</a>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <!-- Recent Borrowing Activity -->
+          <div class="col-12 col-xl-8">
+            <div class="table-card card panel-equal h-100 w-100">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Recent Borrow Activity</span>
+                <a href="librarian-history.html" class="link-light small">Open history</a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0">
+                  <thead><tr><th>Student</th><th>Book</th><th>Borrowed</th><th>Due</th><th>Status</th></tr></thead>
+                  <tbody id="lbRecent"><tr><td colspan="5" class="text-center text-muted py-4">Loading…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- Books Need Attention -->
+          <div class="col-12 col-xl-4">
+            <div class="table-card card panel-equal h-100 w-100">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <span class="fw-semibold"><i class="bi bi-exclamation-triangle me-2"></i>Books That Need Attention</span>
+                <a href="librarian-lowstock.html" class="link-light small">Manage</a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0">
+                  <thead><tr><th>Title</th><th class="text-end">Qty</th><th class="text-end">Needed</th></tr></thead>
+                  <tbody id="lbAttention"><tr><td colspan="3" class="text-center text-muted py-4">Loading…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      `;
+
+      loadLibrarianData();
+    }
+
+    async function loadLibrarianData(){
+      // Loans
+      let loans=[];
+      try{
+        const res=await fetch('/api/loans?page=1&pagesize=500',{credentials:'include'});
+        const data=await res.json().catch(()=>({ok:false}));
+        if(data.ok) loans=data.items||[];
+      }catch{}
+      const today = new Date().toISOString().slice(0,10);
+      const active = loans.filter(l => l.status==='borrowed').length;
+      const overdue = loans.filter(l => l.status==='borrowed' && (l.due_at||'') < today).length;
+      const dueToday = loans.filter(l => l.status==='borrowed' && (l.due_at||'') === today).length;
+      const returnedToday = loans.filter(l => (l.returned_at||'').slice(0,10) === today).length;
+      document.getElementById('lbActive').textContent = active;
+      document.getElementById('lbOverdue').textContent = overdue;
+      document.getElementById('lbDueToday').textContent = dueToday;
+      document.getElementById('lbReturnedToday').textContent = returnedToday;
+
+      const recentTbody = document.getElementById('lbRecent');
+      const recent = [...loans].sort((a,b)=> new Date(b.borrowed_at||0)-new Date(a.borrowed_at||0)).slice(0,5);
+      if(!recent.length) recentTbody.innerHTML = '<tr><td colspan=\"5\" class=\"text-center text-muted py-4\">No recent activity</td></tr>';
+      else recentTbody.innerHTML = recent.map(l => `
+        <tr>
+          <td>${(l.student_name||'—')}</td>
+          <td>${(l.book_title||'—')}</td>
+          <td>${l.borrowed_at? new Date(l.borrowed_at).toLocaleDateString() : '—'}</td>
+          <td>${l.due_at? new Date(l.due_at).toLocaleDateString() : '—'}</td>
+          <td>${l.status==='returned'
+            ? '<span class="badge text-bg-success-soft">Returned</span>'
+            : ( (l.due_at||'')<today ? '<span class="badge text-bg-danger-soft">Overdue</span>' : '<span class="badge text-bg-info-soft">Borrowed</span>' )
+          }</td>
+        </tr>
+      `).join('');
+
+      // Books
+      let books=[];
+      try{
+        const res=await fetch('/api/books',{credentials:'include'});
+        const data=await res.json().catch(()=>({ok:false}));
+        if(data.ok) books=data.books||data.items||[];
+      }catch{}
+      const thresholdDefault = 3;
+      // Calculate available quantity (per-school perspective: quantity - borrowed)
+      const getAvailable = (b) => Math.max(0, (b.quantity??0) - (b.borrowed??0));
+      const lowList = (books||[]).filter(b => getAvailable(b) <= thresholdDefault);
+      const criticalList = (books||[]).filter(b => getAvailable(b) <= 1);
+      const totalBooks = (books||[]).length;
+      const categories = new Set((books||[]).map(b=>b.category).filter(Boolean));
+      document.getElementById('lbLowStock').textContent = lowList.length;
+      document.getElementById('lbCritical').textContent = criticalList.length;
+      document.getElementById('lbTotalBooks').textContent = totalBooks;
+      document.getElementById('lbCategories').textContent = categories.size;
+
+      const attTbody = document.getElementById('lbAttention');
+      const attention = [...lowList].sort((a,b)=>getAvailable(a)-getAvailable(b)).slice(0,5);
+      if(!attention.length) attTbody.innerHTML = '<tr><td colspan=\"3\" class=\"text-center text-muted py-4\">No low stock titles</td></tr>';
+      else attTbody.innerHTML = attention.map(b => {
+        const available = getAvailable(b);
+        const needed = Math.max(0, thresholdDefault - available);
+        return `<tr><td>${(b.title||'—')}</td><td class="text-end"><strong>${available}</strong></td><td class="text-end">${needed}</td></tr>`;
+      }).join('');
+
+      // Students
+      let students=[];
+      try{
+        const res=await fetch('/api/users/search?q=&role=student&limit=500',{credentials:'include'});
+        const data=await res.json().catch(()=>({success:false}));
+        if (data && (data.success===true)) students=data.students||[];
+        else if (data.users) students=data.users||[];
+      }catch{}
+      const registeredToday = students.filter(s => (s.created_at||'').slice(0,10)===today).length;
+      document.getElementById('lbStudents').textContent = students.length||0;
+      document.getElementById('lbStudentsToday').textContent = registeredToday||0;
+
+      // Notifications are handled by centralized notifications.js
+    }
+
+    function initAdminDashboard(section){
+      section.innerHTML = `
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-md-3"><div id="cardAdLibrarians" class="sb-card elevated text-center card-success"><div class="sb-card-title"><i class="bi bi-person-badge"></i>Total Librarians</div><div class="sb-card-value" id="adLibrarians">0</div></div></div>
+          <div class="col-6 col-md-3"><div id="cardAdStudents" class="sb-card elevated text-center card-success"><div class="sb-card-title"><i class="bi bi-people"></i>Total Students</div><div class="sb-card-value" id="adStudents">0</div></div></div>
+          <div class="col-6 col-md-3"><div id="cardAdNewUsers" class="sb-card elevated text-center card-success"><div class="sb-card-title"><i class="bi bi-person-plus"></i>New Users Today</div><div class="sb-card-value" id="adNewUsers">0</div></div></div>
+          <div class="col-6 col-md-3"><div id="cardAdDisabled" class="sb-card elevated text-center card-danger"><div class="sb-card-title"><i class="bi bi-person-x"></i>Disabled Accounts</div><div class="sb-card-value" id="adDisabled">0</div></div></div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-md-3"><div id="cardAdCategories" class="sb-card elevated text-center card-info"><div class="sb-card-title"><i class="bi bi-tags"></i>Categories</div><div class="sb-card-value" id="adCategories">0</div></div></div>
+          <div class="col-6 col-md-3"><div id="cardAdThreshold" class="sb-card elevated text-center card-warning"><div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Low-stock Threshold</div><div class="sb-card-value" id="adThreshold">3</div></div></div>
+          <div class="col-6 col-md-3"><div id="cardAdSmtp" class="sb-card elevated text-center card-success"><div class="sb-card-title"><i class="bi bi-envelope"></i>SMTP Status</div><div class="sb-card-value" id="adSmtp">—</div></div></div>
+          <div class="col-6 col-md-3"><div id="cardAdSysNotif" class="sb-card elevated text-center card-info"><div class="sb-card-title"><i class="bi bi-bell"></i>System Notifications</div><div class="sb-card-value" id="adSysNotif">0</div></div></div>
+        </div>
+        <div class="qa-bar mb-3">
+          <h5 class="fw-semibold">Quick Actions</h5>
+          <div class="shortcuts-group">
+            <a href="admin-users.html?action=add" class="btn btn-shortcut"><i class="bi bi-person-plus"></i>Add Librarian</a>
+            <a href="admin-categories.html" class="btn btn-shortcut"><i class="bi bi-tags"></i>Add Category</a>
+            <a href="admin-settings.html" class="btn btn-shortcut"><i class="bi bi-gear"></i>System Settings</a>
+            <a href="admin-logs.html" class="btn btn-shortcut"><i class="bi bi-card-checklist"></i>View Logs</a>
+          </div>
+        </div>
+        <div class="row g-3">
+          <div class="col-12 col-xl-6">
+            <div class="table-card card panel-equal h-100 w-100">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <span class="fw-semibold"><i class="bi bi-person-lines-fill me-2"></i>Recent Users Registered</span>
+                <a href="admin-users.html" class="link-light small">Manage</a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0">
+                  <thead><tr><th>Name</th><th>Role</th><th>Date</th><th>Status</th></tr></thead>
+                  <tbody id="adRecentUsers"><tr><td colspan="4" class="text-center text-muted py-4">Loading…</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-xl-6">
+            <div class="table-card card panel-equal h-100 w-100">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <span class="fw-semibold"><i class="bi bi-shield-check me-2"></i>Latest Librarian Actions</span>
+                <a href="admin-users.html" class="link-light small">View</a>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0">
+                  <thead><tr><th>Librarian</th><th>Action</th><th>Date</th><th>Details</th></tr></thead>
+                  <tbody id="adLibActions"><tr><td colspan="4" class="text-center text-muted py-4">No data</td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      loadAdminData();
+    }
+    async function loadAdminData(){
+      const today = new Date().toISOString().slice(0,10);
+      let users=[];
+      try{
+        const res=await fetch('/api/users?limit=1000',{credentials:'include'});
+        const data=await res.json().catch(()=>({success:false}));
+        if (data.success) users = data.users || data.students || [];
+      }catch{}
+      const librarians = users.filter(u => (u.role||'').toLowerCase()==='librarian');
+      const students = users.filter(u => (u.role||'').toLowerCase()==='student');
+      const newToday = users.filter(u => (u.created_at||'').slice(0,10)===today).length;
+      const disabled = users.filter(u => (u.status||'').toLowerCase()==='disabled').length;
+      document.getElementById('adLibrarians').textContent = librarians.length||0;
+      document.getElementById('adStudents').textContent = students.length||0;
+      document.getElementById('adNewUsers').textContent = newToday||0;
+      document.getElementById('adDisabled').textContent = disabled||0;
+      const recentTbody = document.getElementById('adRecentUsers');
+      const recent = [...users].sort((a,b)=> new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,6);
+      if(!recent.length) recentTbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">No recent registrations</td></tr>';
+      else recentTbody.innerHTML = recent.map(u => `
+        <tr>
+          <td>${[u.first_name,u.last_name].filter(Boolean).join(' ')||u.email||'—'}</td>
+          <td>${(u.role||'—')}</td>
+          <td>${u.created_at? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+          <td>${(u.status||'Active')}</td>
+        </tr>
+      `).join('');
+      try{
+        const res=await fetch('/api/categories',{credentials:'include'});
+        const data=await res.json().catch(()=>({ok:false}));
+        if(data.ok && Array.isArray(data.categories)) document.getElementById('adCategories').textContent = data.categories.length;
+      }catch{}
+      document.getElementById('adThreshold').textContent = '3';
+      const smtpEl = document.getElementById('adSmtp');
+      smtpEl.textContent = 'Configured';
+      // Notifications are handled by centralized notifications.js
+
+      // Cards are no longer clickable - removed click handlers
+
+      // Recent user row click → open users page focused
+      document.querySelectorAll('#adRecentUsers tr').forEach((tr,idx)=>{
+        const id = (recent[idx]||{}).id;
+        if (!id) return;
+        tr.style.cursor='pointer';
+        tr.addEventListener('click', ()=> go(`admin-users.html?id=${id}`));
+      });
+    }
+    function initStudentDashboard(section) {
+      section.innerHTML = `
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-md-3">
+            <div class="sb-card elevated text-center card-info">
+              <div class="sb-card-title"><i class="bi bi-journal-arrow-up"></i>Borrowed Books</div>
+              <div class="sb-card-value" id="cardBorrowed">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="sb-card elevated text-center card-warning">
+              <div class="sb-card-title"><i class="bi bi-calendar-event"></i>Due Soon</div>
+              <div class="sb-card-value" id="cardDueSoon">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="sb-card elevated text-center card-danger">
+              <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue</div>
+              <div class="sb-card-value" id="cardOverdue">0</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="sb-card elevated text-center card-success">
+              <div class="sb-card-title"><i class="bi bi-check-circle"></i>Approved Requests</div>
+              <div class="sb-card-value" id="cardApproved">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="qa-bar mb-3">
+          <h5 class="fw-semibold">Quick Actions</h5>
+          <div class="shortcuts-group">
+            <a href="books.html" class="btn btn-shortcut"><i class="bi bi-journal-text"></i>Browse Books</a>
+            <a href="student-history.html" class="btn btn-shortcut"><i class="bi bi-clock-history"></i>Borrowing History</a>
+            </div>
+            </div>
+
+          <div class="row g-3">
+          <div class="col-12">
+            <div class="table-card card panel-equal h-100 w-100">
+              <div class="card-header d-flex align-items-center justify-content-between">
+                <span class="fw-semibold"><i class="bi bi-clock-history me-2"></i>Recent Activity</span>
+                <div class="d-flex align-items-center gap-2">
+                  <a href="student-history.html" class="link-light small">See All</a>
+                  <button id="studentActivityRefresh" class="link-light small" style="background:#fff !important; color:#000 !important; border:1px solid transparent; padding:6px 14px !important; border-radius:50px !important; cursor:pointer; font-size:0.8125rem; font-weight:500; opacity:0.9; transition:all 0.2s ease; text-decoration:none;">Refresh</button>
+            </div>
+            </div>
+              <div class="table-responsive">
+                <table class="table table-modern align-middle mb-0">
+                  <thead><tr><th>Activity</th><th>Details</th><th class="text-end">Date</th></tr></thead>
+                  <tbody id="studentActivity"><tr><td colspan="3" class="text-center text-muted py-4">Loading…</td></tr></tbody>
+                </table>
+            </div>
+            </div>
+          </div>
+          </div>
+      `;
+
+      document.getElementById('studentActivityRefresh').addEventListener('click', loadStudentDashboardData);
+      loadStudentDashboardData();
+    }
+
+    async function loadStudentDashboardData() {
+      const borrowedEl = document.getElementById('cardBorrowed');
+      const dueSoonEl = document.getElementById('cardDueSoon');
+      const overdueEl = document.getElementById('cardOverdue');
+      const approvedEl = document.getElementById('cardApproved');
+      const activityList = document.getElementById('studentActivity');
+
+      if (!borrowedEl || !activityList) return;
+
+      try {
+        const loanRes = await fetch('/api/student/my-loans?pagesize=200', { credentials: 'include' });
+        const loanData = await loanRes.json().catch(() => ({ ok: false }));
+        if (loanData.ok) {
+          const loans = loanData.items || [];
+          const today = new Date();
+          const borrowedCount = loans.filter(l => l.loan_status === 'borrowed').length;
+          const overdueCount = loans.filter(l => l.loan_status === 'overdue').length;
+          const dueSoonCount = loans.filter(l => {
+            if (l.loan_status !== 'borrowed' || !l.due_at) return false;
+            const due = new Date(l.due_at);
+            const diff = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+            return diff >= 0 && diff <= 3;
+          }).length;
+
+          borrowedEl.textContent = borrowedCount;
+          overdueEl.textContent = overdueCount;
+          dueSoonEl.textContent = dueSoonCount;
+        } else {
+          borrowedEl.textContent = overdueEl.textContent = dueSoonEl.textContent = '—';
+        }
+      } catch (err) {
+        console.error('Loans fetch failed', err);
+        borrowedEl.textContent = overdueEl.textContent = dueSoonEl.textContent = '—';
+      }
+
+      try {
+        const notifRes = await fetch('/api/student/notifications', { credentials: 'include' });
+        const notifData = await notifRes.json().catch(() => ({ ok: false }));
+        if (!notifData.ok) throw new Error(notifData.error || 'Failed to load notifications');
+
+        const notifications = notifData.notifications || [];
+        const approvedCount = notifications.filter(n => n.type === 'approved').length;
+        approvedEl.textContent = approvedCount;
+
+        if (!notifications.length) {
+          activityList.innerHTML = '<tr><td colspan="3" class="text-center text-muted py-4">No activity yet.</td></tr>';
+        } else {
+          activityList.innerHTML = notifications.slice(0, 5).map(n => {
+            const date = n.created_at ? new Date(n.created_at).toLocaleDateString() : '—';
+            return `
+              <tr>
+                <td><div class="fw-medium">${n.title || 'Notification'}</div></td>
+                <td><div class="text-muted small">${n.message || ''}</div></td>
+                <td class="text-end"><div class="text-muted small">${date}</div></td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        console.error('Notifications fetch failed', err);
+        approvedEl.textContent = '—';
+        activityList.innerHTML = `<tr><td colspan="3" class="text-center text-danger py-4">${err.message || 'Error loading activity'}</td></tr>`;
+      }
+    }
+  </script>
+</body>
+</html>

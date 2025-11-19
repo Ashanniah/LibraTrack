@@ -1,19 +1,19 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>LibraTrack – Search Books</title>
+  <title>LibraTrack – Notifications</title>
 
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
-  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
   <link href="assets/css/student-pages.css" rel="stylesheet">
 </head>
-<body class="sb-body">
+<body class="sb-body sb-expanded">
   <div id="sidebar-root"></div>
   <div class="sb-wrapper">
     <div class="page-head">
@@ -35,30 +35,100 @@
       <section class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <span class="fw-semibold"><i class="bi bi-bell me-2"></i>Recent</span>
-          <small class="text-white-50">Auto-clears after 30 days</small>
+          <button id="btnRefresh" class="btn btn-sm btn-light">Refresh</button>
         </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div><i class="bi bi-exclamation-triangle text-danger me-2"></i><strong>Overdue</strong>: Discrete Math</div>
-            <span class="badge text-bg-danger-soft rounded-pill">1 day late</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div><i class="bi bi-calendar2-week text-primary me-2"></i><strong>Due soon</strong>: Atomic Habits</div>
-            <span class="badge text-bg-primary-soft rounded-pill">Due Sep 22</span>
-          </li>
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-            <div><i class="bi bi-check2-circle text-success me-2"></i><strong>Reservation ready</strong>: Design Patterns</div>
-            <span class="badge text-bg-success-soft rounded-pill">Pick up</span>
-          </li>
+        <ul class="list-group list-group-flush" id="notifList">
+          <li class="list-group-item text-center text-muted py-4">Loading…</li>
         </ul>
+        <div id="notifEmpty" class="text-center text-muted py-5 d-none">
+          <i class="bi bi-bell-slash fs-2 d-block mb-2"></i>
+          No notifications yet.
+        </div>
       </section>
     </main>
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
   <script>
-    /* paste the same renderStudentSidebar + toggleSidebar from student-search.html */
-    renderStudentSidebar('notifications');
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+    (async () => {
+      try {
+        const res = await fetch('/api/check-auth', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+        const data = await res.ok ? await res.json() : null;
+        const role = (data?.user?.role || 'student').toLowerCase();
+        if (['admin', 'librarian', 'student'].includes(role)) {
+          renderSidebar('notifications', role);
+        }
+      } catch {
+        renderSidebar('notifications', 'student');
+      }
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        if (typeof toggleSidebar === 'function') toggleSidebar();
+        else document.body.classList.toggle('sb-expanded');
+      });
+    })();
+
+    const list = document.getElementById('notifList');
+    const empty = document.getElementById('notifEmpty');
+    const btnRefresh = document.getElementById('btnRefresh');
+
+    const TYPE_META = {
+      'overdue': { icon:'bi-exclamation-triangle text-danger', badge:'badge text-bg-danger-soft', label:'Overdue' },
+      'due-soon': { icon:'bi-calendar2-week text-primary', badge:'badge text-bg-primary-soft', label:'Due soon' },
+      'approved': { icon:'bi-check2-circle text-success', badge:'badge text-bg-success-soft', label:'Approved' },
+      'request-pending': { icon:'bi-hourglass-split text-secondary', badge:'badge text-bg-secondary-soft text-dark', label:'Pending' },
+      'rejected': { icon:'bi-x-circle text-danger', badge:'badge text-bg-danger-soft', label:'Rejected' },
+      'returned': { icon:'bi-arrow-counterclockwise text-success', badge:'badge text-bg-success-soft', label:'Returned' },
+    };
+
+    const fmtDateTime = (value) => {
+      if (!value) return '';
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? value : d.toLocaleString();
+    };
+
+    async function loadNotifications() {
+      list.innerHTML = '<li class="list-group-item text-center text-muted py-4">Loading…</li>';
+      empty.classList.add('d-none');
+      try {
+        const res = await fetch('/api/student/notifications', { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'Failed to load notifications');
+        renderNotifications(data.notifications || []);
+      } catch (err) {
+        list.innerHTML = `<li class="list-group-item text-center text-danger py-4">${err.message}</li>`;
+      }
+    }
+
+    function renderNotifications(items) {
+      if (!items.length) {
+        list.innerHTML = '';
+        empty.classList.remove('d-none');
+        return;
+      }
+      empty.classList.add('d-none');
+      list.innerHTML = items.map(item => {
+        const meta = TYPE_META[item.type] || { icon:'bi-bell text-primary', badge:'badge text-bg-light text-dark', label:item.type || 'Info' };
+        const timestamp = fmtDateTime(item.timestamp);
+        return `
+          <li class="list-group-item d-flex justify-content-between align-items-center gap-3">
+            <div class="d-flex align-items-center gap-3">
+              <i class="bi ${meta.icon}"></i>
+              <div>
+                <div class="fw-semibold">${item.title || meta.label}</div>
+                <div class="text-muted small">${item.message || ''}</div>
+                ${timestamp ? `<div class="text-muted small">${timestamp}</div>` : ''}
+              </div>
+            </div>
+            <span class="${meta.badge}">${meta.label}</span>
+          </li>
+        `;
+      }).join('');
+    }
+
+    btnRefresh.addEventListener('click', loadNotifications);
+    loadNotifications();
   </script>
 </body>
+</html>
+

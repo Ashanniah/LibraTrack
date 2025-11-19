@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
@@ -8,146 +8,632 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/css/sidebar.css" rel="stylesheet">
-  <link href="assets/css/student-pages.css" rel="stylesheet">
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+  <style>
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+      --brand-gold:#a68604;
+      --gold-dark:#8d7003;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --header-bg:#fff;
+      --table-header-bg:#fff;
+      --card-border:#e5e7eb;
+    }
+    html{font-size:14px;}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+    main.container-fluid{padding:24px!important}
+
+    /* Header Styling */
+    .admin-header-gold{
+      background:#fff!important;
+      border-bottom:1px solid var(--card-border);
+      padding:12px 24px;
+    }
+    .admin-header-gold .fw-bold,
+    .admin-header-gold .h5,
+    .admin-header-gold #pageTitle {
+      color: var(--text-primary) !important;
+      font-weight:700;
+      font-size:1.25rem;
+      letter-spacing:0.01em;
+    }
+    .search-bar-custom {
+      height: 42px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-sm);
+      background: #fff;
+      overflow: hidden;
+    }
+    .search-bar-custom .input-group-text,
+    .search-bar-custom .form-control {
+      height: 42px;
+      padding: 10px 16px;
+      font-size:0.875rem;
+      border: none !important;
+      background: transparent !important;
+    }
+    .search-bar-custom .input-group-text {
+      color: var(--text-secondary);
+      padding-left: 16px;
+      padding-right: 8px;
+    }
+    .search-bar-custom .form-control {
+      color: var(--text-primary);
+      padding-left: 8px;
+      padding-right: 16px;
+    }
+    .search-bar-custom .form-control::placeholder {
+      color: var(--text-secondary);
+    }
+    .search-bar-custom:focus-within {
+      box-shadow: 0 0 0 3px rgba(166,134,4,0.15);
+      border-color: var(--brand-gold);
+    }
+    .search-bar-custom:focus-within .input-group-text {
+      color: var(--text-primary);
+    }
+    .notification-btn{
+      width:44px;
+      height:44px;
+      border-radius:var(--border-radius-sm);
+      border:none;
+      background:transparent;
+      color:var(--text-primary);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+    }
+    .notification-btn:hover{
+      background:#f8f9fa;
+      color:var(--text-primary);
+    }
+    .notification-btn i{
+      font-size:1.25rem;
+    }
+    .admin-btn-custom{
+      padding:0;
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      border:1px solid var(--card-border);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all 0.2s ease;
+      overflow:hidden;
+    }
+    .admin-btn-custom:hover{
+      border-color:var(--brand-gold);
+      box-shadow:0 0 0 2px rgba(166,134,4,0.1);
+    }
+    .avatar-32 {
+      width:32px;
+      height:32px;
+      border-radius:50%;
+      object-fit:cover;
+    }
+
+    /* Table Styling */
+    .table-modern{
+      margin-bottom:0;
+    }
+    .table-modern thead th{
+      background:#fff;
+      color:var(--text-secondary);
+      font-weight:700;
+      font-size:0.8125rem;
+      text-transform:uppercase;
+      letter-spacing:0.05em;
+      padding:16px var(--cell-pad-x);
+      border-bottom:2px solid var(--ui-border);
+      vertical-align:middle;
+    }
+    .table-modern tbody td{
+      padding:var(--cell-pad-y) var(--cell-pad-x);
+      vertical-align:middle;
+    }
+    .table-modern tbody tr:hover{
+      background:#f8f9fa;
+    }
+
+    /* Filter Buttons */
+    .filter-section {
+      background: #fff;
+      border: 1px solid var(--card-border);
+      border-radius: var(--border-radius-lg);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+    }
+    .filter-section .btn {
+      padding: 8px 20px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--card-border);
+      background: #fff;
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+    }
+    .filter-section .btn.active {
+      background: #111;
+      border-color: #111;
+      color: #fff;
+    }
+    .filter-section .btn:hover:not(.active) {
+      background: #f8f9fa;
+      border-color: var(--card-border);
+    }
+
+    /* Card Styling */
+    .card {
+      border-radius: var(--border-radius-lg);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    /* Pill Badges */
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:0.8125rem;
+      font-weight:600;
+    }
+    .pill-info{background:#dbeafe;color:#1e40af}
+    .pill-success{background:#d1fae5;color:#065f46}
+    .pill-danger{background:#fee2e2;color:#991b1b}
+
+    /* Empty State */
+    #historyEmpty {
+      padding: 48px 24px;
+      color: var(--text-secondary);
+    }
+    #historyEmpty i {
+      color: var(--text-secondary);
+      opacity: 0.5;
+    }
+
+    /* Drawer Styling - Similar to Librarian */
+    .request-drawer { 
+      width: 520px; 
+      max-width: 90vw; 
+    }
+    .request-drawer .offcanvas-header {
+      background: var(--sidebar-bg);
+      color: #fff;
+      border-bottom: none;
+      padding: 24px;
+    }
+    .request-drawer .offcanvas-title {
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    .request-drawer .offcanvas-header .btn-close {
+      filter: invert(1) grayscale(1);
+      opacity: 0.8;
+    }
+    .request-drawer .offcanvas-body { 
+      padding: 24px;
+      background: #fff;
+    }
+    .book-cover-small { 
+      width: 100px; 
+      height: 140px; 
+      object-fit: cover; 
+      border-radius: var(--border-radius-sm);
+      background: #f3f4f6;
+      box-shadow: var(--shadow-sm);
+    }
+    .request-section {
+      margin-bottom: 28px;
+    }
+    .request-section:last-child {
+      margin-bottom: 0;
+    }
+    .request-section-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--sidebar-bg);
+      padding: 8px 16px;
+      border-radius: var(--border-radius-sm);
+    }
+    .request-section-title i {
+      color: #fff;
+      font-size: 1rem;
+    }
+    .book-info-card {
+      background: #f8f9fa;
+      border-radius: var(--border-radius);
+      padding: 16px;
+      border: 1px solid var(--ui-border);
+    }
+    .book-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .book-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .book-meta i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-row {
+      display: flex;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--ui-border);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      min-width: 120px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .info-label i {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      width: 16px;
+    }
+    .info-value {
+      color: var(--text-primary);
+      font-size: 0.9375rem;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body class="sb-body">
   <div id="sidebar-root"></div>
 
   <div class="sb-wrapper">
-    <div class="page-head">
-      <div class="container-fluid d-flex align-items-center justify-content-between py-3">
-        <div class="d-flex align-items-center gap-2">
-          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2" aria-label="Toggle sidebar">
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
             <i class="bi bi-list fs-4"></i>
           </button>
-          <div class="page-title">Borrowing History</div>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Borrowing History</div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
+            <div class="input-group search-bar-custom">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input id="historySearch" class="form-control" type="search" placeholder="Search">
+            </div>
+          </form>
+
+          <div class="dropdown position-relative">
+            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
+              <i class="bi bi-bell"></i>
+              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
+              <li><h6 class="dropdown-header">Notifications</h6></li>
+              <li><hr class="dropdown-divider"></li>
+              <li id="notificationList">
+                <div class="px-3 py-2 text-center text-muted">
+                  <small>No notifications</small>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="dropdown">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="student-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
         </div>
       </div>
-    </div>
+    </nav>
 
     <main class="container-fluid py-4">
-      <section class="card p-0">
+      <div class="filter-section">
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn active" data-status="">All</button>
+          <button class="btn" data-status="borrowed">Borrowed</button>
+          <button class="btn" data-status="returned">Returned</button>
+          <button class="btn" data-status="overdue">Overdue</button>
+        </div>
+      </div>
+
+      <section class="card">
         <div class="table-responsive">
           <table class="table table-modern align-middle mb-0">
             <thead>
               <tr>
-                <th>Date</th>
                 <th>Book</th>
                 <th>Status</th>
                 <th>Borrowed</th>
                 <th>Due</th>
                 <th>Returned</th>
+                <th class="text-end" style="width:120px">Actions</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>Sep 5</td>
-                <td>Atomic Habits</td>
-                <td><span class="pill pill-info"><span class="dot"></span>Borrowed</span></td>
-                <td>Sep 5</td>
-                <td>Sep 22</td>
-                <td>—</td>
-              </tr>
-              <tr>
-                <td>Sep 2</td>
-                <td>Clean Code</td>
-                <td><span class="pill pill-success"><span class="dot"></span>Returned</span></td>
-                <td>Aug 30</td>
-                <td>Sep 6</td>
-                <td>Sep 3</td>
-              </tr>
-              <tr>
-                <td>Aug 30</td>
-                <td>Discrete Math</td>
-                <td><span class="pill pill-danger"><span class="dot"></span>Overdue</span></td>
-                <td>Aug 20</td>
-                <td>Sep 1</td>
-                <td>—</td>
-              </tr>
-            </tbody>
+            <tbody id="historyBody"></tbody>
           </table>
+        </div>
+        <div id="historyEmpty" class="text-center text-muted py-5 d-none">
+          <i class="bi bi-journal-arrow-up fs-2 d-block mb-2"></i>
+          No transactions found.
         </div>
       </section>
     </main>
   </div>
 
+  <!-- Loan Details Drawer -->
+  <div class="offcanvas offcanvas-end request-drawer" tabindex="-1" id="loanDrawer" aria-labelledby="loanDrawerLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="loanDrawerLabel">Loan Details</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+    <div class="offcanvas-body" id="loanDrawerBody">
+      <!-- Content populated by JS -->
+    </div>
+  </div>
+
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
   <script>
-    // ---- Sidebar rendering (no code generation / nested templates) ----
-    function renderStudentSidebar(active = 'history') {
-      const root = document.getElementById('sidebar-root');
-      if (!root) return;
-
-      root.innerHTML = `
-        <nav id="sidebar" class="sb-sidebar d-flex flex-column">
-          <a class="sb-brand" href="student-dashboard.html">
-            <img src="assets/img/LibraTrack-logo.png" class="sb-logo" alt="LibraTrack">
-            <span class="sb-text fw-semibold">LibraTrack</span>
-          </a>
-
-          <div class="sb-menu flex-grow-1">
-            <div class="sb-label">Main</div>
-
-            <a class="sb-link ${active === 'dashboard' ? 'active' : ''}" href="student-dashboard.html">
-              <i class="bi bi-speedometer2"></i><span class="sb-text">Dashboard</span>
-            </a>
-            <a class="sb-link ${active === 'search' ? 'active' : ''}" href="student-search.html">
-              <i class="bi bi-search"></i><span class="sb-text">Search Books</span>
-            </a>
-            <a class="sb-link ${active === 'history' ? 'active' : ''}" href="student-history.html">
-              <i class="bi bi-clock-history"></i><span class="sb-text">History</span>
-            </a>
-            <a class="sb-link ${active === 'favorites' ? 'active' : ''}" href="student-favorite.html">
-              <i class="bi bi-heart"></i><span class="sb-text">Favorites</span>
-            </a>
-            <a class="sb-link ${active === 'overdue' ? 'active' : ''}" href="student-overdue.html">
-              <i class="bi bi-exclamation-triangle"></i><span class="sb-text">Overdue</span>
-            </a>
-            <a class="sb-link ${active === 'notifications' ? 'active' : ''}" href="student-notifications.html">
-              <i class="bi bi-bell"></i><span class="sb-text">Notifications</span>
-            </a>
-
-            <div class="sb-label mt-3">Account</div>
-            <a class="sb-link" href="student-profile.html">
-              <i class="bi bi-person"></i><span class="sb-text">Profile</span>
-            </a>
-            <a class="sb-link" href="login.html">
-              <i class="bi bi-box-arrow-right"></i><span class="sb-text">Logout</span>
-            </a>
-          </div>
-
-          <div class="mt-auto small text-secondary px-3 pb-3 sb-text">
-            © <span id="year"></span> LibraTrack
-          </div>
-        </nav>
-      `;
-
-      const y = root.querySelector('#year');
-      if (y) y.textContent = new Date().getFullYear();
+    async function logout() {
+      try {
+        await fetch('/api/logout', { method: 'POST', credentials: 'include' });
+      } catch {}
+      location.href = 'login.html';
     }
 
-    function toggleSidebar() {
-      const desktop = window.innerWidth >= 992;
-      if (desktop) {
-        document.body.classList.toggle('sb-expanded');
-        document.body.classList.remove('sb-toggled');
-      } else {
-        document.body.classList.toggle('sb-toggled');
-        document.body.classList.remove('sb-expanded');
+    (async () => {
+      try {
+        const res = await fetch('/api/check-auth', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+        const data = await res.ok ? await res.json() : null;
+        const role = (data?.user?.role || 'student').toLowerCase();
+        if (['admin', 'librarian', 'student'].includes(role)) {
+          renderSidebar('history', role);
+          
+          // Load avatar if available
+          const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+          if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') {
+            headerAvatar.src = data.user.avatar;
+          }
+        }
+      } catch {
+        renderSidebar('history', 'student');
       }
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        if (typeof toggleSidebar === 'function') toggleSidebar();
+        else document.body.classList.toggle('sb-expanded');
+      });
+
+      // Search functionality
+      const searchInput = document.getElementById('historySearch');
+      if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+          clearTimeout(searchTimeout);
+          const query = e.target.value.trim().toLowerCase();
+          searchTimeout = setTimeout(() => {
+            filterBySearch(query);
+          }, 300);
+        });
+      }
+    })();
+
+    function filterBySearch(query) {
+      const rows = document.querySelectorAll('#historyBody tr');
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
     }
 
-    // ---- Init ----
-    renderStudentSidebar('history');
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+    const filters = document.querySelectorAll('[data-status]');
+    const tbody = document.getElementById('historyBody');
+    const empty = document.getElementById('historyEmpty');
 
-    // keep state sensible on resize
-    window.addEventListener('resize', () => {
-      if (window.innerWidth >= 992) {
-        document.body.classList.remove('sb-toggled');
-      }
+    let currentStatus = '';
+    let loans = [];
+
+    filters.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filters.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentStatus = btn.dataset.status || '';
+        loadLoans(currentStatus);
+      });
     });
+
+    function statusPill(status) {
+      const map = {
+        borrowed: 'pill-info',
+        returned: 'pill-success',
+        overdue: 'pill-danger'
+      };
+      return `<span class="pill ${map[status] || 'pill-neutral'}">${status.charAt(0).toUpperCase()+status.slice(1)}</span>`;
+    }
+
+    function fmtDate(value) {
+      if (!value) return '—';
+      const d = new Date(value);
+      if (Number.isNaN(d.getTime())) return value;
+      return d.toLocaleDateString();
+    }
+
+    async function loadLoans(status='') {
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Loading…</td></tr>';
+      empty.classList.add('d-none');
+      try {
+        const url = new URL('/api/student/my-loans', location.origin);
+        url.searchParams.set('pagesize', '200');
+        if (status) url.searchParams.set('status', status);
+        const res = await fetch(url, { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'Failed to load');
+        loans = data.items || [];
+        renderRows();
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">${err.message}</td></tr>`;
+      }
+    }
+
+    function renderRows() {
+      if (!loans.length) {
+        tbody.innerHTML = '';
+        empty.classList.remove('d-none');
+        return;
+      }
+      empty.classList.add('d-none');
+      tbody.innerHTML = loans.map(loan => `
+        <tr>
+          <td>
+            <div class="fw-medium">${loan.book_title || '—'}</div>
+            <div class="small text-muted">${loan.isbn || ''}</div>
+          </td>
+          <td>${statusPill(loan.loan_status)}</td>
+          <td>${fmtDate(loan.borrowed_at)}</td>
+          <td>${fmtDate(loan.due_at)}</td>
+          <td>${loan.returned_at ? fmtDate(loan.returned_at) : '—'}</td>
+          <td class="text-end">
+            <i class="bi bi-eye" style="cursor:pointer; font-size:1.125rem; color:var(--text-primary);" data-id="${loan.id}" title="View Details"></i>
+          </td>
+        </tr>
+      `).join('');
+
+      tbody.querySelectorAll('i[data-id]').forEach(icon => {
+        icon.addEventListener('click', () => openDetails(icon.dataset.id));
+        icon.addEventListener('mouseenter', function() {
+          this.style.color = 'var(--brand-gold)';
+        });
+        icon.addEventListener('mouseleave', function() {
+          this.style.color = 'var(--text-primary)';
+        });
+      });
+    }
+
+    function openDetails(id) {
+      const loan = loans.find(l => String(l.id) === String(id));
+      if (!loan) return;
+      
+      const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      const cover = loan.cover_url || 'assets/img/no-cover.png';
+      const statusBadge = loan.loan_status === 'borrowed' ? '<span class="badge" style="background:#dbeafe; color:#1e40af; font-weight:600; padding:6px 12px;">BORROWED</span>'
+                         : loan.loan_status === 'returned' ? '<span class="badge" style="background:#d1fae5; color:#065f46; font-weight:600; padding:6px 12px;">RETURNED</span>'
+                         : loan.loan_status === 'overdue' ? '<span class="badge" style="background:#fee2e2; color:#991b1b; font-weight:600; padding:6px 12px;">OVERDUE</span>'
+                         : '<span class="badge text-bg-secondary">UNKNOWN</span>';
+      
+      const body = `
+        <!-- Status Badge -->
+        <div class="mb-4 text-center">
+          ${statusBadge}
+        </div>
+        
+        <!-- Book Information -->
+        <div class="request-section">
+          <div class="request-section-title">
+            <i class="bi bi-journal-text"></i> Book Information
+          </div>
+          <div class="book-info-card">
+            <div class="d-flex gap-3">
+              <img src="${cover}" alt="${esc(loan.book_title)}" class="book-cover-small" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+              <div class="flex-grow-1">
+                <div class="book-title">${esc(loan.book_title || '—')}</div>
+                ${loan.author ? `<div class="book-meta">
+                  <i class="bi bi-person"></i>
+                  <span>${esc(loan.author)}</span>
+                </div>` : ''}
+                ${loan.category ? `<div class="book-meta">
+                  <i class="bi bi-tag"></i>
+                  <span>${esc(loan.category)}</span>
+                </div>` : ''}
+                ${loan.isbn ? `<div class="book-meta">
+                  <i class="bi bi-upc-scan"></i>
+                  <span>ISBN: ${esc(loan.isbn)}</span>
+                </div>` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Loan Information -->
+        <div class="request-section">
+          <div class="request-section-title">
+            <i class="bi bi-calendar-event"></i> Loan Information
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar-check"></i> Borrowed
+            </div>
+            <div class="info-value">${fmtDate(loan.borrowed_at)}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar-x"></i> Due Date
+            </div>
+            <div class="info-value">${fmtDate(loan.due_at)}</div>
+          </div>
+          ${loan.returned_at ? `<div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-box-arrow-in-left"></i> Returned
+            </div>
+            <div class="info-value">${fmtDate(loan.returned_at)}</div>
+          </div>` : ''}
+          ${loan.extended_due_at ? `<div class="info-row">
+            <div class="info-label">
+              <i class="bi bi-calendar-plus"></i> Extended To
+            </div>
+            <div class="info-value">${fmtDate(loan.extended_due_at)}</div>
+          </div>` : ''}
+        </div>
+      `;
+      
+      document.getElementById('loanDrawerLabel').textContent = `Loan Details – ${esc(loan.book_title || 'Book')}`;
+      document.getElementById('loanDrawerBody').innerHTML = body;
+      bootstrap.Offcanvas.getOrCreateInstance('#loanDrawer').show();
+    }
+
+    loadLoans();
   </script>
 </body>
 </html>

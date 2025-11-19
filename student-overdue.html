@@ -1,19 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>LibraTrack – Search Books</title>
-
+  <title>LibraTrack – Overdue Books</title>
   <link rel="icon" href="assets/img/LibraTrack-logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-
-  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
   <link href="assets/css/student-pages.css" rel="stylesheet">
 </head>
-<body class="sb-body">
+<body class="sb-body sb-expanded">
   <div id="sidebar-root"></div>
   <div class="sb-wrapper">
     <div class="page-head">
@@ -28,10 +26,22 @@
     <main class="container-fluid py-4">
       <div class="row g-3 mb-3">
         <div class="col-6 col-md-3">
-          <div class="kpi"><div class="icon"><i class="bi bi-exclamation-triangle"></i></div><div><div class="small text-muted">Items</div><div class="value">1</div></div></div>
+          <div class="kpi">
+            <div class="icon"><i class="bi bi-exclamation-triangle"></i></div>
+            <div>
+              <div class="small text-muted">Items</div>
+              <div class="value" id="kpiItems">0</div>
+            </div>
+          </div>
         </div>
         <div class="col-6 col-md-3">
-          <div class="kpi"><div class="icon"><i class="bi bi-wallet2"></i></div><div><div class="small text-muted">Estimated Fine</div><div class="value">₱45</div></div></div>
+          <div class="kpi">
+            <div class="icon"><i class="bi bi-wallet2"></i></div>
+            <div>
+              <div class="small text-muted">Estimated Fine</div>
+              <div class="value" id="kpiFine">₱0</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -39,30 +49,109 @@
         <div class="table-responsive">
           <table class="table table-modern align-middle mb-0">
             <thead>
-              <tr><th>Book</th><th>Borrowed</th><th>Due</th><th>Days Late</th><th class="text-end" style="width:160px">Actions</th></tr>
-            </thead>
-            <tbody>
               <tr>
-                <td>Discrete Math</td><td>Aug 20</td><td>Sep 1</td><td><span class="badge text-bg-danger-soft">+7</span></td>
-                <td class="text-end">
-                  <div class="btn-group btn-group-sm">
-                    <button class="btn btn-outline-primary"><i class="bi bi-envelope"></i> Email Librarian</button>
-                    <button class="btn btn-outline-success"><i class="bi bi-bookmark-check"></i> Return</button>
-                  </div>
-                </td>
+                <th>Book</th>
+                <th>Borrowed</th>
+                <th>Due</th>
+                <th>Days Late</th>
+                <th class="text-end" style="width:160px">Actions</th>
               </tr>
-              <tr><td colspan="5" class="small text-muted px-3 py-2">Note: fines are estimates; final amount is posted upon return.</td></tr>
-            </tbody>
+            </thead>
+            <tbody id="overdueBody"></tbody>
           </table>
+        </div>
+        <div id="overdueEmpty" class="text-center text-muted py-5">
+          <i class="bi bi-emoji-smile fs-2 d-block mb-2"></i>
+          No overdue books. Keep it up!
+        </div>
+        <div class="small text-muted px-3 py-2 border-top">
+          Note: fines are estimates; final amount is posted upon return.
         </div>
       </section>
     </main>
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
   <script>
-    /* paste the same renderStudentSidebar + toggleSidebar from student-search.html */
-    renderStudentSidebar('overdue');
-    document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+    (async () => {
+      try {
+        const res = await fetch('/api/check-auth', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+        const data = await res.ok ? await res.json() : null;
+        const role = (data?.user?.role || 'student').toLowerCase();
+        if (['admin', 'librarian', 'student'].includes(role)) {
+          renderSidebar('overdue', role);
+        }
+      } catch {
+        renderSidebar('overdue', 'student');
+      }
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        if (typeof toggleSidebar === 'function') toggleSidebar();
+        else document.body.classList.toggle('sb-expanded');
+      });
+    })();
+
+    const tbody = document.getElementById('overdueBody');
+    const empty = document.getElementById('overdueEmpty');
+    const kpiItems = document.getElementById('kpiItems');
+    const kpiFine = document.getElementById('kpiFine');
+    const FINE_PER_DAY = 5;
+
+    const fmtDate = (value) => {
+      if (!value) return '—';
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString();
+    };
+
+    const renderRows = (items = []) => {
+      if (!items.length) {
+        tbody.innerHTML = '';
+        empty.classList.remove('d-none');
+        kpiItems.textContent = '0';
+        kpiFine.textContent = '₱0';
+        return;
+      }
+      empty.classList.add('d-none');
+      kpiItems.textContent = String(items.length);
+      const totalFine = items.reduce((sum, item) => sum + (item.days_late || 0) * FINE_PER_DAY, 0);
+      kpiFine.textContent = `₱${totalFine.toLocaleString()}`;
+
+      tbody.innerHTML = items.map(item => `
+        <tr>
+          <td>
+            <div class="fw-medium">${item.book_title || '—'}</div>
+            <div class="small text-muted">${item.isbn || ''}</div>
+          </td>
+          <td>${fmtDate(item.borrowed_at)}</td>
+          <td>${fmtDate(item.due_at)}</td>
+          <td><span class="badge text-bg-danger-soft">+${item.days_late || 0}</span></td>
+          <td class="text-end">
+            <div class="btn-group btn-group-sm">
+              <a href="student-notifications.html" class="btn btn-outline-primary"><i class="bi bi-envelope"></i> Notify</a>
+              <a href="borrow-return.html" class="btn btn-outline-success"><i class="bi bi-bookmark-check"></i> Return</a>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    };
+
+    async function loadOverdue() {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Loading…</td></tr>';
+      try {
+        const url = new URL('/api/student/my-loans', location.origin);
+        url.searchParams.set('status', 'overdue');
+        url.searchParams.set('pagesize', '100');
+        const res = await fetch(url, { credentials: 'include' });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'Failed to load');
+        renderRows(data.items || []);
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">${err.message}</td></tr>`;
+      }
+    }
+
+    loadOverdue();
   </script>
 </body>
+</html>
+

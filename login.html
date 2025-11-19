@@ -23,6 +23,86 @@
 
   <!-- Site CSS -->
   <link href="assets/css/main.css" rel="stylesheet">
+  <style>
+    :root {
+      --brand-gold: #a68604;
+      --gold-dark: #8d7003;
+      --border-radius-sm: 8px;
+    }
+    .login-card, .login-card .card-body {
+      background: #fff !important;
+    }
+    .login-card {
+      border-radius: 20px !important;
+      overflow: hidden;
+    }
+    .btn-primary, .form-button-label {
+      background: var(--brand-gold) !important;
+      border-color: var(--brand-gold) !important;
+      color: #fff !important;
+      font-weight: 600;
+      border-radius: var(--border-radius-sm);
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      background: var(--gold-dark) !important;
+      border-color: var(--gold-dark) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(166, 134, 4, 0.3);
+    }
+    .form-big-label {
+      color: #111 !important;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    .form-label-login-register {
+      color: #374151 !important;
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 8px;
+    }
+    .form-control {
+      padding: 10px 14px !important;
+      font-size: 0.9375rem !important;
+      border: 1.5px solid #e5e7eb !important;
+      border-radius: var(--border-radius-sm) !important;
+      background: #fff !important;
+      color: #111827 !important;
+      transition: all 0.2s ease;
+    }
+    .form-control:focus {
+      border-color: var(--brand-gold) !important;
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.1) !important;
+      outline: none !important;
+    }
+    .form-control:hover:not(:focus) {
+      border-color: #d1d5db !important;
+    }
+    .form-control::placeholder {
+      color: #9ca3af !important;
+      font-size: 0.875rem !important;
+    }
+    .form-check-input {
+      border: 1.5px solid #e5e7eb;
+      border-radius: 4px;
+    }
+    .form-check-input:checked {
+      background-color: var(--brand-gold);
+      border-color: var(--brand-gold);
+    }
+    .form-check-label {
+      color: #374151 !important;
+      font-size: 0.875rem;
+    }
+    .form-label-create {
+      color: var(--brand-gold) !important;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .form-label-create:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 
 <body class="index-page">
@@ -54,8 +134,8 @@
   <main class="main">
     <!-- Login -->
     <section class="page-bg min-vh-100 d-flex align-items-center justify-content-center">
-      <div class="card login-card border-0 shadow-sm mx-auto" style="max-width:420px; width:100%;">
-        <div class="card-body p-5">
+      <div class="card login-card border-0 shadow-sm mx-auto" style="max-width:420px; width:100%; background:#fff !important;">
+        <div class="card-body p-5" style="background:#fff !important;">
 
           <!-- Logo -->
           <div class="text-center mb-4">
@@ -63,7 +143,7 @@
           </div>
 
           <!-- Heading -->
-          <h3 class="form-big-label text-center mb-4">Welcome back!</h3>
+          <h3 class="form-big-label text-center mb-4">LOGIN</h3>
 
           <!-- Form -->
           <form id="loginForm" novalidate>
@@ -191,8 +271,8 @@
           return;
         }
 
-        // Use absolute endpoint to avoid base-path issues
-        const ENDPOINT = '/libratrack/backend/login.php';
+        // Use Laravel API endpoint
+        const ENDPOINT = '/api/login';
         console.log('Attempting login to:', ENDPOINT);
 
         try {
@@ -214,6 +294,8 @@
 
           if (!res.ok || !data.success) {
             console.error('Login failed:', msg, data);
+            // Clear any cached role on login failure
+            localStorage.removeItem('userRole');
             if (data.field === 'email') {
               email.classList.add('is-invalid');
               emailError.textContent = msg;
@@ -226,9 +308,13 @@
             return;
           }
 
-          // Success -> redirect. Small delay helps ensure cookie is set.
-          const dest = data.redirect || '/libratrack/dashboard.html';
-          console.log('Login successful, redirecting to:', dest, 'session:', data.session_id);
+          // Success -> cache role and redirect. Small delay helps ensure cookie is set.
+          const role = (data.role || data.user?.role || 'student').toLowerCase();
+          if (['admin', 'librarian', 'student'].includes(role)) {
+            localStorage.setItem('userRole', role);
+          }
+          const dest = data.redirect || '/dashboard';
+          console.log('Login successful, redirecting to:', dest, 'session:', data.session_id, 'role:', role);
           setTimeout(() => { window.location.assign(dest); }, 150);
 
         } catch (err) {

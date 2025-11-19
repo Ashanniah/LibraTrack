@@ -1,0 +1,55 @@
+:root{
+  --ft-card:#0f172a;
+  --ft-card-head:#0b1224;
+  --ft-soft:#f1f5f9;
+  --ft-border:#1f2937;
+  --ft-chip:#e2e8f0;
+}
+
+/* cards */
+.sb-card-link{ display:block; text-decoration:none; }
+.sb-card{
+  position:relative; overflow:hidden; border-radius:16px;
+  background:#ffffff; border:1px solid #e5e7eb; transition:transform .12s ease, box-shadow .12s ease;
+}
+.sb-card:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.08); }
+.sb-card-body{ padding:18px 18px 24px 18px; }
+.sb-card-title{ color:#64748b; font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+.sb-card-value{ font-size:28px; font-weight:700; color:#0f172a; margin-top:4px; }
+.sb-card-icon{
+  position:absolute; right:14px; bottom:10px; font-size:28px; opacity:.25;
+}
+.text-returned{ color:#16a34a !important; }
+
+/* table cards */
+.table-card.card{ border-radius:16px; overflow:hidden; border:1px solid #e5e7eb; }
+.table-card .card-header{
+  background:var(--ft-card); color:#e2e8f0; border-bottom:1px solid var(--ft-border);
+}
+.table-modern thead th{
+  font-size:12px; color:#6b7280; text-transform:uppercase; letter-spacing:.03em; border-bottom:1px solid #e5e7eb;
+}
+.table-modern tbody td{ border-color:#eef2f7; }
+.table-modern .empty{ color:#9aa3af; padding:18px 0; }
+
+.th-tight{ width:120px; }
+.td-tight{ white-space:nowrap; }
+.table-link{ text-decoration:none; color:#0f172a; }
+.table-link:hover{ text-decoration:underline; }
+
+/* pills */
+.pill{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:2px 10px; border-radius:999px; font-size:12px; font-weight:600;
+  background:#eef2ff; color:#3b82f6;
+}
+.pill-success{ background:#e8faf0; color:#16a34a; }
+.pill-info{ background:#e6f7ff; color:#0ea5e9; }
+.dot{ width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block; }
+
+/* list group look */
+.list-group-item{ display:flex; align-items:center; }
+.list-group-item:hover{ background:#fafafa; }
+
+/* small helpers */
+.link-light{ color:#e5e7eb !important; }
