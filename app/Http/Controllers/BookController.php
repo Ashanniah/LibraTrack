@@ -9,6 +9,37 @@ use Illuminate\Validation\Rule;
 
 class BookController extends BaseController
 {
+    public function show($id)
+    {
+        $book = DB::table('books')->where('id', $id)->first();
+        
+        if (!$book) {
+            return response()->json(['ok' => false, 'error' => 'Book not found'], 404);
+        }
+        
+        // Format book data similar to list method
+        $bookData = [
+            'id' => $book->id,
+            'title' => $book->title,
+            'isbn' => $book->isbn,
+            'author' => $book->author,
+            'category' => $book->category,
+            'quantity' => (int)($book->quantity ?? 0), // Ensure quantity is an integer
+            'publisher' => $book->publisher,
+            'date_published' => $book->date_published,
+            'published_at' => $book->date_published,
+            'cover' => $book->cover,
+            'cover_url' => $book->cover ? ("/uploads/covers/".$book->cover) : null,
+            'created_at' => $book->created_at,
+            'rating' => (int)($book->rating ?? 0),
+        ];
+        
+        return response()->json([
+            'ok' => true,
+            'data' => $bookData
+        ]);
+    }
+
     public function list(Request $request)
     {
         $page = max(1, (int)$request->input('page', 1));
@@ -185,74 +216,151 @@ class BookController extends BaseController
 
     public function update(Request $request, $id)
     {
-        $user = $this->requireRole(['librarian', 'admin']);
-
-        $book = DB::table('books')->where('id', $id)->first();
-        if (!$book) {
-            return response()->json(['ok' => false, 'error' => 'Book not found'], 404);
+        try {
+            $user = $this->requireRole(['librarian', 'admin']);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'error' => 'Authentication failed: ' . $e->getMessage()], 401);
         }
 
-        // Validate with ISBN uniqueness rule that ignores the current book
-        $request->validate([
-            'title' => 'required|string',
-            'isbn' => [
-                'required',
-                'string',
-                Rule::unique('books', 'isbn')->ignore($id), // Ignore current book's ISBN
-            ],
-            'author' => 'required|string',
-            'category' => 'required|string',
-            'publisher' => 'required|string',
-            'quantity' => 'required|integer|min:0',
-            'date_published' => 'nullable|date',
-            'cover' => 'nullable|image|max:5120',
-        ]);
-
-        // ISBN validation is handled by Laravel's Rule::unique()->ignore($id) above
-        // This ensures ISBN is unique except for the current book being updated
-
-        $coverFile = $book->cover;
-        if ($request->hasFile('cover')) {
-            $file = $request->file('cover');
-            $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-            if (!in_array($file->getMimeType(), $allowed)) {
-                return response()->json(['ok' => false, 'error' => 'Invalid cover type'], 400);
+        try {
+            $book = DB::table('books')->where('id', $id)->first();
+            if (!$book) {
+                return response()->json(['ok' => false, 'error' => 'Book not found'], 404);
             }
 
-            // Delete old cover
-            if ($coverFile && file_exists(public_path("uploads/covers/{$coverFile}"))) {
-                @unlink(public_path("uploads/covers/{$coverFile}"));
+            // Validate fields - all fields are optional for updates (librarian can update any field they want)
+            // ISBN and date_published are NOT included - they cannot be changed when updating
+            // Explicitly remove them from the request to prevent any validation issues
+            $request->request->remove('isbn');
+            $request->request->remove('date_published');
+            
+            try {
+                $request->validate([
+                    'title' => 'nullable|string',
+                    // ISBN is intentionally excluded - it cannot be edited
+                    'author' => 'nullable|string',
+                    'category' => 'nullable|string',
+                    'publisher' => 'nullable|string',
+                    'quantity' => 'nullable|integer|min:0',
+                    // date_published is intentionally excluded - it cannot be edited
+                    'cover' => 'nullable|image|max:5120',
+                ]);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $errors = $e->errors();
+                $errorMessages = [];
+                foreach ($errors as $field => $messages) {
+                    $errorMessages[] = implode(', ', $messages);
+                }
+                return response()->json([
+                    'ok' => false,
+                    'error' => implode(' ', $errorMessages),
+                    'errors' => $errors
+                ], 422);
             }
-
-            $ext = $file->getClientOriginalExtension();
-            $coverFile = 'cover_' . date('Ymd_His') . '_' . bin2hex(random_bytes(6)) . ".{$ext}";
-            $file->move(public_path('uploads/covers'), $coverFile);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'error' => 'Database error: ' . $e->getMessage()], 500);
         }
 
-        DB::table('books')->where('id', $id)->update([
-            'title' => $request->input('title'),
-            'isbn' => trim($request->input('isbn')), // Store trimmed ISBN
-            'author' => $request->input('author'),
-            'category' => $request->input('category'),
-            'quantity' => $request->input('quantity'),
-            'publisher' => $request->input('publisher'),
-            'date_published' => $request->input('date_published'),
-            'cover' => $coverFile,
-            'updated_at' => now(),
-        ]);
+        try {
+            $coverFile = $book->cover;
+            if ($request->hasFile('cover')) {
+                $file = $request->file('cover');
+                $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                if (!in_array($file->getMimeType(), $allowed)) {
+                    return response()->json(['ok' => false, 'error' => 'Invalid cover type'], 400);
+                }
 
-        return response()->json([
-            'ok' => true,
-            'message' => 'Book updated successfully',
-            'cover_url' => $coverFile ? ("/uploads/covers/".$coverFile) : null
-        ]);
+                // Delete old cover
+                if ($coverFile && file_exists(public_path("uploads/covers/{$coverFile}"))) {
+                    @unlink(public_path("uploads/covers/{$coverFile}"));
+                }
+
+                $ext = $file->getClientOriginalExtension();
+                $coverFile = 'cover_' . date('Ymd_His') . '_' . bin2hex(random_bytes(6)) . ".{$ext}";
+                $file->move(public_path('uploads/covers'), $coverFile);
+            }
+
+            // Update book fields - only update fields that are provided and have values
+            // NOTE: ISBN, date_published, and created_at are intentionally excluded - they cannot be changed
+            // created_at is the system audit date and should NEVER be modified
+            // date_published is set when the book is first added and should not be changed
+            // Note: updated_at column doesn't exist in the books table, so we don't update it
+            $updateData = [];
+            
+            // Only update fields that are provided and have non-empty values
+            // FormData always sends fields, so we check if they have actual values
+            if ($request->filled('title')) {
+                $updateData['title'] = trim($request->input('title'));
+            }
+            if ($request->filled('author')) {
+                $updateData['author'] = trim($request->input('author'));
+            }
+            if ($request->filled('category')) {
+                $updateData['category'] = trim($request->input('category'));
+            }
+            if ($request->filled('publisher')) {
+                $updateData['publisher'] = trim($request->input('publisher'));
+            }
+            // Handle quantity - accept valid integers including 0
+            if ($request->has('quantity')) {
+                $quantityInput = $request->input('quantity');
+                // Accept quantity if it's a valid numeric value (including 0 and empty string "0")
+                if ($quantityInput !== null && $quantityInput !== '' && (is_numeric($quantityInput) || $quantityInput === '0')) {
+                    $updateData['quantity'] = intval($quantityInput);
+                } elseif ($quantityInput === '0' || $quantityInput === 0) {
+                    // Explicitly handle 0
+                    $updateData['quantity'] = 0;
+                }
+            }
+            // ISBN is intentionally excluded - it cannot be changed
+            // date_published is intentionally excluded - it cannot be changed
+            if ($coverFile) {
+                $updateData['cover'] = $coverFile;
+            }
+            // created_at is NEVER updated - it's the system audit date
+            
+            // Only update if there are fields to update
+            if (!empty($updateData)) {
+                DB::table('books')->where('id', $id)->update($updateData);
+                
+                // Verify the update by fetching the updated book
+                $updatedBook = DB::table('books')->where('id', $id)->first();
+                
+                return response()->json([
+                    'ok' => true,
+                    'message' => 'Book updated successfully',
+                    'cover_url' => $coverFile ? ("/uploads/covers/".$coverFile) : null,
+                    'updated_data' => [
+                        'quantity' => (int)($updatedBook->quantity ?? 0),
+                        'publisher' => $updatedBook->publisher ?? null,
+                        'title' => $updatedBook->title ?? null
+                    ]
+                ]);
+            } else {
+                return response()->json([
+                    'ok' => false,
+                    'error' => 'No fields to update'
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'error' => 'Update failed: ' . $e->getMessage()], 500);
+        }
     }
 
     public function delete($id)
     {
-        $user = $this->requireRole(['librarian', 'admin']);
+        try {
+            $user = $this->requireRole(['librarian', 'admin']);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'error' => 'Authentication failed: ' . $e->getMessage()], 401);
+        }
 
-        $book = DB::table('books')->where('id', $id)->first();
+        try {
+            $book = DB::table('books')->where('id', $id)->first();
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'error' => 'Database connection error: ' . $e->getMessage()], 500);
+        }
+        
         if (!$book) {
             return response()->json(['ok' => false, 'error' => 'Book not found'], 404);
         }

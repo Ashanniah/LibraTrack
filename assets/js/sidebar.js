@@ -114,11 +114,15 @@ console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
       ${link(ROUTES.librarian.books,'bi-journal-text','Books',current==='books')}
       ${link(ROUTES.librarian.users,'bi-people','Users',current==='users')}
       ${link(ROUTES.librarian.borrowrequests,'bi-inbox','Borrow Requests',current==='borrowrequests')}
-      ${link(ROUTES.librarian.loans,'bi-journal-arrow-up','Loans',current==='loans')}
+      ${link(ROUTES.librarian.loans,'bi-journal-arrow-up','Active Loans',current==='loans')}
 
       <div class="sb-label mt-3">Reports</div>
       ${link(ROUTES.librarian.lowstock,'bi-box-seam','Low Stock',current==='lowstock')}
       ${link(ROUTES.librarian.history,'bi-clock-history','History',current==='history')}
+
+      <div class="sb-label mt-3">Account</div>
+      ${link(ROUTES.librarian.profile,'bi-person','Profile',current==='profile')}
+      ${link(ROUTES.librarian.logout,'bi-box-arrow-right','Logout',false)}
 
       <div class="sb-label mt-3">Quick Actions</div>
       <button id="qaAddBook" class="btn btn-gold w-100 mb-2">

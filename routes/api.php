@@ -34,6 +34,7 @@ Route::get('/me', [AuthController::class, 'me'])->middleware('web');
 
 // Book routes
 Route::get('/books', [BookController::class, 'list']);
+Route::get('/books/{id}', [BookController::class, 'show']); // Get single book
 Route::post('/books', [BookController::class, 'add'])->middleware('auth');
 Route::put('/books/{id}', [BookController::class, 'update'])->middleware('auth');
 Route::delete('/books/{id}', [BookController::class, 'delete'])->middleware('auth');

@@ -127,13 +127,10 @@
       ${link(ROUTES.librarian.users,'bi-people','Users',current==='users')}
       ${link(ROUTES.librarian.borrowrequests,'bi-inbox','Borrow Requests',current==='borrowrequests')}
       ${link(ROUTES.librarian.activeloans,'bi-journal-arrow-up','Active Loans',current==='activeloans')}
-      ${link(ROUTES.librarian.borrow,'bi-arrow-left-right','Borrow/Return',current==='borrow')}
 
-      <div class="sb-label mt-3">Monitoring</div>
-      ${link(ROUTES.librarian.overdue,'bi-exclamation-triangle','Overdue',current==='overdue')}
+      <div class="sb-label mt-3">Reports</div>
       ${link(ROUTES.librarian.lowstock,'bi-box-seam','Low Stock',current==='lowstock')}
       ${link(ROUTES.librarian.history,'bi-clock-history','History',current==='history')}
-      ${link(ROUTES.librarian.emails,'bi-envelope-paper-heart','Emails',current==='emails')}
 
       <div class="sb-label mt-3">Account</div>
       ${link(ROUTES.librarian.profile,'bi-person-circle','Profile',current==='profile')}

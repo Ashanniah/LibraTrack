@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>LibraTrack - Loans</title>
+  <title>LibraTrack - Active Loans</title>
 
   <!-- Fonts / Icons / Bootstrap -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -547,10 +547,10 @@
   <div class="sb-wrapper">
     <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
       <div class="container-fluid">
-        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+        <button id="sidebarToggle" type="button" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar" style="cursor: pointer; z-index: 1000; position: relative;">
             <i class="bi bi-list fs-4"></i>
           </button>
-        <div class="fw-bold h5 mb-0" id="pageTitle">Loans</div>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Active Loans</div>
 
         <div class="ms-auto d-flex align-items-center gap-2">
           <form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
@@ -953,7 +953,36 @@
         }
       }
       
-      document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+      // Sidebar toggle - simple and direct approach
+      (function setupSidebarToggle() {
+        const sidebarToggleBtn = document.getElementById('sidebarToggle');
+        if (!sidebarToggleBtn) {
+          // Retry if button not found yet
+          setTimeout(setupSidebarToggle, 100);
+          return;
+        }
+        
+        // Remove any existing listeners by cloning
+        const newBtn = sidebarToggleBtn.cloneNode(true);
+        sidebarToggleBtn.parentNode.replaceChild(newBtn, sidebarToggleBtn);
+        
+        // Attach click handler directly
+        newBtn.onclick = function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          // Use toggleSidebar if available, otherwise fallback
+          if (typeof window.toggleSidebar === 'function') {
+            window.toggleSidebar();
+          } else {
+            // Fallback: manually toggle classes
+            const isDesktop = window.innerWidth >= 992;
+            const cls = isDesktop ? 'sb-expanded' : 'sb-toggled';
+            document.body.classList.toggle(cls);
+            if (isDesktop) document.body.classList.remove('sb-toggled');
+          }
+        };
+      })();
       
       // Logout handler
       document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
@@ -1101,20 +1130,30 @@
       });
       
       // Update Active tab stats
-      document.getElementById('statActive')?.textContent = active;
-      document.getElementById('statOverdue')?.textContent = overdue;
-      document.getElementById('statOnTime')?.textContent = onTime;
+      const statActiveEl = document.getElementById('statActive');
+      if (statActiveEl) statActiveEl.textContent = active;
+      const statOverdueEl = document.getElementById('statOverdue');
+      if (statOverdueEl) statOverdueEl.textContent = overdue;
+      const statOnTimeEl = document.getElementById('statOnTime');
+      if (statOnTimeEl) statOnTimeEl.textContent = onTime;
       
       // Update On-Time tab stats
-      document.getElementById('statActiveOnTime')?.textContent = active;
-      document.getElementById('statOverdueOnTime')?.textContent = overdue;
-      document.getElementById('statOnTimeOnTime')?.textContent = onTime;
+      const statActiveOnTimeEl = document.getElementById('statActiveOnTime');
+      if (statActiveOnTimeEl) statActiveOnTimeEl.textContent = active;
+      const statOverdueOnTimeEl = document.getElementById('statOverdueOnTime');
+      if (statOverdueOnTimeEl) statOverdueOnTimeEl.textContent = overdue;
+      const statOnTimeOnTimeEl = document.getElementById('statOnTimeOnTime');
+      if (statOnTimeOnTimeEl) statOnTimeOnTimeEl.textContent = onTime;
       
       // Update Overdue tab stats
-      document.getElementById('statOverdueTotal')?.textContent = overdueTotal;
-      document.getElementById('statLateA')?.textContent = late1to7;
-      document.getElementById('statLateB')?.textContent = late8to30;
-      document.getElementById('statLateC')?.textContent = late30plus;
+      const statOverdueTotalEl = document.getElementById('statOverdueTotal');
+      if (statOverdueTotalEl) statOverdueTotalEl.textContent = overdueTotal;
+      const statLateAEl = document.getElementById('statLateA');
+      if (statLateAEl) statLateAEl.textContent = late1to7;
+      const statLateBEl = document.getElementById('statLateB');
+      if (statLateBEl) statLateBEl.textContent = late8to30;
+      const statLateCEl = document.getElementById('statLateC');
+      if (statLateCEl) statLateCEl.textContent = late30plus;
     }
 
     function renderActive() {
@@ -1542,7 +1581,12 @@
     }
 
     // Event listeners
-    document.getElementById('loanSearch').addEventListener('input', () => { currentPage = 1; loadLoans(); });
+    document.getElementById('loanSearch').addEventListener('input', () => { 
+      currentPage.active = 1;
+      currentPage['on-time'] = 1;
+      currentPage.overdue = 1;
+      loadLoans(); 
+    });
     document.getElementById('btnRefresh').addEventListener('click', () => { loadLoans(); });
 
     // Make functions global

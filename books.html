@@ -489,9 +489,18 @@
       background: #fff;
       transform: translateY(-1px);
     }
-    .form-control-enhanced:disabled {
-      background: #f8f9fa;
-      cursor: not-allowed;
+    .form-control-enhanced:disabled,
+    .form-control-enhanced[readonly] {
+      background: #f3f4f6 !important;
+      cursor: not-allowed !important;
+      opacity: 0.8;
+      border-color: #d1d5db;
+    }
+    .form-control-enhanced:disabled:focus,
+    .form-control-enhanced[readonly]:focus {
+      border-color: #d1d5db;
+      box-shadow: none;
+      outline: none;
     }
     
     /* Date picker dropdown positioning */
@@ -536,6 +545,21 @@
       background-color: #fff !important;
       color: var(--text-primary);
       box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      position: relative;
+      z-index: 1;
+    }
+    /* Force dropdown to open downward */
+    .form-select.form-control-enhanced:focus,
+    select.form-control-enhanced:focus {
+      z-index: 1000;
+      position: relative;
+    }
+    /* Ensure parent containers don't clip the dropdown */
+    .form-section,
+    .form-container,
+    .col-12,
+    .col-md-8 {
+      overflow: visible !important;
     }
     /* Remove any Bootstrap default select styling */
     .form-select.form-control-enhanced::before,
@@ -779,6 +803,28 @@
     .action-buttons .btn-secondary:hover {
       background: #5a6268;
       border-color: #5a6268;
+    }
+    .action-buttons .btn-primary {
+      background: #0d6efd;
+      border-color: #0d6efd;
+      color: #fff;
+    }
+    .action-buttons .btn-primary:hover {
+      background: #0b5ed7;
+      border-color: #0a58ca;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(13,110,253,0.3);
+    }
+    .action-buttons .btn-danger {
+      background: #dc3545;
+      border-color: #dc3545;
+      color: #fff;
+    }
+    .action-buttons .btn-danger:hover {
+      background: #bb2d3b;
+      border-color: #b02a37;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(220,53,69,0.3);
     }
     
     /* Form Actions - Modern Buttons */
@@ -1229,8 +1275,8 @@
           </div>
 
           <!-- Right Column: Form -->
-          <div class="col-12 col-lg-8">
-            <div class="form-container">
+          <div class="col-12 col-lg-8" style="overflow: visible;">
+            <div class="form-container" style="overflow: visible;">
               <!-- Book Information Section -->
               <div class="form-section">
                 <h6 class="section-header mb-3">
@@ -1253,6 +1299,9 @@
                     <label class="form-label fw-medium">ISBN</label>
                     <input id="isbn" name="isbn" type="text" class="form-control form-control-enhanced" placeholder="e.g., 978-0-123456-78-9" required>
                     <div class="invalid-feedback">ISBN is required.</div>
+                    <small id="isbnHelpText" class="form-text text-muted" style="display: none;">
+                      <i class="bi bi-lock-fill me-1"></i>ISBN cannot be changed when editing a book.
+                    </small>
                   </div>
 
                   <div class="col-12 col-md-8">
@@ -1288,6 +1337,9 @@
                   <div class="col-12 col-md-6">
                     <label class="form-label fw-medium">Date Published</label>
                     <input id="publishedAt" name="date_published" type="date" class="form-control form-control-enhanced">
+                    <small id="datePublishedHelpText" class="form-text text-muted" style="display: none;">
+                      <i class="bi bi-lock-fill me-1"></i>Date Published cannot be changed when editing a book.
+                    </small>
                   </div>
                 </div>
               </div>
@@ -1495,7 +1547,7 @@
 </div>
 
 <!-- Confirm Delete Modal -->
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+<div class="modal" id="deleteConfirmModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered modal-sm-fixed">
     <div class="modal-content lt-modal text-center">
       <div class="lt-icon lt-icon-danger">
@@ -1523,6 +1575,37 @@
       <h5 class="lt-title">Book Deleted Successfully</h5>
       <div class="lt-actions">
         <button type="button" class="btn lt-btn lt-btn-neutral" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Book Update Success Modal -->
+<div class="modal fade" id="bookUpdateSuccessModal" tabindex="-1" aria-hidden="false">
+  <div class="modal-dialog modal-dialog-centered modal-sm-fixed">
+    <div class="modal-content lt-modal text-center">
+      <div class="lt-icon lt-icon-success">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <h5 class="lt-title" id="bookUpdateSuccessTitle">Book Updated Successfully</h5>
+      <div class="lt-actions">
+        <button type="button" class="btn lt-btn lt-btn-danger" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Error Modal -->
+<div class="modal" id="deleteErrorModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-sm-fixed">
+    <div class="modal-content lt-modal text-center">
+      <div class="lt-icon lt-icon-danger">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+      </div>
+      <h5 class="lt-title">Cannot Delete Book</h5>
+      <p class="lt-text" id="deleteErrorMessage">An error occurred while deleting the book.</p>
+      <div class="lt-actions">
+        <button type="button" class="btn lt-btn lt-btn-danger" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -1778,7 +1861,7 @@ function initBooks(role){
       const t = esc(b.title||''), a = esc(b.author||'');
       return `
         <div class="rec-card p-2">
-          <div class="cover-wrap position-relative" role="button" onclick='showDetails(${JSON.stringify(b).replace(/'/g,"&#39;")})'>
+          <div class="cover-wrap position-relative" role="button" onclick='showDetails(${b.id})'>
             <img src="${cover}" alt="${t}">
             ${renderHeart(b)}
           </div>
@@ -1823,7 +1906,7 @@ function initBooks(role){
       return `
         <div class="grid-item">
           <div class="book-card p-2">
-            <div class="cover-wrap position-relative" role="button" onclick='showDetails(${JSON.stringify(b).replace(/'/g,"&#39;")})'>
+            <div class="cover-wrap position-relative" role="button" onclick='showDetails(${b.id})'>
               <img class="thumb-lg" src="${cover}" alt="${t}" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
               ${renderHeart(b)}
             </div>
@@ -1945,27 +2028,91 @@ btn.onclick = async (e)=>{
       const textEl  = document.getElementById('deleteConfirmText');
       const okBtn   = document.getElementById('btnConfirmDelete');
 
+      if (!modalEl || !textEl || !okBtn) {
+        console.error('Delete modal elements not found');
+        resolve(false);
+        return;
+      }
+
       textEl.textContent = `Are you sure you want to delete "${title}"? This action cannot be undone.`;
 
-      // Reset handler to avoid stacking
-      const newBtn = okBtn.cloneNode(true);
-      okBtn.parentNode.replaceChild(newBtn, okBtn);
+      // Remove any existing event listeners by cloning and replacing the button
+      const newOkBtn = okBtn.cloneNode(true);
+      okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+      
+      // Update the reference to the new button
+      const confirmBtn = document.getElementById('btnConfirmDelete');
 
-      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-      newBtn.addEventListener('click', () => { modal.hide(); resolve(true); }, { once:true });
-      modalEl.addEventListener('hidden.bs.modal', () => resolve(false), { once:true });
-      modal.show();
+      // Get or create modal instance
+      let modal;
+      try {
+        modal = bootstrap.Modal.getOrCreateInstance(modalEl, {
+          backdrop: true,
+          keyboard: true,
+          focus: true
+        });
+      } catch (e) {
+        console.error('Error creating modal instance:', e);
+        resolve(false);
+        return;
+      }
+      
+      // Set up event handlers
+      let resolved = false;
+      
+      const handleConfirm = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!resolved) {
+          resolved = true;
+          modal.hide();
+          resolve(true);
+        }
+      };
+      
+      // Attach click handler to the confirm button
+      confirmBtn.addEventListener('click', handleConfirm, { once: true });
+      
+      // Handle cancel button
+      const cancelBtn = modalEl.querySelector('[data-bs-dismiss="modal"]');
+      if (cancelBtn) {
+        const handleCancel = () => {
+          if (!resolved) {
+            resolved = true;
+            resolve(false);
+          }
+        };
+        cancelBtn.addEventListener('click', handleCancel, { once: true });
+      }
+      
+      // Handle modal hidden event (when closed via backdrop, ESC, or any other way)
+      const handleHidden = () => {
+        if (!resolved) {
+          resolved = true;
+          resolve(false);
+        }
+      };
+      modalEl.addEventListener('hidden.bs.modal', handleHidden, { once: true });
+      
+      // Show modal
+      try {
+        modal.show();
+      } catch (e) {
+        console.error('Error showing modal:', e);
+        resolve(false);
+      }
     });
   }
 
   let editingId = null;
+  let currentPanelBookId = null; // Track which book is currently shown in the panel
 
   function bindManageButtons(items){
     document.querySelectorAll('.btn-edit').forEach(btn=>{
-      btn.onclick = ()=>{
+      btn.onclick = async ()=>{
         const id = +btn.dataset.id;
-        const b = items.find(x=>+x.id===id);
-        if (b) startEdit(b);
+        // Always fetch fresh data from API when editing
+        await startEdit(id);
       };
     });
 
@@ -1978,10 +2125,17 @@ btn.onclick = async (e)=>{
         const ok = await confirmDeleteModal(t);
         if (!ok) return;
 
-        const fd = new FormData(); fd.set('id', String(id));
-
         try{
-          const res  = await fetch(API_DELETE, {method:'POST', body:fd, credentials:'include'});
+          // Use DELETE method with ID in URL path
+          const res  = await fetch(`${API_DELETE}/${id}`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            }
+          });
+          
           const data = await res.json().catch(()=>null);
 
           if (data?.ok){
@@ -1992,16 +2146,54 @@ btn.onclick = async (e)=>{
             const modalEl = document.getElementById('deleteSuccessModal');
             bootstrap.Modal.getOrCreateInstance(modalEl).show();
           } else {
-            alert(data?.error || 'Delete failed');
+            // Show error modal instead of alert
+            const errorModal = document.getElementById('deleteErrorModal');
+            const errorMessage = document.getElementById('deleteErrorMessage');
+            if (errorModal && errorMessage) {
+              errorMessage.textContent = data?.error || 'Delete failed';
+              bootstrap.Modal.getOrCreateInstance(errorModal).show();
+            } else {
+              alert(data?.error || 'Delete failed');
+            }
           }
-        }catch{
-          alert('Network/server error');
+        }catch(err){
+          console.error('Delete error:', err);
+          // Show error modal instead of alert
+          const errorModal = document.getElementById('deleteErrorModal');
+          const errorMessage = document.getElementById('deleteErrorMessage');
+          if (errorModal && errorMessage) {
+            errorMessage.textContent = 'Network/server error: ' + (err.message || 'Unknown error');
+            bootstrap.Modal.getOrCreateInstance(errorModal).show();
+          } else {
+            alert('Network/server error: ' + (err.message || 'Unknown error'));
+          }
         }
       };
     });
   }
 
-  function startEdit(b){
+  async function startEdit(b){
+    // If b is a number (ID), fetch fresh data from API
+    if (typeof b === 'number' || (typeof b === 'string' && /^\d+$/.test(b))) {
+      try {
+        const bookRes = await fetch(`${API_EDIT}/${b}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Accept': 'application/json' }
+        });
+        const bookData = await bookRes.json();
+        if (bookData.ok && bookData.data) {
+          b = bookData.data;
+        } else {
+          alert('Failed to load book data: ' + (bookData.error || 'Unknown error'));
+          return;
+        }
+      } catch (err) {
+        alert('Failed to load book data: ' + err.message);
+        return;
+      }
+    }
+    
     tabAdd.click();
     editingId = b.id;
 
@@ -2015,14 +2207,90 @@ btn.onclick = async (e)=>{
       pageHeaderSubtitle.textContent = 'Update the book details below';
     }
 
-    // Populate form fields
-    document.getElementById('title').value       = b.title || '';
-    document.getElementById('isbn').value        = b.isbn || '';
-    document.getElementById('author').value      = b.author || '';
-    document.getElementById('category').value    = b.category || '';
-    document.getElementById('quantity').value    = b.quantity ?? 1;
-    document.getElementById('publisher').value   = b.publisher || '';
-    document.getElementById('publishedAt').value = (b.published_at || '').slice(0,10);
+    // Populate form fields - when editing, all fields are optional (librarian can update any field)
+    const titleField = document.getElementById('title');
+    if (titleField) {
+      titleField.value = b.title || '';
+      // Remove required attribute when editing - fields are optional
+      titleField.removeAttribute('required');
+      // Ensure field is enabled and editable
+      titleField.disabled = false;
+      titleField.removeAttribute('disabled');
+      titleField.readOnly = false;
+      titleField.removeAttribute('readonly');
+    }
+    const isbnField = document.getElementById('isbn');
+    const isbnHelpText = document.getElementById('isbnHelpText');
+    isbnField.value = b.isbn || '';
+    // Disable ISBN field when editing - ISBN cannot be changed
+    isbnField.readOnly = true;
+    isbnField.setAttribute('readonly', 'readonly');
+    isbnField.classList.add('bg-light');
+    isbnField.style.backgroundColor = '#f3f4f6';
+    isbnField.style.cursor = 'not-allowed';
+    isbnField.style.opacity = '0.8';
+    // Remove required attribute when editing since ISBN cannot be changed
+    isbnField.removeAttribute('required');
+    // Show helper text
+    if (isbnHelpText) {
+      isbnHelpText.style.display = 'block';
+    }
+    const authorField = document.getElementById('author');
+    if (authorField) {
+      authorField.value = b.author || '';
+      // Remove required attribute when editing - fields are optional
+      authorField.removeAttribute('required');
+      // Ensure field is enabled and editable
+      authorField.disabled = false;
+      authorField.removeAttribute('disabled');
+      authorField.readOnly = false;
+      authorField.removeAttribute('readonly');
+    }
+    const categoryField = document.getElementById('category');
+    if (categoryField) {
+      categoryField.value = b.category || '';
+      // Remove required attribute when editing - fields are optional
+      categoryField.removeAttribute('required');
+      // Ensure field is enabled and editable
+      categoryField.disabled = false;
+      categoryField.removeAttribute('disabled');
+    }
+    const quantityField = document.getElementById('quantity');
+    if (quantityField) {
+      quantityField.value = b.quantity ?? 1;
+      // Remove required attribute when editing - fields are optional
+      quantityField.removeAttribute('required');
+      // Ensure field is enabled and editable
+      quantityField.disabled = false;
+      quantityField.removeAttribute('disabled');
+      quantityField.readOnly = false;
+      quantityField.removeAttribute('readonly');
+    }
+    const publisherField = document.getElementById('publisher');
+    if (publisherField) {
+      publisherField.value = b.publisher || '';
+      // Remove required attribute when editing - fields are optional
+      publisherField.removeAttribute('required');
+      // Ensure field is enabled and editable
+      publisherField.disabled = false;
+      publisherField.removeAttribute('disabled');
+      publisherField.readOnly = false;
+      publisherField.removeAttribute('readonly');
+    }
+    const datePublishedField = document.getElementById('publishedAt');
+    const datePublishedHelpText = document.getElementById('datePublishedHelpText');
+    datePublishedField.value = (b.published_at || '').slice(0,10);
+    // Disable Date Published field when editing - Date Published cannot be changed
+    datePublishedField.readOnly = true;
+    datePublishedField.setAttribute('readonly', 'readonly');
+    datePublishedField.classList.add('bg-light');
+    datePublishedField.style.backgroundColor = '#f3f4f6';
+    datePublishedField.style.cursor = 'not-allowed';
+    datePublishedField.style.opacity = '0.8';
+    // Show helper text
+    if (datePublishedHelpText) {
+      datePublishedHelpText.style.display = 'block';
+    }
 
     // Update status badge
     const qty = b.quantity ?? 0;
@@ -2109,7 +2377,7 @@ btn.onclick = async (e)=>{
           return `
             <div class="grid-item">
               <div class="book-card p-2">
-                <div class="cover-wrap position-relative" role="button" onclick='showDetails(${JSON.stringify(b).replace(/'/g,"&#39;")}); bootstrap.Modal.getInstance("#allBooksModal")?.hide();'>
+                <div class="cover-wrap position-relative" role="button" onclick='showDetails(${b.id}); bootstrap.Modal.getInstance("#allBooksModal")?.hide();'>
                   <img class="thumb-lg" src="${cover}" alt="${t}" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
                   ${renderHeart(b)}
                 </div>
@@ -2164,7 +2432,7 @@ btn.onclick = async (e)=>{
       return `
         <div class="grid-item">
           <div class="book-card p-2">
-            <div class="cover-wrap position-relative" role="button" onclick='showDetails(${JSON.stringify(b).replace(/'/g,"&#39;")}); bootstrap.Modal.getInstance("#allBooksModal")?.hide();'>
+            <div class="cover-wrap position-relative" role="button" onclick='showDetails(${b.id}); bootstrap.Modal.getInstance("#allBooksModal")?.hide();'>
               <img class="thumb-lg" src="${cover}" alt="${t}" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
               ${renderHeart(b)}
             </div>
@@ -2214,7 +2482,30 @@ btn.onclick = async (e)=>{
   qInput.addEventListener('input', e=>{ state.q=e.target.value.trim(); state.page=1; loadGrid(); });
 
   // details offcanvas
-  window.showDetails = function(b){
+  // If b is a number (ID), fetch fresh data from API
+  // Otherwise, use the provided book object
+  window.showDetails = async function(b){
+    // If b is a number (ID), fetch fresh data from API
+    if (typeof b === 'number' || (typeof b === 'string' && /^\d+$/.test(b))) {
+      try {
+        const bookRes = await fetch(`${API_EDIT}/${b}`, {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Accept': 'application/json' }
+        });
+        const bookData = await bookRes.json();
+        if (bookData.ok && bookData.data) {
+          b = bookData.data; // Use fresh data from API
+        } else {
+          console.error('Failed to fetch book details:', bookData.error || 'Unknown error');
+          return;
+        }
+      } catch (err) {
+        console.error('Error fetching book details:', err);
+        return;
+      }
+    }
+    
     const cover = fixCoverUrl(b.cover_url);
     const quantityStatus = (b.quantity ?? 0) > 5 ? 'success' : (b.quantity ?? 0) > 0 ? 'warning' : 'danger';
     const quantityText = (b.quantity ?? 0) > 5 ? 'In Stock' : (b.quantity ?? 0) > 0 ? 'Low Stock' : 'Out of Stock';
@@ -2224,6 +2515,12 @@ btn.onclick = async (e)=>{
         <button class="btn ${(b.quantity ?? 0) > 0 ? 'btn-success' : 'btn-secondary'}" id="btnBorrow" data-book-id="${b.id}" data-book-title="${esc(b.title||'')}" ${(b.quantity ?? 0) === 0 ? 'disabled' : ''}>
           <i class="bi bi-book me-2"></i> ${(b.quantity ?? 0) > 0 ? 'Borrow' : 'Not Available'}
         </button>
+      </div>` : '';
+    
+    const manageButtons = canManage() ? `
+      <div class="card-actions" style="margin-top: 24px;">
+        <button class="icon-btn btn-edit" id="btnEditBook" data-book-id="${b.id}" title="Edit"><i class="bi bi-pencil-square" style="font-size:18px;"></i></button>
+        <button class="icon-btn btn-delete" id="btnDeleteBook" data-book-id="${b.id}" data-book-title="${esc(b.title||'')}" title="Delete"><i class="bi bi-trash3"></i></button>
       </div>` : '';
     
     const body = `
@@ -2275,9 +2572,13 @@ btn.onclick = async (e)=>{
         </div>
       </div>
       
-      ${borrowButton}`;
+      ${borrowButton}
+      ${manageButtons}`;
     document.getElementById('bookDetailsLabel').textContent = b.title || 'Book';
     document.getElementById('detailsBody').innerHTML = body;
+    
+    // Store the current book ID being shown in the panel
+    currentPanelBookId = b.id;
     
     // Bind borrow button click handler if it exists
     if (role === 'student') {
@@ -2300,6 +2601,72 @@ btn.onclick = async (e)=>{
           // Store book ID for the confirm handler
           const modalEl = document.getElementById('borrowModal');
           modalEl.dataset.currentBookId = bookId;
+        };
+      }
+    }
+    
+    // Bind edit and delete buttons for librarians/admins
+    if (canManage()) {
+      const btnEdit = document.getElementById('btnEditBook');
+      if (btnEdit) {
+        btnEdit.onclick = async function() {
+          const bookId = btnEdit.dataset.bookId;
+          // Store that we're editing from the panel before closing it
+          // This helps the refresh logic know to reopen the panel after edit
+          window.editingFromPanel = true;
+          window.editingPanelBookId = bookId;
+          bootstrap.Offcanvas.getInstance('#bookDetails')?.hide();
+          // Fetch fresh data from API before editing
+          await startEdit(bookId);
+        };
+      }
+      
+      const btnDelete = document.getElementById('btnDeleteBook');
+      if (btnDelete) {
+        btnDelete.onclick = async function() {
+          const bookId = +btnDelete.dataset.bookId;
+          const bookTitle = btnDelete.dataset.bookTitle || 'this book';
+          
+          // Bootstrap confirm modal
+          const ok = await confirmDeleteModal(bookTitle);
+          if (!ok) return;
+          
+          try {
+            // Use DELETE method with ID in URL path
+            const res = await fetch(`${API_DELETE}/${bookId}`, {
+              method: 'DELETE',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              }
+            });
+            
+            const data = await res.json().catch(() => null);
+            
+            if (data?.ok) {
+              bootstrap.Offcanvas.getInstance('#bookDetails')?.hide();
+              await loadGrid();
+              await loadRecommended();
+              
+              // success modal
+              const modalEl = document.getElementById('deleteSuccessModal');
+              bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } else {
+              // Show error modal instead of alert
+              const errorModal = document.getElementById('deleteErrorModal');
+              const errorMessage = document.getElementById('deleteErrorMessage');
+              if (errorModal && errorMessage) {
+                errorMessage.textContent = data?.error || 'Delete failed';
+                bootstrap.Modal.getOrCreateInstance(errorModal).show();
+              } else {
+                alert(data?.error || 'Delete failed');
+              }
+            }
+          } catch (err) {
+            console.error('Delete error:', err);
+            alert('Network/server error: ' + (err.message || 'Unknown error'));
+          }
         };
       }
     }
@@ -2386,31 +2753,343 @@ btn.onclick = async (e)=>{
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
       if (!canManage()){ alert('Only librarians can add/edit books.'); return; }
-      form.classList.add('was-validated');
-      if (!form.checkValidity()) return;
-
+      
       const isEditing = !!editingId;
-      const url = isEditing ? API_EDIT : API_CREATE;
+      
+      // Only validate form when creating new books (all fields required)
+      // When editing, fields are optional - librarian can update any field they want
+      if (!isEditing) {
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) return;
+      }
+      
+      const url = isEditing ? `${API_EDIT}/${editingId}` : API_CREATE;
 
-      const fd = new FormData(form);
-      fd.set('quantity', String(Math.max(1, parseInt(fd.get('quantity') || '0', 10))));
-      if (isEditing) fd.set('id', String(editingId));
+      // Get all form fields directly
+      const titleField = document.getElementById('title');
+      const authorField = document.getElementById('author');
+      const categoryField = document.getElementById('category');
+      const publisherField = document.getElementById('publisher');
+      const quantityField = document.getElementById('quantity');
+      
+      // Validate that all required fields exist
+      if (!titleField || !authorField || !categoryField || !publisherField || !quantityField) {
+        alert('Error: Form fields not found. Please refresh the page.');
+        console.error('Missing fields:', {
+          title: !!titleField,
+          author: !!authorField,
+          category: !!categoryField,
+          publisher: !!publisherField,
+          quantity: !!quantityField
+        });
+        return;
+      }
+      
+      // Create FormData and only include fields that have values
+      const fd = new FormData();
+      
+      // For editing: only send fields that have values (librarian can update any field they want)
+      // For creating: all fields are required (handled by form validation)
+      if (isEditing) {
+        // Only include fields that have values - librarian can update any field they want
+        const titleValue = (titleField.value || '').trim();
+        const authorValue = (authorField.value || '').trim();
+        const categoryValue = (categoryField.value || '').trim();
+        const publisherValue = (publisherField.value || '').trim();
+        // Parse quantity - handle empty string, null, or valid number (including 0)
+        let quantityValue = null;
+        const quantityInput = quantityField.value.trim();
+        if (quantityInput !== '') {
+          const parsed = parseInt(quantityInput, 10);
+          if (!isNaN(parsed) && parsed >= 0) {
+            quantityValue = parsed;
+          }
+        }
+        
+        // When editing, send all fields that have values (even if unchanged)
+        // This allows updating any combination of fields
+        if (titleValue) fd.set('title', titleValue);
+        if (authorValue) fd.set('author', authorValue);
+        if (categoryValue) fd.set('category', categoryValue);
+        if (publisherValue) fd.set('publisher', publisherValue);
+        // Always send quantity if it's a valid number (including 0)
+        if (quantityValue !== null && quantityValue !== undefined) {
+          fd.set('quantity', String(quantityValue));
+          console.log('Sending quantity in update:', quantityValue, '(from input:', quantityField.value, ')');
+        } else {
+          console.warn('Quantity value is invalid or empty. Input value:', quantityField.value, 'Parsed:', quantityValue);
+        }
+        
+        // Ensure at least one field is being updated
+        if (fd.has('title') || fd.has('author') || fd.has('category') || fd.has('publisher') || fd.has('quantity') || (coverInput && coverInput.files && coverInput.files.length > 0)) {
+          // At least one field has a value, proceed with update
+        } else {
+          alert('Please update at least one field.');
+          return;
+        }
+      } else {
+        // For creating: all fields are required (form validation handles this)
+        const titleValue = (titleField.value || '').trim();
+        const authorValue = (authorField.value || '').trim();
+        const categoryValue = (categoryField.value || '').trim();
+        const publisherValue = (publisherField.value || '').trim();
+        const quantityValue = parseInt(quantityField.value) || 0;
+        
+        fd.set('title', titleValue);
+        fd.set('author', authorValue);
+        fd.set('category', categoryValue);
+        fd.set('publisher', publisherValue);
+        fd.set('quantity', String(Math.max(0, quantityValue)));
+      }
+      
+      // Handle cover file if present
+      const coverInput = document.getElementById('coverInput');
+      if (coverInput && coverInput.files && coverInput.files.length > 0) {
+        fd.set('cover', coverInput.files[0]);
+      }
+      
+      // For editing: ISBN and date_published are NOT included (they cannot be changed)
+      // Explicitly remove them from FormData to ensure they're not sent
+      if (isEditing) {
+        fd.delete('isbn');
+        fd.delete('date_published');
+      } else {
+        // For creating: include ISBN (it's already in the form, but we'll set it explicitly)
+        const isbnField = document.getElementById('isbn');
+        if (isbnField) fd.set('isbn', (isbnField.value || '').trim());
+        const datePublishedField = document.getElementById('publishedAt');
+        if (datePublishedField && datePublishedField.value) {
+          fd.set('date_published', datePublishedField.value);
+        }
+      }
+      
+      // Add ID for editing
+      if (isEditing && editingId) {
+        // Note: ID is in URL path, not FormData for PUT requests
+        // Ensure ISBN is not in FormData
+        fd.delete('isbn');
+        fd.delete('date_published');
+      }
 
+      // Debug: Log what we're sending
+      if (isEditing) {
+        console.log('Updating book with FormData:');
+        for (let [key, value] of fd.entries()) {
+          console.log(`  ${key}: ${value}`);
+        }
+      }
+      
       try{
-        const res = await fetch(url, {method:'POST', body:fd, credentials:'include'});
+        const res = await fetch(url, {
+          method: isEditing ? 'PUT' : 'POST',
+          body: fd,
+          credentials: 'include',
+          headers: {
+            'Accept': 'application/json'
+            // Don't set Content-Type for FormData - browser sets it automatically with boundary
+          }
+        });
         const raw = await res.text();
         let data = null;
         try{ data = JSON.parse(raw); }catch{ alert(`HTTP ${res.status} ${res.statusText}\n\n${raw.slice(0,800)}`); return; }
-        if (!res.ok || !data.ok){ alert(data.error || `Save failed (HTTP ${res.status})`); return; }
+        
+        // Log the update response
+        if (isEditing) {
+          console.log('Update response:', data);
+          if (data.updated_data) {
+            console.log('Updated data from server:', data.updated_data);
+            console.log('Quantity after update:', data.updated_data.quantity);
+          }
+        }
+        
+        // Handle validation errors (422) and other errors
+        if (!res.ok || !data.ok){
+          let errorMsg = data.error || `Save failed (HTTP ${res.status})`;
+          // If there are validation errors, format them nicely
+          if (data.errors && typeof data.errors === 'object') {
+            const errorList = [];
+            for (const field in data.errors) {
+              if (Array.isArray(data.errors[field])) {
+                errorList.push(...data.errors[field]);
+              } else {
+                errorList.push(data.errors[field]);
+              }
+            }
+            if (errorList.length > 0) {
+              errorMsg = errorList.join('\n');
+            }
+          }
+          alert(errorMsg);
+          return;
+        }
 
+        // Save the book ID before clearing editingId (needed for refreshing details panel)
+        const updatedBookId = editingId;
+        
         editingId = null;
         document.getElementById('btnSaveText').textContent = 'Save Book';
-        toastMsg.textContent = isEditing ? 'Book updated.' : 'Book saved.';
-        toastSaved.show();
+        
+        // Refresh the book list to show updated data
+        if (isEditing && updatedBookId) {
+          await loadGrid();
+          await loadRecommended();
+          
+          // Always refresh the book details panel with updated data
+          try {
+            const bookRes = await fetch(`${API_EDIT}/${updatedBookId}`, {
+              method: 'GET',
+              credentials: 'include',
+              headers: { 'Accept': 'application/json' }
+            });
+            const bookData = await bookRes.json();
+            if (bookData.ok && bookData.data) {
+              console.log('Fetched updated book data:', bookData.data);
+              console.log('Updated quantity from API:', bookData.data.quantity);
+              console.log('Updated publisher from API:', bookData.data.publisher);
+              
+              // Verify the data is correct
+              if (bookData.data.quantity === 0 && updatedBookId) {
+                console.warn('WARNING: API returned quantity as 0. Checking update response...');
+              }
+              
+              // Check if we edited from the panel (panel was closed when edit button was clicked)
+              const editedFromPanel = window.editingFromPanel && window.editingPanelBookId === updatedBookId;
+              
+              // Check current panel state BEFORE updating content
+              const bookDetailsEl = document.getElementById('bookDetails');
+              const wasPanelOpen = bookDetailsEl && (bookDetailsEl.classList.contains('show') || bookDetailsEl.classList.contains('showing'));
+              const wasShowingThisBook = currentPanelBookId === updatedBookId;
+              
+              // ALWAYS update the panel content with fresh data
+              // This ensures the panel shows the latest data
+              showDetails(bookData.data);
+              
+              // Verify the update
+              console.log('Panel updated. Current panel book ID:', currentPanelBookId);
+              
+              // Check current panel state AFTER updating content
+              const isPanelOpen = bookDetailsEl && (bookDetailsEl.classList.contains('show') || bookDetailsEl.classList.contains('showing'));
+              const isShowingThisBook = currentPanelBookId === updatedBookId;
+              
+              // If we edited from the panel, always reopen it to show updated data
+              if (editedFromPanel) {
+                setTimeout(() => {
+                  const offcanvas = bootstrap.Offcanvas.getInstance('#bookDetails') || new bootstrap.Offcanvas('#bookDetails');
+                  offcanvas.show();
+                }, 200);
+                // Clear the flags after a delay to ensure they're used
+                setTimeout(() => {
+                  window.editingFromPanel = false;
+                  window.editingPanelBookId = null;
+                }, 300);
+              } else if (wasPanelOpen && wasShowingThisBook) {
+                // Panel was open and showing this book - force refresh by toggling
+                const offcanvas = bootstrap.Offcanvas.getInstance('#bookDetails');
+                if (offcanvas) {
+                  // Force a visual refresh by hiding and showing
+                  setTimeout(() => {
+                    if (offcanvas._isShown) {
+                      offcanvas.hide();
+                      setTimeout(() => {
+                        // Re-call showDetails to ensure fresh data is displayed
+                        showDetails(bookData.data);
+                        offcanvas.show();
+                        // Verify the content after showing
+                        setTimeout(() => {
+                          const quantityBadge = document.querySelector('#detailsBody .badge');
+                          if (quantityBadge) {
+                            const expectedText = `Quantity: ${bookData.data.quantity} (${(bookData.data.quantity ?? 0) > 5 ? 'In Stock' : (bookData.data.quantity ?? 0) > 0 ? 'Low Stock' : 'Out of Stock'})`;
+                            console.log('Expected quantity text:', expectedText);
+                            console.log('Actual quantity badge text:', quantityBadge.textContent);
+                            if (!quantityBadge.textContent.includes(String(bookData.data.quantity))) {
+                              console.warn('Quantity mismatch! Forcing refresh again...');
+                              showDetails(bookData.data);
+                            }
+                          }
+                        }, 100);
+                      }, 150);
+                    } else {
+                      // Panel instance exists but not shown - show it with fresh data
+                      showDetails(bookData.data);
+                      setTimeout(() => offcanvas.show(), 100);
+                    }
+                  }, 50);
+                }
+              } else if (!wasPanelOpen && wasShowingThisBook) {
+                // Panel was closed but was showing this book - reopen it
+                setTimeout(() => {
+                  const offcanvas = bootstrap.Offcanvas.getInstance('#bookDetails') || new bootstrap.Offcanvas('#bookDetails');
+                  offcanvas.show();
+                }, 150);
+              }
+              // If panel is open but showing a different book, don't change it
+              // The updated data is stored, so when user clicks this book again, it will show updated data
+            } else {
+              console.error('Failed to fetch updated book:', bookData.error || 'Unknown error');
+            }
+          } catch (err) {
+            console.error('Failed to refresh book details:', err);
+          }
+        } else {
+          // For new books, just refresh the grid
+          await loadGrid();
+          await loadRecommended();
+        }
+        
+        // Show success modal instead of toast
+        const successTitle = document.getElementById('bookUpdateSuccessTitle');
+        if (successTitle) {
+          successTitle.textContent = isEditing ? 'Book Updated Successfully' : 'Book Saved Successfully';
+        }
+        const successModal = document.getElementById('bookUpdateSuccessModal');
+        if (successModal) {
+          bootstrap.Modal.getOrCreateInstance(successModal).show();
+        }
 
         form.reset(); form.classList.remove('was-validated');
         coverPreview.src=''; coverPreview.classList.add('d-none'); dropHint.classList.remove('d-none');
         coverPreview.onclick = null;
+        
+        // Re-enable ISBN field (it was disabled during editing)
+        const isbnField = document.getElementById('isbn');
+        const isbnHelpText = document.getElementById('isbnHelpText');
+        isbnField.readOnly = false;
+        isbnField.removeAttribute('readonly');
+        isbnField.setAttribute('required', 'required'); // Re-add required for new books
+        isbnField.classList.remove('bg-light');
+        isbnField.style.backgroundColor = '';
+        isbnField.style.cursor = '';
+        isbnField.style.opacity = '';
+        // Hide helper text
+        if (isbnHelpText) {
+          isbnHelpText.style.display = 'none';
+        }
+        
+        // Re-enable Date Published field (it was disabled during editing)
+        const datePublishedField = document.getElementById('publishedAt');
+        const datePublishedHelpText = document.getElementById('datePublishedHelpText');
+        datePublishedField.readOnly = false;
+        datePublishedField.removeAttribute('readonly');
+        datePublishedField.classList.remove('bg-light');
+        datePublishedField.style.backgroundColor = '';
+        datePublishedField.style.cursor = '';
+        datePublishedField.style.opacity = '';
+        // Hide helper text
+        if (datePublishedHelpText) {
+          datePublishedHelpText.style.display = 'none';
+        }
+        
+        // Re-add required attributes for all fields when creating new books
+        const titleField = document.getElementById('title');
+        const authorField = document.getElementById('author');
+        const categoryField = document.getElementById('category');
+        const publisherField = document.getElementById('publisher');
+        const quantityField = document.getElementById('quantity');
+        if (titleField) titleField.setAttribute('required', 'required');
+        if (authorField) authorField.setAttribute('required', 'required');
+        if (categoryField) categoryField.setAttribute('required', 'required');
+        if (publisherField) publisherField.setAttribute('required', 'required');
+        if (quantityField) quantityField.setAttribute('required', 'required');
         
         // Reset header
         document.getElementById('pageHeaderTitle').textContent = 'Add New Book';
