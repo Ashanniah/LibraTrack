@@ -5,13 +5,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>LibraTrack – Notifications</title>
 
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
 
   <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
   <link href="assets/css/student-pages.css" rel="stylesheet">
+  <style>
+    /* Skeleton Loaders */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .skeleton-line {
+      height: 16px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .skeleton-line.short {
+      width: 60%;
+    }
+    .skeleton-line.medium {
+      width: 80%;
+    }
+    .skeleton-line.long {
+      width: 100%;
+    }
+    .skeleton-line.thin {
+      height: 12px;
+      width: 50%;
+    }
+    .skeleton-badge {
+      width: 70px;
+      height: 24px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body class="sb-body sb-expanded">
   <div id="sidebar-root"></div>
@@ -42,7 +107,7 @@
         </ul>
         <div id="notifEmpty" class="text-center text-muted py-5 d-none">
           <i class="bi bi-bell-slash fs-2 d-block mb-2"></i>
-          No notifications yet.
+          <p class="mb-0">No notifications yet. You'll receive updates by email.</p>
         </div>
       </section>
     </main>
@@ -71,6 +136,24 @@
     const list = document.getElementById('notifList');
     const empty = document.getElementById('notifEmpty');
     const btnRefresh = document.getElementById('btnRefresh');
+    let isLoading = false;
+
+    // Render skeleton notification rows
+    function renderSkeletonRows(count = 3) {
+      return Array.from({length: count}, () => `
+        <li class="list-group-item d-flex justify-content-between align-items-center gap-3">
+          <div class="d-flex align-items-center gap-3">
+            <div class="skeleton-icon"></div>
+            <div class="flex-grow-1">
+              <div class="skeleton-line medium" style="margin-bottom: 8px;"></div>
+              <div class="skeleton-line long" style="margin-bottom: 4px;"></div>
+              <div class="skeleton-line thin"></div>
+            </div>
+          </div>
+          <div class="skeleton-badge"></div>
+        </li>
+      `).join('');
+    }
 
     const TYPE_META = {
       'overdue': { icon:'bi-exclamation-triangle text-danger', badge:'badge text-bg-danger-soft', label:'Overdue' },
@@ -88,8 +171,12 @@
     };
 
     async function loadNotifications() {
-      list.innerHTML = '<li class="list-group-item text-center text-muted py-4">Loading…</li>';
+      // Show skeleton loading
+      list.innerHTML = renderSkeletonRows(3);
       empty.classList.add('d-none');
+      btnRefresh.disabled = true;
+      isLoading = true;
+      
       try {
         const res = await fetch('/api/student/notifications', { credentials: 'include' });
         const data = await res.json();
@@ -97,21 +184,29 @@
         renderNotifications(data.notifications || []);
       } catch (err) {
         list.innerHTML = `<li class="list-group-item text-center text-danger py-4">${err.message}</li>`;
+        empty.classList.add('d-none');
+      } finally {
+        btnRefresh.disabled = false;
+        isLoading = false;
       }
     }
 
     function renderNotifications(items) {
+      // Hide empty state during render
+      empty.classList.add('d-none');
+      
       if (!items.length) {
         list.innerHTML = '';
         empty.classList.remove('d-none');
         return;
       }
-      empty.classList.add('d-none');
+      
+      // Render notifications with fade-in
       list.innerHTML = items.map(item => {
         const meta = TYPE_META[item.type] || { icon:'bi-bell text-primary', badge:'badge text-bg-light text-dark', label:item.type || 'Info' };
         const timestamp = fmtDateTime(item.timestamp);
         return `
-          <li class="list-group-item d-flex justify-content-between align-items-center gap-3">
+          <li class="list-group-item d-flex justify-content-between align-items-center gap-3 fade-in">
             <div class="d-flex align-items-center gap-3">
               <i class="bi ${meta.icon}"></i>
               <div>
@@ -126,7 +221,11 @@
       }).join('');
     }
 
-    btnRefresh.addEventListener('click', loadNotifications);
+    btnRefresh.addEventListener('click', () => {
+      if (!isLoading) {
+        loadNotifications();
+      }
+    });
     loadNotifications();
   </script>
 </body>

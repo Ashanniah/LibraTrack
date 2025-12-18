@@ -9,64 +9,78 @@ class LogController extends BaseController
 {
     public function list(Request $request)
     {
-        $user = $this->requireRole(['librarian', 'admin']);
+        // Only admin can access system logs
+        $user = $this->requireRole(['admin']);
 
+        // Get query parameters
+        $q = trim($request->input('q', ''));
+        $action = trim($request->input('action', ''));
+        $from = trim($request->input('from', ''));
+        $to = trim($request->input('to', ''));
         $page = max(1, (int)$request->input('page', 1));
-        $pagesize = max(1, min(100, (int)$request->input('pagesize', 20)));
+        $limit = max(1, min(100, (int)$request->input('limit', 20)));
 
-        $query = DB::table('logs');
+        // Build query
+        $query = DB::table('system_logs');
 
-        // School filtering for librarians
-        $currentRole = strtolower($user['role'] ?? '');
-        if ($currentRole === 'librarian') {
-            $librarianSchoolId = (int)($user['school_id'] ?? 0);
-            if ($librarianSchoolId > 0) {
-                // Check if logs table has school_id column
-                try {
-                    $columns = DB::select("SHOW COLUMNS FROM logs LIKE 'school_id'");
-                    if (count($columns) > 0) {
-                        $query->where('school_id', $librarianSchoolId);
-                    }
-                } catch (\Exception $e) {
-                    // Column doesn't exist, no filtering
-                }
-            } else {
-                return response()->json([
-                    'ok' => true,
-                    'items' => [],
-                    'total' => 0,
-                    'page' => $page,
-                    'pages' => 0,
-                    'pagesize' => $pagesize
-                ]);
+        // Search across actor_name, action, and details
+        if ($q !== '') {
+            $query->where(function($qry) use ($q) {
+                $qry->where('actor_name', 'LIKE', "%{$q}%")
+                    ->orWhere('action', 'LIKE', "%{$q}%")
+                    ->orWhere('details', 'LIKE', "%{$q}%");
+            });
+        }
+
+        // Filter by action
+        if ($action !== '' && $action !== 'all') {
+            $query->where('action', $action);
+        }
+
+        // Filter by date range
+        if ($from !== '') {
+            try {
+                $fromDate = date('Y-m-d 00:00:00', strtotime($from));
+                $query->where('created_at', '>=', $fromDate);
+            } catch (\Exception $e) {
+                // Invalid date format, ignore
             }
         }
 
-        $total = $query->count();
-        $pages = max(1, (int)ceil($total / $pagesize));
-        $offset = ($page - 1) * $pagesize;
+        if ($to !== '') {
+            try {
+                $toDate = date('Y-m-d 23:59:59', strtotime($to));
+                $query->where('created_at', '<=', $toDate);
+            } catch (\Exception $e) {
+                // Invalid date format, ignore
+            }
+        }
 
+        // Get total count
+        $total = $query->count();
+
+        // Pagination
+        $offset = ($page - 1) * $limit;
         $items = $query->orderBy('created_at', 'desc')
-            ->limit($pagesize)
+            ->limit($limit)
             ->offset($offset)
-            ->get();
+            ->get()
+            ->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'actor_name' => $item->actor_name,
+                    'actor_role' => $item->actor_role,
+                    'action' => $item->action,
+                    'created_at' => $item->created_at,
+                    'details' => $item->details,
+                ];
+            });
 
         return response()->json([
-            'ok' => true,
             'items' => $items,
-            'total' => $total,
             'page' => $page,
-            'pages' => $pages,
-            'pagesize' => $pagesize
+            'limit' => $limit,
+            'total' => $total,
         ]);
     }
 }
-
-
-
-
-
-
-
-
-

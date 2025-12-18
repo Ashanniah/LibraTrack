@@ -11,7 +11,7 @@
   <link href="assets/css/admin-users.css" rel="stylesheet">
   <link href="assets/css/librarian-students.css" rel="stylesheet">
   <link href="assets/css/responsive.css" rel="stylesheet">
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
 
   <style>
     :root{
@@ -76,6 +76,72 @@
       margin-left:0.5rem;
     }
     .table-card .card-body{padding:0}
+    
+    /* Skeleton Loaders for Table Rows */
+    .skeleton-table-row td {
+      padding: 16px 20px;
+    }
+    .skeleton-table-cell {
+      height: 1rem;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-cell.short {
+      width: 60%;
+    }
+    .skeleton-table-cell.medium {
+      width: 80%;
+    }
+    .skeleton-table-cell.long {
+      width: 100%;
+    }
+    .skeleton-checkbox {
+      width: 18px;
+      height: 18px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .skeleton-badge {
+      width: 60px;
+      height: 24px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 12px;
+    }
+    .skeleton-button {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     
     /* Pagination Styling */
     .pagination{gap:.35rem}
@@ -172,41 +238,6 @@
       background: #fff !important;
       color: var(--text-primary) !important;
       border-color: var(--brand-gold);
-    }
-
-    .notification-btn{
-      color:var(--text-primary) !important;
-      padding:8px 12px;
-      border-radius:var(--border-radius-sm);
-      transition:all 0.2s ease;
-    }
-    .notification-btn:hover{
-      color:var(--text-primary) !important;
-      background-color:#f8f9fa;
-    }
-    .notification-badge{
-      font-size:0.6875rem;
-      padding:3px 7px;
-      font-weight:600;
-      background:var(--brand-gold) !important;
-      color:#fff !important;
-    }
-    .notification-dropdown{
-      border-radius:var(--border-radius);
-      box-shadow:var(--shadow-lg);
-      border:1px solid var(--card-border);
-      margin-top:8px;
-    }
-    .notification-dropdown .dropdown-item{
-      padding:12px 16px;
-      border-bottom:1px solid #f0f0f0;
-      transition:background-color 0.2s ease;
-    }
-    .notification-dropdown .dropdown-item:last-child{
-      border-bottom:none;
-    }
-    .notification-dropdown .dropdown-item:hover{
-      background-color:#f8f9fa;
     }
 
     .admin-btn-custom {
@@ -997,17 +1028,6 @@
             </div>
           </form>
 
-          <div class="dropdown me-2">
-            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
-              <i class="bi bi-bell fs-5"></i>
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
-              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
-              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
-            </ul>
-          </div>
-
           <div class="dropdown">
             <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
               <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
@@ -1016,7 +1036,7 @@
               <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
               <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-gear me-2"></i>Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="/api/logout"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+              <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>
           </div>
         </div>
@@ -1175,7 +1195,7 @@
 
             <div class="col-12 col-md-6" style="margin-top:24px;">
               <label class="form-label">School</label>
-              <input id="fSchoolName" type="text" class="form-control" disabled placeholder="Loading school...">
+              <input id="fSchoolName" type="text" class="form-control" disabled placeholder="Loading school..." style="background-color: #e9ecef; color: #6c757d; cursor: not-allowed;">
               <div class="form-text-hint" id="schoolHint">Automatically assigned based on librarian's school</div>
             </div>
 
@@ -1350,6 +1370,7 @@
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/logout.js"></script>
   <script src="assets/js/sidebar.js?v=2025-11-17-restructured"></script>
 
   <script>
@@ -1507,7 +1528,8 @@
         me.name || me.email || 'Account';
       const whoChipEl = document.getElementById('whoChip');
       if (whoChipEl) {
-        whoChipEl.textContent = displayName;
+        const role = (me.role || '').toLowerCase();
+        whoChipEl.innerHTML = `<span class="badge role-chip ${role}">${role.toUpperCase()}</span> ${displayName}`;
       }
       // Load avatar in header if available
       const headerAvatar = document.querySelector('#userBtn img.avatar-32');
@@ -1529,7 +1551,7 @@
 
     function rowHtml(u){
   return `
-    <tr>
+    <tr class="fade-in">
       <td><input class="form-check-input row-check" type="checkbox" value="${u.id}"></td>
 
       <!-- Name (no ID pill here anymore) -->
@@ -1611,7 +1633,10 @@
       const end   = Math.min(start + pageSize, total);
 
       acctCount.textContent = String(students.length);
-      tbody.innerHTML = total ? list.slice(start, end).map(rowHtml).join('') : `<tr class="empty-row"><td colspan="8">No students found.</td></tr>`;
+      tbody.innerHTML = total ? list.slice(start, end).map(u => {
+        const html = rowHtml(u);
+        return html.replace('<tr>', '<tr class="fade-in">');
+      }).join('') : `<tr class="empty-row fade-in"><td colspan="10">No students found.</td></tr>`;
       pageInfo.textContent = total ? `Showing ${start+1}–${end} of ${total}` : '—';
       buildPager(total);
 
@@ -1626,7 +1651,39 @@
       });
     }
 
+    // Render skeleton table rows
+    function renderSkeletonTableRows(count = 8) {
+      return Array.from({length: count}, () => `
+        <tr class="skeleton-table-row">
+          <td><div class="skeleton-checkbox"></div></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-table-cell medium"></div>
+            </div>
+          </td>
+          <td class="col-id"><div class="skeleton-table-cell short"></div></td>
+          <td><div class="skeleton-table-cell medium"></div></td>
+          <td class="d-none d-xl-table-cell"><div class="skeleton-table-cell medium"></div></td>
+          <td><div class="skeleton-table-cell long"></div></td>
+          <td><div class="skeleton-table-cell short"></div></td>
+          <td><div class="skeleton-table-cell short"></div></td>
+          <td class="col-status"><div class="skeleton-badge"></div></td>
+          <td class="text-end col-actions">
+            <div class="d-flex align-items-center justify-content-end gap-1">
+              <div class="skeleton-button"></div>
+              <div class="skeleton-button"></div>
+              <div class="skeleton-button"></div>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
     async function loadStudents(){
+      // Show skeleton loaders while fetching
+      tbody.innerHTML = renderSkeletonTableRows(8);
+      
       try{
         const data = await getJson('/api/users?role=student');
         students = (data.students || []).map(s => ({
@@ -1649,7 +1706,35 @@
     }
 
     const validEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||'');
-    const strongEnough = pw => /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{}|\\:;'"<>,.?/~`]).{8,}$/.test(pw||'');
+    
+    // Password validation: min 8 chars, 1 uppercase, 1 lowercase, 1 number
+    const strongEnough = (pw, email, studentNo) => {
+      if (!pw || pw.length < 8) return false;
+      if (!/[A-Z]/.test(pw)) return false; // At least 1 uppercase
+      if (!/[a-z]/.test(pw)) return false; // At least 1 lowercase
+      if (!/[0-9]/.test(pw)) return false; // At least 1 number
+      // Must NOT be identical to email or student ID
+      if (email && pw.toLowerCase() === email.toLowerCase()) return false;
+      if (studentNo && pw === studentNo) return false;
+      return true;
+    };
+    
+    // Name validation: letters, spaces, hyphen, apostrophe; 2-50 chars
+    const validName = (name) => {
+      if (!name || name.trim().length < 2 || name.trim().length > 50) return false;
+      return /^[a-zA-Z\s\-']+$/.test(name.trim());
+    };
+    
+    // Allowed suffix values
+    const allowedSuffixes = ['', 'N/A', 'Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+    const validSuffix = (suffix) => {
+      return allowedSuffixes.includes(suffix || '');
+    };
+    
+    // Valid status values
+    const validStatus = (status) => {
+      return ['active', 'disabled', 'inactive'].includes((status || '').toLowerCase());
+    };
 
     function clearErr(i,e){ i?.classList.remove('is-invalid'); if(e){ e.textContent=''; e.classList.add('d-none'); } }
     function setErr(i,e,msg){ i?.classList.add('is-invalid'); if(e){ e.textContent=msg; e.classList.remove('d-none'); } }
@@ -1734,25 +1819,130 @@
 
     studentForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      [[fFirst,errFirst],[fLast,errLast],[fEmail,errEmail],[fStudNo,errStudNo],[fCourse,errCourse],[fYear,errYear],[fSection,errSection],[fPassword,errPassword],[fConfirm,errConfirm]]
+      // Clear all errors
+      [[fFirst,errFirst],[fMiddle],[fLast,errLast],[fSuffix],[fEmail,errEmail],[fStatus],[fStudNo,errStudNo],[fCourse,errCourse],[fYear,errYear],[fSection,errSection],[fPassword,errPassword],[fConfirm,errConfirm]]
         .forEach(([i,e])=>clearErr(i,e));
 
       let ok = true;
-      if(!(fFirst.value||'').trim()){ setErr(fFirst,errFirst,'First name is required.'); ok=false; }
-      if(!(fLast.value||'').trim()){ setErr(fLast,errLast,'Last name is required.'); ok=false; }
-      if(!validEmail(fEmail.value)){ setErr(fEmail,errEmail,'Enter a valid email.'); ok=false; }
-      const sn = (fStudNo.value||'').trim();
-      if(!/^\d{8}$/.test(sn)){ setErr(fStudNo,errStudNo,'Student number must be exactly 8 digits.'); ok=false; }
-      if(!fCourse.value.trim()){ setErr(fCourse,errCourse,'Course is required.'); ok=false; }
-      if(!fYear.value.trim()){ setErr(fYear,errYear,'Year level is required.'); ok=false; }
-      if(!fSection.value.trim()){ setErr(fSection,errSection,'Section is required.'); ok=false; }
-
       const isCreate = !(fId.value||'').trim();
+      
+      // 🧍 Personal Info Validation
+      const firstName = (fFirst.value||'').trim();
+      if(!firstName){
+        setErr(fFirst,errFirst,'First name is required.');
+        ok=false;
+      } else if(!validName(firstName)){
+        setErr(fFirst,errFirst,'First name must be 2-50 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        ok=false;
+      }
+      
+      const middleName = (fMiddle.value||'').trim();
+      if(middleName && !validName(middleName)){
+        // Middle name is optional, but if provided, it must be valid
+        // We'll show error on first name field since there's no errMiddle
+        setErr(fMiddle,errFirst,'Middle name must be 2-50 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        ok=false;
+      }
+      
+      const lastName = (fLast.value||'').trim();
+      if(!lastName){
+        setErr(fLast,errLast,'Last name is required.');
+        ok=false;
+      } else if(!validName(lastName)){
+        setErr(fLast,errLast,'Last name must be 2-50 characters and contain only letters, spaces, hyphens, or apostrophes.');
+        ok=false;
+      }
+      
+      const suffix = (fSuffix.value||'').trim();
+      if(suffix && !validSuffix(suffix)){
+        // Suffix validation error - no dedicated error field, so we'll skip showing it
+        // The backend will catch this anyway
+        ok=false;
+      }
+      
+      // 📧 Account & Status Validation
+      const email = (fEmail.value||'').trim().toLowerCase();
+      if(!email){
+        setErr(fEmail,errEmail,'Email is required.');
+        ok=false;
+      } else if(!validEmail(email)){
+        setErr(fEmail,errEmail,'Enter a valid email address.');
+        ok=false;
+      }
+      
+      const status = (fStatus.value||'').trim();
+      if(!status || !validStatus(status)){
+        // Status validation error - no dedicated error field, backend will catch this
+        ok=false;
+      }
+      
       const pw = fPassword.value || '';
       const cf = fConfirm.value || '';
-      if (isCreate) { if(!pw){ setErr(fPassword,errPassword,'Password is required.'); ok=false; } if(!cf){ setErr(fConfirm,errConfirm,'Please confirm the password.'); ok=false; } }
-      if (pw){ if(!strongEnough(pw)){ setErr(fPassword,errPassword,'Use ≥8 chars with 1 uppercase & 1 special character.'); ok=false; }
-               if(pw!==cf){ setErr(fConfirm,errConfirm,'Passwords do not match.'); ok=false; } }
+      
+      // Password validation rules:
+      // - CREATE: Password is required
+      // - EDIT: Password is optional (only validate if admin wants to reset it)
+      if (isCreate) {
+        // Create mode: Password is required
+        if(!pw){
+          setErr(fPassword,errPassword,'Password is required.');
+          ok=false;
+        }
+        if(!cf){
+          setErr(fConfirm,errConfirm,'Please confirm the password.');
+          ok=false;
+        }
+      } else {
+        // Edit mode: Password is optional, but if filled, confirm password is required
+        if (pw && !cf) {
+          setErr(fConfirm,errConfirm,'Please confirm the password.');
+          ok=false;
+        }
+      }
+      
+      // If password is provided (create or edit), validate it
+      if (pw) {
+        const sn = (fStudNo.value||'').trim();
+        if(!strongEnough(pw, email, sn)){
+          setErr(fPassword,errPassword,'Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number. It cannot be the same as your email or student ID.');
+          ok=false;
+        }
+        if(pw !== cf){
+          setErr(fConfirm,errConfirm,'Passwords do not match.');
+          ok=false;
+        }
+      }
+      
+      // 🏫 Academic Info Validation
+      // School is automatically assigned (read-only), so we skip validation
+      
+      const sn = (fStudNo.value||'').trim();
+      if(!sn){
+        setErr(fStudNo,errStudNo,'School ID / Student No. is required.');
+        ok=false;
+      } else if(!/^\d{8}$/.test(sn)){
+        setErr(fStudNo,errStudNo,'Student number must be exactly 8 digits.');
+        ok=false;
+      }
+      
+      const course = (fCourse.value||'').trim();
+      if(!course){
+        setErr(fCourse,errCourse,'Course is required.');
+        ok=false;
+      }
+      
+      const year = (fYear.value||'').trim();
+      if(!year){
+        setErr(fYear,errYear,'Year level is required.');
+        ok=false;
+      }
+      
+      const section = (fSection.value||'').trim();
+      if(!section){
+        setErr(fSection,errSection,'Section is required.');
+        ok=false;
+      }
+      
       if(!ok) return;
 
       const model = {
@@ -1769,8 +1959,9 @@
       const submitBtn = document.getElementById('btnSaveStudent');
       try{
         beginLoading(submitBtn);
-        const url = isCreate ? '/api/users/students' : '/api/users';
-        await getJson(url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(model) });
+        const url = isCreate ? '/api/users/students' : `/api/users/${fId.value}`;
+        const method = isCreate ? 'POST' : 'PUT';
+        await getJson(url, { method: method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(model) });
         await loadStudents();
         studentModalEl.addEventListener('hidden.bs.modal', () => {
           if (isCreate) showSuccess('Student Added','The student account has been created successfully.');

@@ -4,12 +4,21 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>LibraTrack – System Logs</title>
-	<link rel="icon" href="assets/img/LibraTrack-logo.png">
+	<link rel="icon" href="assets/img/logo.png" type="image/png">
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.css">
 	<link rel="stylesheet" href="assets/css/sidebar.css">`n  <link href="assets/css/responsive.css" rel="stylesheet">
 	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		html, body {
+			margin: 0 !important;
+			padding: 0 !important;
+		}
 		:root{
 			--gold:#a68604;
 			--gold-dark:#8d7003;
@@ -36,6 +45,51 @@
 			border-bottom:1px solid var(--card-border);
 			box-shadow:var(--shadow-sm);
 			padding:12px 0;
+			margin-top: 0 !important;
+			margin-bottom: 0 !important;
+		}
+		.sb-topbar {
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+			top: 0 !important;
+			margin-bottom: 0 !important;
+		}
+		.sb-topbar.navbar {
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+			margin-bottom: 0 !important;
+		}
+		.sb-wrapper {
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+		}
+		body.sb-body {
+			margin: 0 !important;
+			padding: 0 !important;
+		}
+		.navbar {
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+		}
+		.sticky-top {
+			top: 0 !important;
+			margin-top: 0 !important;
+		}
+		/* Remove all horizontal spacing from topbar - completely edge-to-edge */
+		.admin-header-gold .container-fluid,
+		.sb-topbar .container-fluid {
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+			margin-left: 0 !important;
+			margin-right: 0 !important;
+		}
+		/* Add minimal padding to first button only */
+		.admin-header-gold .container-fluid > button:first-child {
+			margin-left: 16px !important;
+		}
+		/* Add minimal padding to last element group */
+		.admin-header-gold .container-fluid > *:last-child {
+			margin-right: 16px !important;
 		}
 		.admin-header-gold .fw-bold,
 		.admin-header-gold .h5,
@@ -113,7 +167,7 @@
 			padding: 0;
 			width: 44px;
 			height: 44px;
-			border-radius: var(--border-radius-sm);
+			border-radius: 50%;
 			border: 1px solid var(--card-border);
 			background: #fff;
 			transition: all 0.2s ease;
@@ -137,31 +191,6 @@
 			height: 32px;
 			border-radius: 50%;
 			object-fit: cover;
-		}
-		
-		/* Notification Button */
-		.notification-btn{
-			color:var(--text-primary) !important;
-			padding:8px 12px;
-			border-radius:var(--border-radius-sm);
-			transition:all 0.2s ease;
-		}
-		.notification-btn:hover{
-			color:var(--text-primary) !important;
-			background-color:#f8f9fa;
-		}
-		.notification-badge{
-			font-size:0.6875rem;
-			padding:3px 7px;
-			font-weight:600;
-			background:var(--gold) !important;
-			color:#fff !important;
-		}
-		.notification-dropdown{
-			border-radius:var(--border-radius);
-			box-shadow:var(--shadow-lg);
-			border:1px solid var(--card-border);
-			margin-top:8px;
 		}
 		
 		/* Consistent Card Design */
@@ -191,17 +220,26 @@
 			width:100%;
 		}
 		.table-modern thead th{
-			background:var(--sidebar-bg);
+			background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
 			color:#fff;
 			font-weight:700;
 			font-size:0.75rem;
 			text-transform:uppercase;
 			letter-spacing:0.05em;
-			padding:14px 20px;
+			padding:16px 20px;
 			border-bottom:2px solid var(--card-border);
 			border-top:none;
 			white-space:nowrap;
 			vertical-align:middle;
+			position: sticky;
+			top: 0;
+			z-index: 10;
+		}
+		.table-modern thead th:first-child {
+			border-top-left-radius: var(--border-radius-lg);
+		}
+		.table-modern thead th:last-child {
+			border-top-right-radius: var(--border-radius-lg);
 		}
 		.table-modern tbody td{
 			padding:16px 20px;
@@ -323,6 +361,20 @@
 		.btn-outline-primary:active{
 			transform:translateY(0);
 		}
+		.btn-outline-secondary {
+			border: 2px solid var(--card-border);
+			color: var(--text-secondary);
+			background: #fff;
+			border-radius: var(--border-radius-sm);
+			padding: 10px 16px;
+			font-weight: 500;
+			transition: all 0.2s ease;
+		}
+		.btn-outline-secondary:hover {
+			background: #f8f9fa;
+			border-color: var(--text-secondary);
+			color: var(--text-primary);
+		}
 		
 		main.container-fluid{
 			padding:24px !important;
@@ -357,13 +409,251 @@
 			color:#6f42c1;
 			border:1px solid rgba(111,66,193,.2);
 		}
+		
+		/* Improved Filter Section */
+		.filter-section {
+			background: #fff;
+			border-radius: var(--border-radius-lg);
+			border: 1px solid var(--card-border);
+			padding: 20px;
+			margin-bottom: 24px;
+			box-shadow: var(--shadow-sm);
+		}
+		.filter-section-title {
+			font-size: 0.875rem;
+			font-weight: 600;
+			color: var(--text-secondary);
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			margin-bottom: 16px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.filter-section-title i {
+			color: var(--gold);
+		}
+		.filter-controls-row {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 16px;
+			align-items: flex-end;
+		}
+		
+		/* Action Badge Styling */
+		.action-badge {
+			display: inline-block;
+			padding: 4px 10px;
+			border-radius: 6px;
+			font-size: 0.75rem;
+			font-weight: 600;
+			letter-spacing: 0.02em;
+			text-transform: uppercase;
+		}
+		.action-badge.book { background: #dbeafe; color: #1e40af; }
+		.action-badge.user { background: #fce7f3; color: #9f1239; }
+		.action-badge.category { background: #fef3c7; color: #92400e; }
+		.action-badge.settings { background: #e0e7ff; color: #3730a3; }
+		.action-badge.transaction { background: #d1fae5; color: #065f46; }
+		.action-badge.auth { background: #f3f4f6; color: #374151; }
+		.action-badge.success { background: #d1fae5; color: #065f46; }
+		.action-badge.fail { background: #fee2e2; color: #991b1b; }
+		
+		/* Improved Table Styling */
+		.table-modern tbody td {
+			padding: 18px 20px;
+			border-bottom: 1px solid #f0f0f0;
+			color: var(--text-primary);
+			font-size: 0.875rem;
+			vertical-align: middle;
+		}
+		.table-modern tbody tr {
+			transition: all 0.2s ease;
+		}
+		.table-modern tbody tr:hover {
+			background-color: #f8f9fa;
+			transform: translateX(2px);
+		}
+		.table-modern tbody td:first-child {
+			font-weight: 500;
+			color: var(--text-primary);
+		}
+		.table-modern tbody td:nth-child(3) {
+			color: var(--text-secondary);
+			font-size: 0.8125rem;
+			white-space: nowrap;
+		}
+		.table-modern tbody td:nth-child(4) {
+			color: var(--text-secondary);
+			max-width: 400px;
+			word-wrap: break-word;
+		}
+		
+		/* Improved Empty State */
+		#empty {
+			padding: 60px 20px !important;
+		}
+		#empty i {
+			font-size: 4rem;
+			color: var(--text-muted);
+			opacity: 0.5;
+			margin-bottom: 16px;
+		}
+		#empty .empty-title {
+			font-size: 1.125rem;
+			font-weight: 600;
+			color: var(--text-secondary);
+			margin-bottom: 8px;
+		}
+		#empty .empty-subtitle {
+			font-size: 0.875rem;
+			color: var(--text-muted);
+		}
+		
+		/* Improved Pagination */
+		#logPagination {
+			padding: 20px;
+			background: #f8f9fa;
+			border-top: 1px solid var(--card-border);
+		}
+		#logPagination .pagination-info {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+		#logPagination .btn {
+			min-width: 100px;
+			font-weight: 500;
+		}
+		#logPagination .btn:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+		#logPagination .page-info {
+			font-size: 0.875rem;
+			color: var(--text-secondary);
+			font-weight: 500;
+		}
+		
+		/* Actor Role Badge */
+		.actor-role-badge {
+			display: inline-block;
+			padding: 2px 8px;
+			border-radius: 4px;
+			font-size: 0.6875rem;
+			font-weight: 600;
+			margin-left: 8px;
+			text-transform: uppercase;
+		}
+		.actor-role-badge.admin {
+			background: #4a4a4a;
+			color: #fff;
+		}
+		.actor-role-badge.librarian {
+			background: #e7f1ff;
+			color: #0d6efd;
+		}
+		.actor-role-badge.student {
+			background: #efe7ff;
+			color: #6f42c1;
+		}
+		
+		/* Loading State */
+		.loading-spinner {
+			display: inline-block;
+			width: 16px;
+			height: 16px;
+			border: 2px solid var(--gold);
+			border-top-color: transparent;
+			border-radius: 50%;
+			animation: spin 0.6s linear infinite;
+		}
+		@keyframes spin {
+			to { transform: rotate(360deg); }
+		}
+
+		/* Skeleton Loaders */
+		.skeleton {
+			background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+			background-size: 200% 100%;
+			animation: skeleton-shimmer 1.5s ease-in-out infinite;
+			border-radius: 4px;
+		}
+		@keyframes skeleton-shimmer {
+			0% { background-position: 200% 0; }
+			100% { background-position: -200% 0; }
+		}
+		.skeleton-table-row td {
+			padding: 18px 20px;
+		}
+		.skeleton-table-cell {
+			height: 1rem;
+			background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+			background-size: 200% 100%;
+			animation: skeleton-shimmer 1.5s ease-in-out infinite;
+			border-radius: 4px;
+		}
+		.skeleton-table-cell.short {
+			width: 60%;
+		}
+		.skeleton-table-cell.medium {
+			width: 80%;
+		}
+		.skeleton-table-cell.long {
+			width: 100%;
+		}
+		.skeleton-badge {
+			width: 100px;
+			height: 24px;
+			border-radius: 6px;
+			background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+			background-size: 200% 100%;
+			animation: skeleton-shimmer 1.5s ease-in-out infinite;
+			display: inline-block;
+		}
+		.fade-in {
+			animation: fadeIn 0.3s ease-in;
+		}
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+		.btn-loading {
+			position: relative;
+			pointer-events: none;
+		}
+		.btn-loading .spinner-border-sm {
+			width: 1rem;
+			height: 1rem;
+			border-width: 0.15em;
+		}
+		.form-select:disabled,
+		input[type="date"]:disabled,
+		.search-input-custom:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+			background-color: #e9ecef;
+		}
+		
+		/* Responsive Improvements */
+		@media (max-width: 991.98px) {
+			.filter-controls-row {
+				flex-direction: column;
+			}
+			.filter-controls-row > * {
+				width: 100%;
+			}
+			.table-modern tbody td:nth-child(4) {
+				max-width: 200px;
+			}
+		}
 	</style>
 </head>
-<body class="sb-body sb-expanded">
-	<div id="sidebar-root"></div>
+<body class="sb-body sb-expanded" style="margin:0; padding:0;">
+	<div id="sidebar-root" style="margin:0; padding:0;"></div>
 
-	<div class="sb-wrapper">
-		<nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+	<div class="sb-wrapper" style="margin-top:0; padding-top:0;">
+		<nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold" style="margin-top:0 !important; padding-top:0 !important; top:0 !important;">
 			<div class="container-fluid">
 				<button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
 					<i class="bi bi-list fs-4"></i>
@@ -378,19 +668,8 @@
 						</div>
 					</form>
 
-					<div class="dropdown me-2">
-						<button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
-							<i class="bi bi-bell fs-5"></i>
-							<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
-						</button>
-						<ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
-							<li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
-							<li id="notificationList" class="px-3 py-2"><div class="text-muted small">No alerts</div></li>
-						</ul>
-					</div>
-
 					<div class="dropdown">
-						<button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:var(--border-radius-sm);">
+						<button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
 							<img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
 						</button>
 						<ul class="dropdown-menu dropdown-menu-end">
@@ -405,45 +684,87 @@
 		</nav>
 
 		<main class="sb-content container-fluid">
-			<div class="d-flex align-items-end justify-content-between mb-4">
-				<div class="d-flex align-items-end gap-3 ms-auto">
-					<select id="type" class="form-select">
-						<option value="">All</option>
-						<option value="librarian">Librarian Actions</option>
-						<option value="user">User Status Changes</option>
-						<option value="settings">System Settings</option>
-						<option value="login">Login Attempts</option>
-						<option value="error">Errors/Warnings</option>
-					</select>
-					<div class="date-input-wrapper">
-						<label for="from">From:</label>
+			<!-- Filter Section -->
+			<div class="filter-section">
+				<div class="filter-section-title">
+					<i class="bi bi-funnel"></i>
+					<span>Filter Logs</span>
+				</div>
+				<div class="filter-controls-row">
+					<div class="filter-control-wrapper" style="flex: 1; min-width: 200px;">
+						<label for="type">Action Type</label>
+						<select id="type" class="form-select">
+							<option value="">All Actions</option>
+							<optgroup label="Books">
+								<option value="BOOK_CREATE">Book Create</option>
+								<option value="BOOK_UPDATE">Book Update</option>
+								<option value="BOOK_DELETE">Book Delete</option>
+							</optgroup>
+							<optgroup label="Users">
+								<option value="USER_CREATE">User Create</option>
+								<option value="USER_UPDATE">User Update</option>
+								<option value="USER_DEACTIVATE">User Deactivate</option>
+								<option value="USER_REACTIVATE">User Reactivate</option>
+								<option value="USER_RESET_PASSWORD">Password Reset</option>
+							</optgroup>
+							<optgroup label="Categories">
+								<option value="CATEGORY_CREATE">Category Create</option>
+								<option value="CATEGORY_UPDATE">Category Update</option>
+								<option value="CATEGORY_DELETE">Category Delete</option>
+							</optgroup>
+							<optgroup label="System">
+								<option value="SETTINGS_UPDATE">Settings Update</option>
+							</optgroup>
+							<optgroup label="Transactions">
+								<option value="BORROW_REQUEST_APPROVE">Borrow Approve</option>
+								<option value="BORROW_REQUEST_REJECT">Borrow Reject</option>
+								<option value="TRANSACTION_BORROW">Transaction Borrow</option>
+								<option value="TRANSACTION_RETURN">Transaction Return</option>
+							</optgroup>
+							<optgroup label="Authentication">
+								<option value="LOGIN_SUCCESS">Login Success</option>
+								<option value="LOGIN_FAIL">Login Fail</option>
+								<option value="LOGOUT">Logout</option>
+							</optgroup>
+						</select>
+					</div>
+					<div class="date-input-wrapper" style="flex: 0 0 auto;">
+						<label for="from">From Date</label>
 						<input type="date" id="from" placeholder="dd/mm/yyyy">
 					</div>
-					<div class="date-input-wrapper">
-						<label for="to">To:</label>
+					<div class="date-input-wrapper" style="flex: 0 0 auto;">
+						<label for="to">To Date</label>
 						<input type="date" id="to" placeholder="dd/mm/yyyy">
 					</div>
-					<button id="btnFilter" class="btn btn-outline-primary"><i class="bi bi-filter"></i></button>
+					<div style="flex: 0 0 auto; display: flex; align-items: flex-end; gap: 8px;">
+						<button id="btnFilter" class="btn btn-outline-primary" style="height: 42px; min-width: 120px;">
+							<i class="bi bi-filter me-2"></i>Apply Filters
+						</button>
+						<button id="btnClearFilters" class="btn btn-outline-secondary" style="height: 42px; min-width: 100px;">
+							<i class="bi bi-x-circle me-2"></i>Clear
+						</button>
+					</div>
 				</div>
 			</div>
 
-			<div class="card">
+			<div class="card" style="overflow: hidden;">
 				<div class="card-body p-0">
-					<div class="table-responsive">
+					<div class="table-responsive" style="max-height: calc(100vh - 350px); overflow-y: auto;">
 						<table class="table table-modern align-middle mb-0">
 							<thead>
 								<tr>
-									<th>Actor</th>
-									<th>Action</th>
-									<th>Date</th>
+									<th style="min-width: 180px;">Actor</th>
+									<th style="min-width: 150px;">Action</th>
+									<th style="min-width: 160px;">Date</th>
 									<th>Details</th>
 								</tr>
 							</thead>
 							<tbody id="logBody"></tbody>
 						</table>
 						<div id="empty" class="text-center text-muted py-5 d-none">
-							<i class="bi bi-card-checklist fs-1 d-block mb-2"></i>
-							No logs.
+							<i class="bi bi-inbox"></i>
+							<div class="empty-title">No logs found</div>
+							<div class="empty-subtitle">Try adjusting your filters or check back later</div>
 						</div>
 					</div>
 				</div>
@@ -453,6 +774,7 @@
 
 	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 	<script src="assets/js/sidebar.js?v=2025-11-17-unified"></script>
+	<script src="assets/js/logout.js"></script>
 	<script>
 		async function getMe() {
 			const authUrl = '/api/check-auth';
@@ -501,38 +823,283 @@
 			document.getElementById('whoChip').innerHTML =
 				`<span class="badge role-chip ${role}">${role.toUpperCase()}</span> ${fullName || me.email}`;
 
-			document.getElementById('logoutLink')?.addEventListener('click', async e => {
-				e.preventDefault();
-				try { await fetch('/api/logout', { method:'POST', credentials:'include' }); } catch {}
-				location.href = '/login';
-			});
+			// Logout - handled by logout.js (confirmation dialog)
 
 			const body = document.getElementById('logBody');
 			const empty = document.getElementById('empty');
+			const btnFilter = document.getElementById('btnFilter');
+			const btnClearFilters = document.getElementById('btnClearFilters');
+			const typeSelect = document.getElementById('type');
+			const fromDate = document.getElementById('from');
+			const toDate = document.getElementById('to');
+			let currentPage = 1;
+			let totalPages = 1;
+			let isLoading = false;
 
-			async function load(){
-				const p = new URLSearchParams();
-				const t = document.getElementById('type').value;
-				const f = document.getElementById('from').value;
-				const to = document.getElementById('to').value;
-				if (t) p.set('type', t);
-				if (f) p.set('from', f);
-				if (to) p.set('to', to);
-				const url = '/api/logs' + (p.toString() ? ('?' + p.toString()) : '');
-				const res = await fetch(url).then(r=>r.json()).catch(()=>({logs:[]}));
-				const items = res?.logs || [];
-				body.innerHTML = items.map(x => `
-					<tr>
-						<td>${escapeHtml(x.actor || x.user || 'System')}</td>
-						<td>${escapeHtml(x.action || x.type || '')}</td>
-						<td>${escapeHtml(x.created_at || x.date || '')}</td>
-						<td>${escapeHtml(x.details || '')}</td>
+			// Render skeleton table rows
+			function renderSkeletonTableRows(count = 8) {
+				return Array.from({length: count}, () => `
+					<tr class="skeleton-table-row">
+						<td>
+							<div class="skeleton-table-cell medium"></div>
+							<div class="skeleton-badge" style="margin-top: 8px; width: 60px; height: 20px;"></div>
+						</td>
+						<td>
+							<div class="skeleton-badge"></div>
+						</td>
+						<td>
+							<div class="skeleton-table-cell short"></div>
+						</td>
+						<td>
+							<div class="skeleton-table-cell long"></div>
+						</td>
 					</tr>
 				`).join('');
-				empty.classList.toggle('d-none', items.length > 0);
 			}
-			function escapeHtml(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-			document.getElementById('btnFilter').addEventListener('click', load);
+
+			// Set loading state for filters and buttons
+			function setLoadingState(loading) {
+				isLoading = loading;
+				
+				// Disable filter inputs
+				if (typeSelect) typeSelect.disabled = loading;
+				if (fromDate) fromDate.disabled = loading;
+				if (toDate) toDate.disabled = loading;
+				
+				// Disable search input
+				const searchInput = document.querySelector('.search-input-custom');
+				if (searchInput) searchInput.disabled = loading;
+				
+				// Disable buttons
+				if (btnFilter) {
+					btnFilter.disabled = loading;
+					if (loading) {
+						btnFilter.classList.add('btn-loading');
+						const originalHtml = btnFilter.innerHTML;
+						btnFilter.dataset.originalHtml = originalHtml;
+						btnFilter.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+					} else {
+						btnFilter.classList.remove('btn-loading');
+						if (btnFilter.dataset.originalHtml) {
+							btnFilter.innerHTML = btnFilter.dataset.originalHtml;
+							delete btnFilter.dataset.originalHtml;
+						}
+					}
+				}
+				
+				if (btnClearFilters) {
+					btnClearFilters.disabled = loading;
+					if (loading) {
+						btnClearFilters.classList.add('btn-loading');
+						const originalHtml = btnClearFilters.innerHTML;
+						btnClearFilters.dataset.originalHtml = originalHtml;
+						btnClearFilters.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+					} else {
+						btnClearFilters.classList.remove('btn-loading');
+						if (btnClearFilters.dataset.originalHtml) {
+							btnClearFilters.innerHTML = btnClearFilters.dataset.originalHtml;
+							delete btnClearFilters.dataset.originalHtml;
+						}
+					}
+				}
+			}
+
+			function formatDate(dateString) {
+				if (!dateString) return '';
+				try {
+					const date = new Date(dateString);
+					return date.toLocaleString('en-US', {
+						year: 'numeric',
+						month: '2-digit',
+						day: '2-digit',
+						hour: '2-digit',
+						minute: '2-digit',
+						hour12: false
+					}).replace(',', '');
+				} catch (e) {
+					return dateString;
+				}
+			}
+
+			function escapeHtml(s){ 
+				return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); 
+			}
+
+			async function load(){
+				// Show skeleton loaders
+				body.innerHTML = renderSkeletonTableRows(8);
+				empty.classList.add('d-none');
+				setLoadingState(true);
+				
+				const p = new URLSearchParams();
+				const action = document.getElementById('type').value;
+				const from = document.getElementById('from').value;
+				const to = document.getElementById('to').value;
+				const search = document.querySelector('.search-input-custom')?.value || '';
+				
+				if (action && action !== 'all') p.set('action', action);
+				if (from) p.set('from', from);
+				if (to) p.set('to', to);
+				if (search) p.set('q', search);
+				p.set('page', currentPage);
+				p.set('limit', 20);
+				
+				const url = '/api/logs' + (p.toString() ? ('?' + p.toString()) : '');
+				
+				try {
+					const res = await fetch(url, {
+						credentials: 'include',
+						headers: { 'Accept': 'application/json' }
+					});
+					
+					if (res.status === 403) {
+						body.innerHTML = '<tr><td colspan="4" class="text-center py-4"><div class="text-danger"><i class="bi bi-shield-exclamation fs-4 d-block mb-2"></i>Access denied. Admin access required.</div></td></tr>';
+						empty.classList.add('d-none');
+						return;
+					}
+					
+					const data = await res.json().catch(() => ({items: []}));
+					const items = data?.items || [];
+					const total = data?.total || 0;
+					totalPages = Math.ceil(total / 20);
+					window.lastLogTotal = total;
+					
+					function getActionBadgeClass(action) {
+						if (!action) return 'auth';
+						if (action.includes('BOOK')) return 'book';
+						if (action.includes('USER')) return 'user';
+						if (action.includes('CATEGORY')) return 'category';
+						if (action.includes('SETTINGS')) return 'settings';
+						if (action.includes('TRANSACTION') || action.includes('BORROW')) return 'transaction';
+						if (action.includes('LOGIN_SUCCESS')) return 'success';
+						if (action.includes('LOGIN_FAIL')) return 'fail';
+						return 'auth';
+					}
+					
+					function getRoleBadgeClass(role) {
+						return role ? role.toLowerCase() : 'admin';
+					}
+					
+					// Hide empty state during render
+					empty.classList.add('d-none');
+					
+					if (items.length === 0) {
+						body.innerHTML = '';
+						empty.classList.remove('d-none');
+					} else {
+						body.innerHTML = items.map(x => {
+							const actionClass = getActionBadgeClass(x.action);
+							const roleClass = getRoleBadgeClass(x.actor_role);
+							return `
+							<tr class="fade-in">
+								<td>
+									<div style="display: flex; align-items: center; gap: 8px;">
+										<span>${escapeHtml(x.actor_name || 'System')}</span>
+										${x.actor_role ? `<span class="actor-role-badge ${roleClass}">${escapeHtml(x.actor_role)}</span>` : ''}
+									</div>
+								</td>
+								<td>
+									<span class="action-badge ${actionClass}">${escapeHtml(x.action || '')}</span>
+								</td>
+								<td>${escapeHtml(formatDate(x.created_at))}</td>
+								<td style="line-height: 1.5;">${escapeHtml(x.details || '')}</td>
+							</tr>
+						`;
+						}).join('');
+					}
+					
+					// Update pagination
+					updatePagination();
+				} catch (err) {
+					console.error('Load logs error:', err);
+					body.innerHTML = '<tr><td colspan="4" class="text-center py-4"><div class="text-danger"><i class="bi bi-exclamation-triangle fs-4 d-block mb-2"></i>Error loading logs. Please try again.</div></td></tr>';
+					empty.classList.add('d-none');
+				} finally {
+					setLoadingState(false);
+				}
+			}
+			
+			function updatePagination() {
+				let pagination = document.getElementById('logPagination');
+				if (!pagination) {
+					pagination = document.createElement('div');
+					pagination.id = 'logPagination';
+					document.querySelector('.card-body').appendChild(pagination);
+				}
+				
+				// Get total from the last load
+				const total = window.lastLogTotal || 0;
+				const startItem = total > 0 ? ((currentPage - 1) * 20) + 1 : 0;
+				const endItem = Math.min(currentPage * 20, total);
+				
+				if (total === 0) {
+					pagination.innerHTML = '';
+					return;
+				}
+				
+				const prevBtn = document.createElement('button');
+				prevBtn.className = 'btn btn-sm btn-outline-primary';
+				prevBtn.disabled = currentPage <= 1;
+				prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i> Previous';
+				prevBtn.onclick = () => { currentPage = Math.max(1, currentPage - 1); load(); };
+				
+				const nextBtn = document.createElement('button');
+				nextBtn.className = 'btn btn-sm btn-outline-primary';
+				nextBtn.disabled = currentPage >= totalPages;
+				nextBtn.innerHTML = 'Next <i class="bi bi-chevron-right"></i>';
+				nextBtn.onclick = () => { currentPage = Math.min(totalPages, currentPage + 1); load(); };
+				
+				pagination.innerHTML = `
+					<div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+						<div class="pagination-info d-flex align-items-center gap-2">
+						</div>
+						<div class="text-muted small">
+							Showing ${startItem}-${endItem} of ${total} logs
+						</div>
+					</div>
+				`;
+				
+				const paginationInfo = pagination.querySelector('.pagination-info');
+				paginationInfo.appendChild(prevBtn);
+				paginationInfo.appendChild(document.createTextNode(' '));
+				const pageSpan = document.createElement('span');
+				pageSpan.className = 'page-info mx-3';
+				pageSpan.textContent = `Page ${currentPage} of ${totalPages || 1}`;
+				paginationInfo.appendChild(pageSpan);
+				paginationInfo.appendChild(document.createTextNode(' '));
+				paginationInfo.appendChild(nextBtn);
+			}
+			
+			// Search functionality
+			const searchInput = document.querySelector('.search-input-custom');
+			if (searchInput) {
+				let searchTimeout;
+				searchInput.addEventListener('input', function() {
+					clearTimeout(searchTimeout);
+					searchTimeout = setTimeout(() => {
+						currentPage = 1;
+						load();
+					}, 500);
+				});
+			}
+			
+			btnFilter.addEventListener('click', function() {
+				if (isLoading) return;
+				currentPage = 1;
+				load();
+			});
+			
+			btnClearFilters.addEventListener('click', function() {
+				if (isLoading) return;
+				typeSelect.value = '';
+				fromDate.value = '';
+				toDate.value = '';
+				const searchInput = document.querySelector('.search-input-custom');
+				if (searchInput) searchInput.value = '';
+				currentPage = 1;
+				load();
+			});
+			
 			load();
 		})();
 	</script>

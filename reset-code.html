@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LibraTrack — Verify Code</title>
 
-  <!-- Favicons (same as the rest of the site) - commented out due to missing files
-  <link rel="icon" href="assets/img/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
+  <!-- Favicons -->
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
   <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
   -->
 
@@ -20,20 +18,97 @@
   <!-- Vendor CSS -->
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet"
   <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
 
   <!-- Site CSS -->
   <link href="assets/css/main.css" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Poppins', sans-serif !important;
+    }
+    :root {
+      --brand-gold: #a68604;
+      --gold-dark: #8d7003;
+      --border-radius-sm: 8px;
+    }
+    .card, .card .card-body {
+      background: #fff !important;
+    }
+    .card {
+      border-radius: 20px !important;
+      overflow: hidden;
+    }
+    .btn-primary, .form-button-label {
+      background: var(--brand-gold) !important;
+      border-color: var(--brand-gold) !important;
+      color: #fff !important;
+      font-weight: 600;
+      border-radius: var(--border-radius-sm);
+      transition: all 0.2s ease;
+    }
+    .btn-primary:hover {
+      background: var(--gold-dark) !important;
+      border-color: var(--gold-dark) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(166, 134, 4, 0.3);
+    }
+    .form-big-label {
+      color: #111 !important;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    .form-label-login-register {
+      color: #374151 !important;
+      font-weight: 600;
+      font-size: 0.875rem;
+      margin-bottom: 8px;
+    }
+    .form-control {
+      padding: 10px 14px !important;
+      font-size: 0.9375rem !important;
+      border: 1.5px solid #e5e7eb !important;
+      border-radius: var(--border-radius-sm) !important;
+      background: #fff !important;
+      color: #111827 !important;
+      transition: all 0.2s ease;
+    }
+    .form-control:focus {
+      border-color: var(--brand-gold) !important;
+      box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.1) !important;
+      outline: none !important;
+    }
+    .form-control:hover:not(:focus) {
+      border-color: #d1d5db !important;
+    }
+    .form-control::placeholder {
+      color: #9ca3af !important;
+      font-size: 0.875rem !important;
+    }
+    .form-label-create {
+      color: var(--brand-gold) !important;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .form-label-create:hover {
+      text-decoration: underline;
+    }
+    .btn-link {
+      color: var(--brand-gold) !important;
+    }
+    .btn-link:hover {
+      color: var(--gold-dark) !important;
+    }
+  </style>
 </head>
 
 <body class="index-page d-flex flex-column min-vh-100">
-  <!-- Header (same as other public pages) -->
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container position-relative d-flex align-items-center justify-content-between">
+
       <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
         <img src="assets/img/LibraTrack-logo.png" alt="LibraTrack Logo" style="width:45px; height:100px;">
-        <h1 class="sitename" style="font-size:24px;">LibraTrack</h1>
+        <h1 class="sitename" style="font-size: 24px;">LibraTrack</h1>
       </a>
 
       <nav id="navmenu" class="navmenu">
@@ -42,39 +117,21 @@
           <li><a href="index.html#about">About</a></li>
           <li><a href="register.html">Register</a></li>
           <li><a href="login.html">Login</a></li>
-          <li class="dropdown">
-            <a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="#">Dropdown 1</a></li>
-              <li class="dropdown">
-                <a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-                <ul>
-                  <li><a href="#">Deep Dropdown 1</a></li>
-                  <li><a href="#">Deep Dropdown 2</a></li>
-                  <li><a href="#">Deep Dropdown 3</a></li>
-                  <li><a href="#">Deep Dropdown 4</a></li>
-                  <li><a href="#">Deep Dropdown 5</a></li>
-                </ul>
-              </li>
-              <li><a href="#">Dropdown 2</a></li>
-              <li><a href="#">Dropdown 3</a></li>
-              <li><a href="#">Dropdown 4</a></li>
-            </ul>
-          </li>
           <li><a href="index.html#contact">Contact</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
 
       <a class="btn-getstarted d-none d-sm-block" href="index.html#menu">Browse Catalog</a>
+
     </div>
   </header>
 
   <!-- Main -->
   <main class="main flex-grow-1">
     <section class="page-bg min-vh-100 d-flex align-items-center justify-content-center">
-      <div class="card border-0 shadow-sm mx-auto" style="max-width: 460px; width: 100%;">
-        <div class="card-body p-5">
+      <div class="card border-0 shadow-sm mx-auto" style="max-width: 460px; width: 100%; background:#fff !important;">
+        <div class="card-body p-5" style="background:#fff !important;">
           <div class="text-center mb-4">
             <img src="assets/img/LibraTrack-logo.png" alt="LibraTrack Logo" width="84" height="84">
           </div>

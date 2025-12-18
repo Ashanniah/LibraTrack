@@ -2,7 +2,7 @@
 // Version: 2025-11-19-FINAL-LOANS-COMBINED-V4
 console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
 (function () {
-  const APP_BASE = '/libratrack/';
+  const APP_BASE = '/';
 
   const ROUTES = {
     admin: {
@@ -182,15 +182,28 @@ console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
     root.querySelector('#qaAddBook')?.addEventListener('click', () => location.href = url('books.html#add'));
     root.querySelector('#qaRegMember')?.addEventListener('click', () => location.href = url('librarian-users.html'));
 
-    // Logout handler
+    // Logout handler - use confirmation modal if available, otherwise direct logout
     root.querySelectorAll('a[href*="login.html"]').forEach(link => {
       if (link.textContent.trim().toLowerCase().includes('logout')) {
+        // Set id for logout.js to handle
+        link.id = 'logoutLink';
+        link.href = '#';
+        // Keep logout link white (don't add text-danger class)
+        
+        // Always check for confirmation function when clicked (in case logout.js loads after sidebar.js)
         link.addEventListener('click', async (e) => {
           e.preventDefault();
-          try {
-            await fetch(APP_BASE + 'backend/logout.php', { method: 'POST', credentials: 'include' });
-          } catch {}
-          location.href = url('login.html');
+          
+          // If logout.js is loaded, use confirmation modal
+          if (typeof window.showLogoutConfirmation === 'function') {
+            window.showLogoutConfirmation();
+          } else {
+            // Fallback: direct logout if logout.js not loaded
+            try {
+              await fetch(APP_BASE + 'backend/logout.php', { method: 'POST', credentials: 'include' });
+            } catch {}
+            location.href = url('login.html');
+          }
         });
       }
     });
@@ -199,6 +212,13 @@ console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
     const yearEl = root.querySelector('#year');
     if (yearEl && !yearEl.textContent) {
       yearEl.textContent = new Date().getFullYear();
+    }
+    
+    // Re-initialize logout handlers if logout.js is loaded (for sidebar logout links)
+    if (typeof window.initLogoutHandlers === 'function') {
+      setTimeout(() => {
+        window.initLogoutHandlers();
+      }, 100);
     }
   };
 

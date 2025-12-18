@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AuditLog;
 
 class LoanController extends BaseController
 {
@@ -26,6 +27,13 @@ class LoanController extends BaseController
         if ($currentRole === 'librarian') {
             $librarianSchoolId = (int)($user['school_id'] ?? 0);
             if ($librarianSchoolId > 0) {
+                // Filter by book's school_id (books are now school-specific)
+                $hasBookSchoolId = $this->booksHasSchoolId();
+                if ($hasBookSchoolId) {
+                    $query->where('b.school_id', $librarianSchoolId);
+                }
+                
+                // Also filter by loan's school_id OR student's school_id as backup
                 if ($this->loansHasSchoolId()) {
                     $query->where('l.school_id', $librarianSchoolId);
                 } else {
@@ -174,6 +182,17 @@ class LoanController extends BaseController
             return response()->json(['ok' => false, 'error' => 'Book not found'], 404);
         }
 
+        // School isolation check: Librarians can only create loans for books from their school
+        if ($currentRole === 'librarian') {
+            $librarianSchoolId = (int)($user['school_id'] ?? 0);
+            if ($librarianSchoolId > 0 && $this->booksHasSchoolId()) {
+                $bookSchoolId = (int)($book->school_id ?? 0);
+                if ($bookSchoolId !== $librarianSchoolId) {
+                    return response()->json(['ok' => false, 'error' => 'You can only create loans for books from your school'], 403);
+                }
+            }
+        }
+
         $borrowedCount = DB::table('loans')
             ->where('book_id', $bookId)
             ->where('status', 'borrowed')
@@ -200,6 +219,17 @@ class LoanController extends BaseController
         }
 
         $loanId = DB::table('loans')->insertGetId($loanData);
+
+        // Log loan creation (borrow)
+        $book = DB::table('books')->where('id', $bookId)->first();
+        $student = DB::table('users')->where('id', $studentId)->first();
+        AuditLog::logAction(
+            $user,
+            'TRANSACTION_BORROW',
+            'transaction',
+            $loanId,
+            "Created loan ID {$loanId}: Book '{$book->title}' borrowed by student {$student->first_name} {$student->last_name}"
+        );
 
         return response()->json([
             'ok' => true,
@@ -271,6 +301,18 @@ class LoanController extends BaseController
                 ->increment('quantity');
 
             DB::commit();
+            
+            // Log book return
+            $book = DB::table('books')->where('id', $loan->book_id)->first();
+            $student = DB::table('users')->where('id', $loan->student_id)->first();
+            AuditLog::logAction(
+                $user,
+                'TRANSACTION_RETURN',
+                'transaction',
+                $loanId,
+                "Returned book: '{$book->title}' by student {$student->first_name} {$student->last_name}"
+            );
+            
             return response()->json(['ok' => true, 'message' => 'Book marked as returned successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -365,6 +407,10 @@ class LoanController extends BaseController
         return response()->json(['ok' => true, 'message' => 'Loan deleted successfully']);
     }
 }
+
+
+
+
 
 
 

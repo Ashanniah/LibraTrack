@@ -5,12 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LibraTrack - Login</title>
 
-  <!-- Favicons (kept commented if files are missing)
-  <link rel="icon" href="assets/img/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="assets/img/favicon-16x16.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="assets/img/apple-touch-icon.png">
-  -->
+  <!-- Favicons -->
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/logo.png">
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -24,6 +21,9 @@
   <!-- Site CSS -->
   <link href="assets/css/main.css" rel="stylesheet">
   <style>
+    * {
+      font-family: 'Poppins', sans-serif !important;
+    }
     :root {
       --brand-gold: #a68604;
       --gold-dark: #8d7003;
@@ -107,7 +107,6 @@
 
 <body class="index-page">
 
-  <!-- Header -->
   <header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container position-relative d-flex align-items-center justify-content-between">
 
@@ -128,6 +127,7 @@
       </nav>
 
       <a class="btn-getstarted d-none d-sm-block" href="index.html#menu">Browse Catalog</a>
+
     </div>
   </header>
 
@@ -211,11 +211,23 @@
       const form = document.getElementById('loginForm');
       const email = document.getElementById('email');
       const password = document.getElementById('password');
+      const remember = document.getElementById('remember');
       const emailError = document.getElementById('emailError');
       const passwordError = document.getElementById('passwordError');
       const togglePassword = document.getElementById('togglePassword');
       const eyeIcon = document.getElementById('eyeIcon');
       const submitBtn = form.querySelector('button[type="submit"]');
+
+      // Load saved email and remember me state on page load
+      const savedEmail = localStorage.getItem('rememberedEmail');
+      const savedRememberState = localStorage.getItem('rememberMe') === 'true';
+      
+      if (savedEmail) {
+        email.value = savedEmail;
+      }
+      if (savedRememberState) {
+        remember.checked = true;
+      }
 
       // Show/hide password
       togglePassword.addEventListener('click', function () {
@@ -306,6 +318,17 @@
             submitting = false;
             submitBtn.disabled = false;
             return;
+          }
+
+          // Handle "Remember me" functionality
+          if (remember.checked) {
+            // Save email (never save password for security)
+            localStorage.setItem('rememberedEmail', emailVal);
+            localStorage.setItem('rememberMe', 'true');
+          } else {
+            // Clear saved credentials if "Remember me" is unchecked
+            localStorage.removeItem('rememberedEmail');
+            localStorage.removeItem('rememberMe');
           }
 
           // Success -> cache role and redirect. Small delay helps ensure cookie is set.

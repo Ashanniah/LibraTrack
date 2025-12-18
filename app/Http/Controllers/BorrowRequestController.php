@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AuditLog;
+use App\Helpers\NotificationHelper;
 
 class BorrowRequestController extends BaseController
 {
@@ -107,6 +109,16 @@ class BorrowRequestController extends BaseController
             return response()->json(['ok' => false, 'error' => 'Book not found'], 404);
         }
 
+        // School isolation: Students can only request books from their school
+        $studentSchoolId = (int)($user['school_id'] ?? 0);
+        $hasBookSchoolId = DB::select("SHOW COLUMNS FROM books LIKE 'school_id'");
+        if (count($hasBookSchoolId) > 0 && $studentSchoolId > 0) {
+            $bookSchoolId = (int)($book->school_id ?? 0);
+            if ($bookSchoolId > 0 && $bookSchoolId !== $studentSchoolId) {
+                return response()->json(['ok' => false, 'error' => 'You can only request books from your school'], 403);
+            }
+        }
+
         if (($book->quantity ?? 0) < 1) {
             return response()->json(['ok' => false, 'error' => 'Book is not available'], 400);
         }
@@ -128,6 +140,10 @@ class BorrowRequestController extends BaseController
             'status' => 'pending',
             'requested_at' => now(),
         ]);
+
+        // BORROW_REQUEST_SUBMITTED and NEW_BORROW_REQUEST do not send emails
+        // Therefore, no in-app notifications are created for these events
+        // (Notifications are only created when emails are successfully sent)
 
         return response()->json([
             'ok' => true,
@@ -225,6 +241,66 @@ class BorrowRequestController extends BaseController
                 ->decrement('quantity');
 
             DB::commit();
+            
+            // Log borrow request approval
+            $book = DB::table('books')->where('id', $borrowRequest->book_id)->first();
+            $student = DB::table('users')->where('id', $borrowRequest->student_id)->first();
+            AuditLog::logAction(
+                $user,
+                'BORROW_REQUEST_APPROVE',
+                'transaction',
+                $loanId,
+                "Approved borrow request ID {$requestId}: Book '{$book->title}' loaned to student {$student->first_name} {$student->last_name}"
+            );
+            
+            // Queue email notification (in-app notification created automatically when email is sent)
+            try {
+                NotificationHelper::queueEmail(
+                    $borrowRequest->student_id,
+                    'BORROW_REQUEST_APPROVED',
+                    'loan',
+                    $loanId
+                );
+            } catch (\Exception $e) {
+                error_log("Failed to queue approval email: " . $e->getMessage());
+            }
+            
+            // Check for low stock after approval
+            try {
+                $remainingQty = DB::table('books')->where('id', $borrowRequest->book_id)->value('quantity');
+                $lowStockThreshold = (int)(DB::table('settings')->where('key', 'low_stock_threshold')->value('value') ?? 5);
+                
+                if ($remainingQty <= $lowStockThreshold) {
+                    // Notify librarians about low stock
+                    $librariansQuery = DB::table('users')
+                        ->where('role', 'librarian')
+                        ->where('status', 'active');
+                    
+                    if ($studentSchoolId > 0) {
+                        $librariansQuery->where('school_id', $studentSchoolId);
+                    }
+                    
+                    $librarians = $librariansQuery->get();
+                    
+                    foreach ($librarians as $librarian) {
+                        try {
+                            // Queue email notification (REQUIRED for LOW_STOCK)
+                            // In-app notification created automatically when email is sent successfully
+                            NotificationHelper::queueEmail(
+                                $librarian->id,
+                                'LOW_STOCK',
+                                'book',
+                                $borrowRequest->book_id
+                            );
+                        } catch (\Exception $e) {
+                            error_log("Failed to queue low stock email: " . $e->getMessage());
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore low stock check errors
+            }
+            
             return response()->json([
                 'ok' => true,
                 'loan_id' => $loanId,
@@ -286,6 +362,29 @@ class BorrowRequestController extends BaseController
                 'rejection_reason' => $rejectionReason,
             ]);
 
+        // Log borrow request rejection
+        $book = DB::table('books')->where('id', $borrowRequest->book_id)->first();
+        $student = DB::table('users')->where('id', $borrowRequest->student_id)->first();
+        AuditLog::logAction(
+            $user,
+            'BORROW_REQUEST_REJECT',
+            'transaction',
+            $requestId,
+            "Rejected borrow request ID {$requestId}: Book '{$book->title}' requested by student {$student->first_name} {$student->last_name}. Reason: " . ($rejectionReason ?: 'Not specified')
+        );
+
+        // Queue email notification (in-app notification created automatically when email is sent successfully)
+        try {
+            NotificationHelper::queueEmail(
+                $borrowRequest->student_id,
+                'BORROW_REQUEST_REJECTED',
+                'borrow_request',
+                $requestId
+            );
+        } catch (\Exception $e) {
+            error_log("Failed to queue rejection email: " . $e->getMessage());
+        }
+
         return response()->json(['ok' => true, 'message' => 'Request rejected successfully']);
     }
 
@@ -311,6 +410,10 @@ class BorrowRequestController extends BaseController
         return response()->json(['ok' => true, 'count' => $count]);
     }
 }
+
+
+
+
 
 
 

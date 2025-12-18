@@ -79,11 +79,38 @@
    HEADER & NAVIGATION RESPONSIVE
    ============================================ */
 
+/* Remove horizontal padding from topbar container - completely edge-to-edge, no spaces */
+.sb-topbar .container-fluid,
+.admin-header-gold .container-fluid {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* Add minimal padding to first button and last element for readability */
+.sb-topbar .container-fluid > button:first-child,
+.admin-header-gold .container-fluid > button:first-child {
+  margin-left: 16px !important;
+}
+
+.sb-topbar .container-fluid > *:last-child,
+.admin-header-gold .container-fluid > *:last-child {
+  margin-right: 16px !important;
+}
+
 @media (max-width: 991.98px) {
   /* Top header adjustments */
   .admin-header-gold,
   .sb-topbar {
     padding: 8px 12px !important;
+  }
+  
+  /* Keep no horizontal padding on container-fluid inside topbar */
+  .sb-topbar .container-fluid,
+  .admin-header-gold .container-fluid {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
   
   /* Hide search on very small screens */

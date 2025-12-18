@@ -14,7 +14,7 @@
   <link href="assets/css/sidebar.css" rel="stylesheet">
   <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
 
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
   <style>
     :root{
       --card-pad:24px;
@@ -99,28 +99,6 @@
       background: #fff !important;
     }
     /* Notification button styling */
-    .notification-btn{
-      color:var(--text-primary) !important;
-      padding:8px 12px;
-      border-radius:var(--border-radius-sm);
-      transition:all 0.2s ease;
-    }
-    .notification-btn:hover{
-      color:var(--text-primary) !important;
-      background-color:#f8f9fa;
-    }
-    .notification-badge{
-      font-size:0.6875rem;
-      padding:3px 7px;
-      font-weight:600;
-      background:var(--brand-gold) !important;
-      color:#fff !important;
-    }
-    .notification-dropdown{
-      border-radius:var(--border-radius-sm);
-      box-shadow:var(--shadow-lg);
-      border:1px solid var(--card-border);
-    }
     .admin-btn-custom {
       padding:0 !important;
       width:44px !important;
@@ -149,6 +127,26 @@
       height:32px;
       border-radius:50%;
       object-fit:cover;
+    }
+    .role-chip{
+      font-weight:600;
+      border-radius:999px;
+      padding:.2rem .6rem;
+      font-size:.75rem;
+    }
+    .role-chip.admin{
+      background:#4a4a4a;
+      color:#fff;
+    }
+    .role-chip.librarian{
+      background:#e7f1ff;
+      color:#0d6efd;
+      border:1px solid rgba(13,110,253,.2);
+    }
+    .role-chip.student{
+      background:#efe7ff;
+      color:#6f42c1;
+      border:1px solid rgba(111,66,193,.2);
     }
 
     /* Stat Cards - Dashboard Style */
@@ -208,8 +206,89 @@
     .sb-card.card-info .sb-card-value{
       color:#3b82f6 !important;
     }
-
-
+    
+    /* Skeleton Loaders */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-value {
+      height: 1.75rem;
+      width: 40%;
+      margin: 0 auto;
+    }
+    .skeleton-table-row td {
+      padding: 16px 20px;
+    }
+    .skeleton-table-cell {
+      height: 1rem;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-cell.short {
+      width: 60%;
+    }
+    .skeleton-table-cell.medium {
+      width: 80%;
+    }
+    .skeleton-table-cell.long {
+      width: 100%;
+    }
+    .skeleton-cover {
+      width: 50px;
+      height: 65px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-badge {
+      width: 70px;
+      height: 24px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 12px;
+    }
+    .skeleton-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .btn-loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .btn-loading .spinner-border-sm {
+      width: 0.875rem;
+      height: 0.875rem;
+      border-width: 0.15em;
+    }
+    .nav-link:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      cursor: not-allowed;
+    }
 
     /* Empty Box */
     .empty-box { 
@@ -560,17 +639,6 @@
             </div>
           </form>
 
-          <div class="dropdown me-2">
-            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
-              <i class="bi bi-bell fs-5"></i>
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
-              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
-              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
-            </ul>
-          </div>
-
           <div class="dropdown">
             <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
               <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
@@ -609,19 +677,19 @@
             <div class="col-6 col-md-4">
               <div class="sb-card elevated text-center card-info">
                 <div class="sb-card-title"><i class="bi bi-journal-arrow-up"></i>Active</div>
-                <div class="sb-card-value" id="statActive">0</div>
+                <div class="sb-card-value" id="statActive"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
             <div class="col-6 col-md-4">
               <div class="sb-card elevated text-center card-danger">
                 <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue</div>
-                <div class="sb-card-value" id="statOverdue">0</div>
+                <div class="sb-card-value" id="statOverdue"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
             <div class="col-6 col-md-4">
               <div class="sb-card elevated text-center card-success">
                 <div class="sb-card-title"><i class="bi bi-check-circle"></i>On-Time</div>
-                <div class="sb-card-value" id="statOnTime">0</div>
+                <div class="sb-card-value" id="statOnTime"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
           </section>
@@ -652,6 +720,7 @@
                 <table class="table table-modern align-middle mb-0" id="loansTableActive">
                   <thead>
                     <tr>
+                      <th style="width:80px">Cover</th>
                       <th>Student</th>
                       <th>Book</th>
                       <th>Borrowed On</th>
@@ -684,19 +753,19 @@
             <div class="col-6 col-md-4">
               <div class="sb-card elevated text-center card-info">
                 <div class="sb-card-title"><i class="bi bi-journal-arrow-up"></i>Active</div>
-                <div class="sb-card-value" id="statActiveOnTime">0</div>
+                <div class="sb-card-value" id="statActiveOnTime"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
             <div class="col-6 col-md-4">
               <div class="sb-card elevated text-center card-danger">
                 <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue</div>
-                <div class="sb-card-value" id="statOverdueOnTime">0</div>
+                <div class="sb-card-value" id="statOverdueOnTime"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
             <div class="col-6 col-md-4">
               <div class="sb-card elevated text-center card-success">
                 <div class="sb-card-title"><i class="bi bi-check-circle"></i>On-Time</div>
-                <div class="sb-card-value" id="statOnTimeOnTime">0</div>
+                <div class="sb-card-value" id="statOnTimeOnTime"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
           </section>
@@ -727,6 +796,7 @@
                 <table class="table table-modern align-middle mb-0" id="loansTableOnTime">
                   <thead>
                     <tr>
+                      <th style="width:80px">Cover</th>
                       <th>Student</th>
                       <th>Book</th>
                       <th>Borrowed On</th>
@@ -759,25 +829,25 @@
             <div class="col-6 col-md-3">
               <div class="sb-card elevated text-center card-danger">
                 <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Overdue</div>
-                <div class="sb-card-value" id="statOverdueTotal">0</div>
+                <div class="sb-card-value" id="statOverdueTotal"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
             <div class="col-6 col-md-3">
               <div class="sb-card elevated text-center card-warning">
                 <div class="sb-card-title"><i class="bi bi-hourglass"></i>1–7 Days Late</div>
-                <div class="sb-card-value" id="statLateA">0</div>
+                <div class="sb-card-value" id="statLateA"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
             <div class="col-6 col-md-3">
               <div class="sb-card elevated text-center card-warning">
                 <div class="sb-card-title"><i class="bi bi-hourglass-split"></i>8–30 Days Late</div>
-                <div class="sb-card-value" id="statLateB">0</div>
+                <div class="sb-card-value" id="statLateB"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
             <div class="col-6 col-md-3">
               <div class="sb-card elevated text-center card-info">
                 <div class="sb-card-title"><i class="bi bi-clock-history"></i>30+ Days Late</div>
-                <div class="sb-card-value" id="statLateC">0</div>
+                <div class="sb-card-value" id="statLateC"><div class="skeleton skeleton-value"></div></div>
               </div>
             </div>
           </section>
@@ -821,6 +891,7 @@
                   <thead>
                     <tr>
                       <th style="width:38px"><input class="form-check-input" type="checkbox" id="checkAllOverdue"></th>
+                      <th style="width:80px">Cover</th>
                       <th>Student</th>
                       <th>Book</th>
                       <th>Borrowed On</th>
@@ -830,7 +901,7 @@
                       <th class="text-end" style="width:160px">Actions</th>
                     </tr>
                   </thead>
-                  <tbody id="loanBodyOverdue"><!-- JS --></tbody>
+                  <tbody id="loanBodyOverdue"><!-- Data will be loaded here --></tbody>
                 </table>
               </div>
 
@@ -905,7 +976,7 @@
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-LOANS-COMBINED-V4"></script>
   <!-- Centralized Notifications -->
-  <script src="assets/js/notifications.js"></script>
+  <script src="assets/js/logout.js"></script>
   <script>
     let currentLoan = null;
     let currentPage = {active: 1, 'on-time': 1, overdue: 1};
@@ -949,7 +1020,7 @@
         const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
         const whoChipEl = document.getElementById('whoChip');
         if (whoChipEl) {
-          whoChipEl.innerHTML = `<span class="badge" style="background:#4a4a4a;color:#fff;font-weight:600;">${role.toUpperCase()}</span> ${fullName || me.email}`;
+          whoChipEl.innerHTML = `<span class="badge role-chip ${role}">${role.toUpperCase()}</span> ${fullName || me.email}`;
         }
       }
       
@@ -984,15 +1055,7 @@
         };
       })();
       
-      // Logout handler
-      document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
-        e.preventDefault();
-        try {
-          await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-          localStorage.removeItem('userRole');
-        } catch {}
-        location.href = '/login';
-      });
+      // Logout - handled by logout.js (confirmation dialog)
       
       // Notifications are handled by centralized notifications.js
       
@@ -1072,14 +1135,156 @@
       loadLoans();
     })();
 
+    // Helper function to update KPI cards with fade-in
+    function updateCard(id, value) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.innerHTML = '';
+        el.textContent = value;
+        el.classList.add('fade-in');
+      }
+    }
+    
+    // Render skeleton KPI cards for a specific tab
+    function renderSkeletonKPIs(tab) {
+      if (tab === 'active') {
+        document.getElementById('statActive').innerHTML = '<div class="skeleton skeleton-value"></div>';
+        document.getElementById('statOverdue').innerHTML = '<div class="skeleton skeleton-value"></div>';
+        document.getElementById('statOnTime').innerHTML = '<div class="skeleton skeleton-value"></div>';
+      } else if (tab === 'on-time') {
+        document.getElementById('statActiveOnTime').innerHTML = '<div class="skeleton skeleton-value"></div>';
+        document.getElementById('statOverdueOnTime').innerHTML = '<div class="skeleton skeleton-value"></div>';
+        document.getElementById('statOnTimeOnTime').innerHTML = '<div class="skeleton skeleton-value"></div>';
+      } else if (tab === 'overdue') {
+        document.getElementById('statOverdueTotal').innerHTML = '<div class="skeleton skeleton-value"></div>';
+        document.getElementById('statLateA').innerHTML = '<div class="skeleton skeleton-value"></div>';
+        document.getElementById('statLateB').innerHTML = '<div class="skeleton skeleton-value"></div>';
+        document.getElementById('statLateC').innerHTML = '<div class="skeleton skeleton-value"></div>';
+      }
+    }
+    
+    // Render skeleton table rows
+    function renderSkeletonTableRows(count = 8, includeCheckbox = false) {
+      return Array.from({length: count}, () => {
+        const checkboxCell = includeCheckbox ? '<td><div class="skeleton-table-cell" style="width: 18px; height: 18px; border-radius: 3px;"></div></td>' : '';
+        return `
+        <tr class="skeleton-table-row">
+          ${checkboxCell}
+          <td><div class="skeleton-cover"></div></td>
+          <td>
+            <div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td>
+            <div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td><div class="skeleton-table-cell short"></div></td>
+          <td><div class="skeleton-table-cell short"></div></td>
+          ${includeCheckbox ? '<td><div class="skeleton-table-cell short"></div></td>' : ''}
+          <td><div class="skeleton-badge"></div></td>
+          <td class="text-end">
+            <div class="d-flex align-items-center gap-2 justify-content-end">
+              <div class="skeleton-button"></div>
+              <div class="skeleton-button"></div>
+              <div class="skeleton-button"></div>
+            </div>
+          </td>
+        </tr>
+      `;
+      }).join('');
+    }
+    
+    // Disable/enable interactions during loading
+    function setLoadingState(isLoading) {
+      const tabs = document.querySelectorAll('[data-bs-toggle="tab"]');
+      const searchInput = document.getElementById('loanSearch');
+      const filterBtns = document.querySelectorAll('[id^="filterStatusBtn"], [id^="filterLateBtn"], [id^="filterDueBtn"]');
+      const refreshBtns = document.querySelectorAll('[id^="btnRefresh"]');
+      
+      tabs.forEach(tab => {
+        tab.disabled = isLoading;
+        if (isLoading) {
+          tab.classList.add('disabled');
+        } else {
+          tab.classList.remove('disabled');
+        }
+      });
+      
+      if (searchInput) {
+        searchInput.disabled = isLoading;
+      }
+      
+      filterBtns.forEach(btn => {
+        btn.disabled = isLoading;
+      });
+      
+      refreshBtns.forEach(btn => {
+        btn.disabled = isLoading;
+        if (isLoading) {
+          const originalText = btn.innerHTML;
+          btn.dataset.originalText = originalText;
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Refreshing...';
+        } else {
+          const originalText = btn.dataset.originalText;
+          if (originalText) {
+            btn.innerHTML = originalText;
+            delete btn.dataset.originalText;
+          }
+        }
+      });
+    }
+
     async function loadLoans() {
+      // Show skeleton loaders and disable interactions
+      renderSkeletonKPIs(currentTab);
+      setLoadingState(true);
+      
+      // Show skeleton rows in current tab's table
+      const tbodyActive = document.getElementById('loanBodyActive');
+      const tbodyOnTime = document.getElementById('loanBodyOnTime');
+      const tbodyOverdue = document.getElementById('loanBodyOverdue');
+      const emptyActive = document.getElementById('emptyStateActive');
+      const emptyOnTime = document.getElementById('emptyStateOnTime');
+      const emptyOverdue = document.getElementById('emptyStateOverdue');
+      
+      // Show reasonable number of skeletons (min of 8 or pageSize)
+      const skeletonCount = Math.min(8, pageSize);
+      if (currentTab === 'active' && tbodyActive) {
+        tbodyActive.innerHTML = renderSkeletonTableRows(skeletonCount);
+        emptyActive?.classList.add('d-none');
+      } else if (currentTab === 'on-time' && tbodyOnTime) {
+        tbodyOnTime.innerHTML = renderSkeletonTableRows(skeletonCount);
+        emptyOnTime?.classList.add('d-none');
+      } else if (currentTab === 'overdue' && tbodyOverdue) {
+        tbodyOverdue.innerHTML = renderSkeletonTableRows(skeletonCount, true);
+        emptyOverdue?.classList.add('d-none');
+      }
+      
       const q = document.getElementById('loanSearch')?.value.trim() || '';
       const url = `/api/loans?page=1&pagesize=1000&active_only=1`;
       
       try {
         const res = await fetch(url, {credentials:'include'});
         const data = await res.json().catch(()=>({ok:false}));
-        if (!data.ok) { alert('Failed to load loans'); return; }
+        if (!data.ok) {
+          // Remove skeletons and show error (keep previous data if any)
+          if (currentTab === 'active' && tbodyActive) {
+            tbodyActive.innerHTML = '';
+            emptyActive?.classList.remove('d-none');
+            emptyActive.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load loans. Please try again.</div>';
+          } else if (currentTab === 'on-time' && tbodyOnTime) {
+            tbodyOnTime.innerHTML = '';
+            emptyOnTime?.classList.remove('d-none');
+            emptyOnTime.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load loans. Please try again.</div>';
+          } else if (currentTab === 'overdue' && tbodyOverdue) {
+            tbodyOverdue.innerHTML = '';
+            emptyOverdue?.classList.remove('d-none');
+            emptyOverdue.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Failed to load loans. Please try again.</div>';
+          }
+          updateAllStats();
+          return;
+        }
         
         allLoans = (data.items || []).filter(l => l.status !== 'returned' && !l.returned_at);
         
@@ -1103,7 +1308,24 @@
           renderOverdue();
         }
       } catch (err) {
-        alert('Error loading loans: ' + err.message);
+        // Remove skeletons and show error (keep previous data if any)
+        if (currentTab === 'active' && tbodyActive) {
+          tbodyActive.innerHTML = '';
+          emptyActive?.classList.remove('d-none');
+          emptyActive.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Error loading loans: ' + (err.message || 'Network error') + '</div>';
+        } else if (currentTab === 'on-time' && tbodyOnTime) {
+          tbodyOnTime.innerHTML = '';
+          emptyOnTime?.classList.remove('d-none');
+          emptyOnTime.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Error loading loans: ' + (err.message || 'Network error') + '</div>';
+        } else if (currentTab === 'overdue' && tbodyOverdue) {
+          tbodyOverdue.innerHTML = '';
+          emptyOverdue?.classList.remove('d-none');
+          emptyOverdue.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Error loading loans: ' + (err.message || 'Network error') + '</div>';
+        }
+        updateAllStats();
+      } finally {
+        // Re-enable interactions
+        setLoadingState(false);
       }
     }
 
@@ -1129,31 +1351,21 @@
         active++;
       });
       
-      // Update Active tab stats
-      const statActiveEl = document.getElementById('statActive');
-      if (statActiveEl) statActiveEl.textContent = active;
-      const statOverdueEl = document.getElementById('statOverdue');
-      if (statOverdueEl) statOverdueEl.textContent = overdue;
-      const statOnTimeEl = document.getElementById('statOnTime');
-      if (statOnTimeEl) statOnTimeEl.textContent = onTime;
+      // Update Active tab stats (replace skeletons with real values)
+      updateCard('statActive', active);
+      updateCard('statOverdue', overdue);
+      updateCard('statOnTime', onTime);
       
       // Update On-Time tab stats
-      const statActiveOnTimeEl = document.getElementById('statActiveOnTime');
-      if (statActiveOnTimeEl) statActiveOnTimeEl.textContent = active;
-      const statOverdueOnTimeEl = document.getElementById('statOverdueOnTime');
-      if (statOverdueOnTimeEl) statOverdueOnTimeEl.textContent = overdue;
-      const statOnTimeOnTimeEl = document.getElementById('statOnTimeOnTime');
-      if (statOnTimeOnTimeEl) statOnTimeOnTimeEl.textContent = onTime;
+      updateCard('statActiveOnTime', active);
+      updateCard('statOverdueOnTime', overdue);
+      updateCard('statOnTimeOnTime', onTime);
       
       // Update Overdue tab stats
-      const statOverdueTotalEl = document.getElementById('statOverdueTotal');
-      if (statOverdueTotalEl) statOverdueTotalEl.textContent = overdueTotal;
-      const statLateAEl = document.getElementById('statLateA');
-      if (statLateAEl) statLateAEl.textContent = late1to7;
-      const statLateBEl = document.getElementById('statLateB');
-      if (statLateBEl) statLateBEl.textContent = late8to30;
-      const statLateCEl = document.getElementById('statLateC');
-      if (statLateCEl) statLateCEl.textContent = late30plus;
+      updateCard('statOverdueTotal', overdueTotal);
+      updateCard('statLateA', late1to7);
+      updateCard('statLateB', late8to30);
+      updateCard('statLateC', late30plus);
     }
 
     function renderActive() {
@@ -1171,6 +1383,7 @@
       if (filtered.length === 0) {
         tbody.innerHTML = '';
         empty?.classList.remove('d-none');
+        empty.innerHTML = '<i class="bi bi-journal-arrow-up fs-2 d-block mb-2 text-muted fade-in"></i><p class="text-muted mb-0 fade-in">No loans found.</p>';
         document.getElementById('loansTableActive')?.classList.add('d-none');
         pageInfo.textContent = 'Showing 0 of 0';
         document.getElementById('loanCountActive').textContent = '0';
@@ -1188,9 +1401,15 @@
       tbody.innerHTML = pageLoans.map(l => {
         const statusBadge = l.loan_status === 'overdue' ? '<span class="badge text-bg-danger-soft">Overdue</span>'
                          : '<span class="badge text-bg-success-soft">On-Time</span>';
+        const coverUrl = l.cover_url || 'assets/img/default-book.png';
         
         return `
-          <tr>
+          <tr class="fade-in">
+            <td>
+              <img src="${coverUrl}" alt="${esc(l.book_title)}" 
+                   style="width:50px;height:65px;object-fit:cover;border-radius:4px;background:#f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,0.1);"
+                   onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
+            </td>
             <td>
               <div class="fw-medium">${esc(l.student_name)}</div>
               <small class="text-muted">${esc(l.student_no || '—')}</small>
@@ -1241,6 +1460,7 @@
       if (filtered.length === 0) {
         tbody.innerHTML = '';
         empty?.classList.remove('d-none');
+        empty.innerHTML = '<i class="bi bi-journal-arrow-up fs-2 d-block mb-2 text-muted fade-in"></i><p class="text-muted mb-0 fade-in">No loans found.</p>';
         document.getElementById('loansTableOnTime')?.classList.add('d-none');
         pageInfo.textContent = 'Showing 0 of 0';
         document.getElementById('loanCountOnTime').textContent = '0';
@@ -1256,8 +1476,14 @@
       const pageLoans = filtered.slice(start, end);
       
       tbody.innerHTML = pageLoans.map(l => {
+        const coverUrl = l.cover_url || 'assets/img/default-book.png';
         return `
-          <tr>
+          <tr class="fade-in">
+            <td>
+              <img src="${coverUrl}" alt="${esc(l.book_title)}" 
+                   style="width:50px;height:65px;object-fit:cover;border-radius:4px;background:#f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,0.1);"
+                   onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
+            </td>
             <td>
               <div class="fw-medium">${esc(l.student_name)}</div>
               <small class="text-muted">${esc(l.student_no || '—')}</small>
@@ -1331,6 +1557,7 @@
       if (filtered.length === 0) {
         tbody.innerHTML = '';
         empty?.classList.remove('d-none');
+        empty.innerHTML = '<i class="bi bi-journal-arrow-up fs-2 d-block mb-2 text-muted fade-in"></i><p class="text-muted mb-0 fade-in">No loans found.</p>';
         document.getElementById('loansTableOverdue')?.classList.add('d-none');
         pageInfo.textContent = 'Showing 0 of 0';
         document.getElementById('loanCountOverdue').textContent = '0';
@@ -1353,9 +1580,15 @@
         else if (daysLate >= 8 && daysLate <= 30) lateBadge = '<span class="badge text-bg-warning-soft">8-30 Days</span>';
         else if (daysLate > 30) lateBadge = '<span class="badge text-bg-danger-soft">30+ Days</span>';
         
+        const coverUrl = l.cover_url || 'assets/img/default-book.png';
         return `
-          <tr>
+          <tr class="fade-in">
             <td><input class="form-check-input row-check" type="checkbox" value="${l.loan_id}"></td>
+            <td>
+              <img src="${coverUrl}" alt="${esc(l.book_title)}" 
+                   style="width:50px;height:65px;object-fit:cover;border-radius:4px;background:#f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,0.1);"
+                   onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
+            </td>
             <td>
               <div class="fw-medium">${esc(l.student_name)}</div>
               <small class="text-muted">${esc(l.student_no || '—')}</small>

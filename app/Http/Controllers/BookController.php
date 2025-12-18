@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Helpers\IsbnValidator;
+use App\Helpers\AuditLog;
+use App\Helpers\NotificationHelper;
 
 class BookController extends BaseController
 {
@@ -49,6 +52,41 @@ class BookController extends BaseController
 
         $query = DB::table('books');
 
+        // Librarian-level isolation - librarians only see books they added
+        $currentUser = $this->currentUser();
+        if ($currentUser) {
+            $userRole = strtolower($currentUser['role'] ?? '');
+            $userId = (int)($currentUser['id'] ?? 0);
+            
+            // Filter by added_by for librarians - they only see books they added
+            if ($userRole === 'librarian') {
+                $hasAddedBy = $this->booksHasAddedBy();
+                if ($hasAddedBy) {
+                    // Librarians only see books they added
+                    $query->where('books.added_by', $userId);
+                } else {
+                    // If column doesn't exist yet, show all books for librarians
+                    // This allows them to see books until the column is added
+                    // Once column is added, filtering will work properly
+                }
+            } elseif ($userRole === 'student') {
+                // Students see ONLY books from their school (strict school-based filtering)
+                $userSchoolId = (int)($currentUser['school_id'] ?? 0);
+                if ($userSchoolId > 0) {
+                    $hasSchoolId = $this->booksHasSchoolId();
+                    if ($hasSchoolId) {
+                        // Students ONLY see books from their school (no NULL books)
+                        // This ensures students only see books added by librarians from their school
+                        $query->where('books.school_id', $userSchoolId);
+                    }
+                } else {
+                    // Student without school_id - show no books
+                    $query->whereRaw('1 = 0'); // Never match anything
+                }
+            }
+        }
+        // Admin and public users see all books (no filter)
+
         if ($q !== '') {
             $query->where(function($qry) use ($q) {
                 $qry->where('title', 'LIKE', "%{$q}%")
@@ -87,7 +125,7 @@ class BookController extends BaseController
         // Calculate borrowed counts (filtered by school for librarians)
         $borrowedCounts = [];
         if (!empty($bookIds)) {
-            $currentUser = $this->currentUser();
+            // Use the same $currentUser we already fetched above
             $queryBorrowed = DB::table('loans')
                 ->whereIn('book_id', $bookIds)
                 ->where('status', 'borrowed');
@@ -168,9 +206,32 @@ class BookController extends BaseController
             'cover' => 'nullable|image|max:5120',
         ]);
 
-        // Check unique ISBN (normalize by trimming)
-        $isbn = trim($request->input('isbn'));
-        if (DB::table('books')->whereRaw('TRIM(isbn) = ?', [trim($isbn)])->exists()) {
+        // Comprehensive ISBN Validation
+        $rawIsbn = $request->input('isbn');
+        $isbnValidation = IsbnValidator::validate($rawIsbn);
+        
+        if (!$isbnValidation['valid']) {
+            return response()->json(['ok' => false, 'error' => $isbnValidation['error']], 422);
+        }
+
+        // Use normalized ISBN for uniqueness check and storage
+        $normalizedIsbn = $isbnValidation['cleaned'];
+        
+        // Check unique ISBN (using normalized ISBN)
+        // For librarians: check uniqueness within books they added only
+        // For admins: check global uniqueness
+        $isbnQuery = DB::table('books')->whereRaw('TRIM(REPLACE(REPLACE(isbn, "-", ""), " ", "")) = ?', [$normalizedIsbn]);
+        
+        if (strtolower($user['role'] ?? '') === 'librarian') {
+            $userId = (int)($user['id'] ?? 0);
+            if ($userId > 0 && $this->booksHasAddedBy()) {
+                // Check ISBN uniqueness within books added by this librarian only
+                $isbnQuery->where('added_by', $userId);
+            }
+        }
+        // Admin checks global ISBN uniqueness (no filter)
+        
+        if ($isbnQuery->exists()) {
             return response()->json(['ok' => false, 'error' => 'ISBN already exists'], 409);
         }
 
@@ -188,9 +249,9 @@ class BookController extends BaseController
         }
 
         try {
-            $bookId = DB::table('books')->insertGetId([
+            $insertData = [
                 'title' => $request->input('title'),
-                'isbn' => trim($request->input('isbn')), // Store trimmed ISBN
+                'isbn' => $normalizedIsbn, // Store normalized ISBN (cleaned, validated)
                 'author' => $request->input('author'),
                 'category' => $request->input('category'),
                 'quantity' => $request->input('quantity'),
@@ -198,7 +259,94 @@ class BookController extends BaseController
                 'date_published' => $request->input('date_published'),
                 'cover' => $coverFile,
                 'created_at' => now(),
-            ]);
+            ];
+
+            // Set added_by for librarians (track who added the book)
+            if (strtolower($user['role'] ?? '') === 'librarian') {
+                $userId = (int)($user['id'] ?? 0);
+                if ($userId > 0) {
+                    // Always try to set added_by if column exists
+                    if ($this->booksHasAddedBy()) {
+                        $insertData['added_by'] = $userId;
+                        // Log for debugging (remove in production if not needed)
+                        error_log("BookController@add: Setting added_by = {$userId} for user {$user['email']} (ID: {$user['id']})");
+                    } else {
+                        error_log("BookController@add: WARNING - booksHasAddedBy() returned false, added_by not set!");
+                    }
+                } else {
+                    error_log("BookController@add: WARNING - userId is 0 or invalid for user: " . ($user['email'] ?? 'unknown'));
+                }
+                // ALWAYS set school_id for librarians (REQUIRED for student visibility)
+                $librarianSchoolId = (int)($user['school_id'] ?? 0);
+                if ($librarianSchoolId > 0) {
+                    if ($this->booksHasSchoolId()) {
+                        $insertData['school_id'] = $librarianSchoolId;
+                        error_log("BookController@add: Setting school_id = {$librarianSchoolId} for librarian {$user['email']}");
+                    } else {
+                        error_log("BookController@add: WARNING - booksHasSchoolId() returned false, school_id not set! Students won't see this book.");
+                    }
+                } else {
+                    error_log("BookController@add: WARNING - Librarian {$user['email']} has no school_id! Students won't see books added by this librarian.");
+                }
+            }
+            // Admin can leave added_by and school_id null for global books
+
+            $bookId = DB::table('books')->insertGetId($insertData);
+            
+            // Log book creation
+            AuditLog::logAction(
+                $user,
+                'BOOK_CREATE',
+                'book',
+                $bookId,
+                "Created book: {$request->input('title')} (ISBN: {$normalizedIsbn})"
+            );
+            
+            // Check for low stock on new book creation
+            try {
+                $quantity = (int)$request->input('quantity');
+                $lowStockThreshold = (int)(DB::table('settings')->where('key', 'low_stock_threshold')->value('value') ?? 5);
+                
+                if ($quantity <= $lowStockThreshold) {
+                    // Notify librarians about low stock
+                    $librariansQuery = DB::table('users')
+                        ->where('role', 'librarian')
+                        ->where('status', 'active');
+                    
+                    $librarianSchoolId = (int)($user['school_id'] ?? 0);
+                    if ($librarianSchoolId > 0) {
+                        $librariansQuery->where('school_id', $librarianSchoolId);
+                    }
+                    
+                    $librarians = $librariansQuery->get();
+                    
+                    foreach ($librarians as $librarian) {
+                        try {
+                            // Queue email notification (REQUIRED for LOW_STOCK)
+                            // In-app notification created automatically when email is sent successfully
+                            NotificationHelper::queueEmail(
+                                $librarian->id,
+                                'LOW_STOCK',
+                                'book',
+                                $bookId
+                            );
+                        } catch (\Exception $e) {
+                            error_log("Failed to queue low stock email: " . $e->getMessage());
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore low stock check errors
+            }
+            
+            // Verify added_by was set correctly (for debugging)
+            if (strtolower($user['role'] ?? '') === 'librarian' && $this->booksHasAddedBy()) {
+                $insertedBook = DB::table('books')->where('id', $bookId)->first();
+                $actualAddedBy = $insertedBook->added_by ?? null;
+                if ($actualAddedBy != $userId) {
+                    error_log("BookController@add: ERROR - Book ID {$bookId} has added_by = {$actualAddedBy}, expected {$userId}");
+                }
+            }
 
             return response()->json([
                 'ok' => true,
@@ -227,6 +375,18 @@ class BookController extends BaseController
             if (!$book) {
                 return response()->json(['ok' => false, 'error' => 'Book not found'], 404);
             }
+
+            // Librarian ownership validation - librarians can only update books they added
+            if (strtolower($user['role'] ?? '') === 'librarian') {
+                $userId = (int)($user['id'] ?? 0);
+                if ($userId > 0 && $this->booksHasAddedBy()) {
+                    $bookAddedBy = (int)($book->added_by ?? 0);
+                    if ($bookAddedBy !== $userId) {
+                        return response()->json(['ok' => false, 'error' => 'You can only update books you added'], 403);
+                    }
+                }
+            }
+            // Admin can update any book
 
             // Validate fields - all fields are optional for updates (librarian can update any field they want)
             // ISBN and date_published are NOT included - they cannot be changed when updating
@@ -280,36 +440,67 @@ class BookController extends BaseController
                 $file->move(public_path('uploads/covers'), $coverFile);
             }
 
-            // Update book fields - only update fields that are provided and have values
+            // Update book fields - update ALL editable fields (Title, Author, Category, Publisher, Quantity)
             // NOTE: ISBN, date_published, and created_at are intentionally excluded - they cannot be changed
             // created_at is the system audit date and should NEVER be modified
             // date_published is set when the book is first added and should not be changed
             // Note: updated_at column doesn't exist in the books table, so we don't update it
             $updateData = [];
             
-            // Only update fields that are provided and have non-empty values
-            // FormData always sends fields, so we check if they have actual values
-            if ($request->filled('title')) {
-                $updateData['title'] = trim($request->input('title'));
+            // Debug: Log all request inputs - check both all() and input() methods
+            error_log('BookController@update: Request method: ' . $request->method());
+            error_log('BookController@update: Request all(): ' . json_encode($request->all()));
+            error_log('BookController@update: Request input(): ' . json_encode($request->input()));
+            error_log('BookController@update: Request has title: ' . ($request->has('title') ? 'yes' : 'no'));
+            error_log('BookController@update: Request has category: ' . ($request->has('category') ? 'yes' : 'no'));
+            error_log('BookController@update: Request has quantity: ' . ($request->has('quantity') ? 'yes' : 'no'));
+            
+            // For PUT requests with FormData, Laravel may not parse it correctly
+            // Try to get data from request->all() first, then fall back to input()
+            $allInputs = $request->all();
+            
+            // Update ALL editable fields - Title, Author, Category, Publisher, Quantity
+            // These fields are always sent from the frontend when editing
+            if (isset($allInputs['title']) || $request->has('title')) {
+                $titleValue = trim($allInputs['title'] ?? $request->input('title', ''));
+                if ($titleValue !== '') {
+                    $updateData['title'] = $titleValue;
+                    error_log('BookController@update: Setting title = ' . $updateData['title']);
+                }
             }
-            if ($request->filled('author')) {
-                $updateData['author'] = trim($request->input('author'));
+            if (isset($allInputs['author']) || $request->has('author')) {
+                $authorValue = trim($allInputs['author'] ?? $request->input('author', ''));
+                if ($authorValue !== '') {
+                    $updateData['author'] = $authorValue;
+                    error_log('BookController@update: Setting author = ' . $updateData['author']);
+                }
             }
-            if ($request->filled('category')) {
-                $updateData['category'] = trim($request->input('category'));
+            if (isset($allInputs['category']) || $request->has('category')) {
+                $categoryValue = trim($allInputs['category'] ?? $request->input('category', ''));
+                if ($categoryValue !== '') {
+                    $updateData['category'] = $categoryValue;
+                    error_log('BookController@update: Setting category = ' . $updateData['category']);
+                }
             }
-            if ($request->filled('publisher')) {
-                $updateData['publisher'] = trim($request->input('publisher'));
+            if (isset($allInputs['publisher']) || $request->has('publisher')) {
+                $publisherValue = trim($allInputs['publisher'] ?? $request->input('publisher', ''));
+                if ($publisherValue !== '') {
+                    $updateData['publisher'] = $publisherValue;
+                    error_log('BookController@update: Setting publisher = ' . $updateData['publisher']);
+                }
             }
             // Handle quantity - accept valid integers including 0
-            if ($request->has('quantity')) {
-                $quantityInput = $request->input('quantity');
-                // Accept quantity if it's a valid numeric value (including 0 and empty string "0")
-                if ($quantityInput !== null && $quantityInput !== '' && (is_numeric($quantityInput) || $quantityInput === '0')) {
+            if (isset($allInputs['quantity']) || $request->has('quantity')) {
+                $quantityInput = $allInputs['quantity'] ?? $request->input('quantity');
+                error_log('BookController@update: Quantity input = ' . var_export($quantityInput, true));
+                // Accept quantity if it's a valid numeric value (including 0)
+                if ($quantityInput !== null && $quantityInput !== '' && is_numeric($quantityInput)) {
                     $updateData['quantity'] = intval($quantityInput);
+                    error_log('BookController@update: Setting quantity = ' . $updateData['quantity']);
                 } elseif ($quantityInput === '0' || $quantityInput === 0) {
                     // Explicitly handle 0
                     $updateData['quantity'] = 0;
+                    error_log('BookController@update: Setting quantity = 0');
                 }
             }
             // ISBN is intentionally excluded - it cannot be changed
@@ -323,18 +514,105 @@ class BookController extends BaseController
             if (!empty($updateData)) {
                 DB::table('books')->where('id', $id)->update($updateData);
                 
+                // Log book update
+                $updatedFields = implode(', ', array_keys($updateData));
+                AuditLog::logAction(
+                    $user,
+                    'BOOK_UPDATE',
+                    'book',
+                    $id,
+                    "Updated book ID {$id}: {$updatedFields}"
+                );
+                
                 // Verify the update by fetching the updated book
                 $updatedBook = DB::table('books')->where('id', $id)->first();
+                
+                // Check for low stock if quantity was updated
+                if (isset($updateData['quantity'])) {
+                    try {
+                        $newQuantity = (int)($updatedBook->quantity ?? 0);
+                        $oldQuantity = (int)($book->quantity ?? 0);
+                        $lowStockThreshold = (int)(DB::table('settings')->where('key', 'low_stock_threshold')->value('value') ?? 5);
+                        
+                        // Only notify if crossing threshold (was above, now at or below)
+                        if ($oldQuantity > $lowStockThreshold && $newQuantity <= $lowStockThreshold) {
+                            // Get school_id for filtering librarians
+                            $bookSchoolId = (int)($updatedBook->school_id ?? 0);
+                            
+                            // Notify librarians
+                            $librariansQuery = DB::table('users')
+                                ->where('role', 'librarian')
+                                ->where('status', 'active');
+                            
+                            if ($bookSchoolId > 0) {
+                                $librariansQuery->where('school_id', $bookSchoolId);
+                            }
+                            
+                            $librarians = $librariansQuery->get();
+                            
+                            foreach ($librarians as $librarian) {
+                                try {
+                                    NotificationHelper::create(
+                                        $librarian->id,
+                                        'librarian',
+                                        'LOW_STOCK',
+                                        'Low stock alert',
+                                        "{$updatedBook->title} has reached the low-stock threshold ({$newQuantity} copies left).",
+                                        'book',
+                                        $id,
+                                        'librarian-lowstock.html'
+                                    );
+                                    
+                                    // Queue email (REQUIRED for LOW_STOCK)
+                                    try {
+                                        require_once __DIR__ . '/../../includes/email_notifications.php';
+                                        $pdo = DB::connection()->getPdo();
+                                        queue_email($pdo, $librarian->id, 'LOW_STOCK', 'book', $id);
+                                    } catch (\Exception $e) {
+                                        error_log("Failed to queue low stock email: " . $e->getMessage());
+                                    }
+                                } catch (\Exception $e) {
+                                    // Continue with other librarians
+                                }
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Ignore low stock check errors
+                        error_log("Low stock check error: " . $e->getMessage());
+                    }
+                }
+                
+                // Return full updated book data for frontend refresh
+                $bookData = [
+                    'id' => $updatedBook->id,
+                    'title' => $updatedBook->title,
+                    'isbn' => $updatedBook->isbn,
+                    'author' => $updatedBook->author,
+                    'category' => $updatedBook->category,
+                    'quantity' => (int)($updatedBook->quantity ?? 0),
+                    'publisher' => $updatedBook->publisher,
+                    'date_published' => $updatedBook->date_published,
+                    'published_at' => $updatedBook->date_published,
+                    'cover' => $updatedBook->cover,
+                    'cover_url' => $updatedBook->cover ? ("/uploads/covers/".$updatedBook->cover) : null,
+                    'created_at' => $updatedBook->created_at,
+                    'rating' => (int)($updatedBook->rating ?? 0),
+                ];
                 
                 return response()->json([
                     'ok' => true,
                     'message' => 'Book updated successfully',
                     'cover_url' => $coverFile ? ("/uploads/covers/".$coverFile) : null,
+                    'data' => $bookData, // Return full book data for frontend refresh
                     'updated_data' => [
                         'quantity' => (int)($updatedBook->quantity ?? 0),
                         'publisher' => $updatedBook->publisher ?? null,
-                        'title' => $updatedBook->title ?? null
-                    ]
+                        'title' => $updatedBook->title ?? null,
+                        'category' => $updatedBook->category ?? null
+                    ],
+                    // Debug info to track what was received and applied
+                    'request_inputs' => $request->all(),
+                    'applied_update_data' => $updateData
                 ]);
             } else {
                 return response()->json([
@@ -364,6 +642,18 @@ class BookController extends BaseController
         if (!$book) {
             return response()->json(['ok' => false, 'error' => 'Book not found'], 404);
         }
+
+        // Librarian ownership validation - librarians can only delete books they added
+        if (strtolower($user['role'] ?? '') === 'librarian') {
+            $userId = (int)($user['id'] ?? 0);
+            if ($userId > 0 && $this->booksHasAddedBy()) {
+                $bookAddedBy = (int)($book->added_by ?? 0);
+                if ($bookAddedBy !== $userId) {
+                    return response()->json(['ok' => false, 'error' => 'You can only delete books you added'], 403);
+                }
+            }
+        }
+        // Admin can delete any book
 
         try {
             // Check if book has active loans (not returned)
@@ -435,6 +725,15 @@ class BookController extends BaseController
             if (!$deleted) {
                 return response()->json(['ok' => false, 'error' => 'Failed to delete book'], 500);
             }
+
+            // Log book deletion
+            AuditLog::logAction(
+                $user,
+                'BOOK_DELETE',
+                'book',
+                $id,
+                "Deleted book: {$book->title} (ISBN: {$book->isbn})"
+            );
 
             return response()->json(['ok' => true, 'message' => 'Book deleted successfully']);
         } catch (\Exception $e) {

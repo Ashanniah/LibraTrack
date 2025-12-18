@@ -14,7 +14,7 @@
   <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
   <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
 
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
   <style>
     :root{
       --card-pad:24px;
@@ -84,27 +84,6 @@
     .search-bar-custom:focus-within .input-group-text {
       color: var(--text-primary);
     }
-    .notification-btn{
-      width:44px;
-      height:44px;
-      border-radius:var(--border-radius-sm);
-      border:none;
-      background:transparent;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition:all 0.2s ease;
-      color:var(--text-primary);
-      padding:0;
-      position:relative;
-    }
-    .notification-btn:hover{
-      background:#f8f9fa;
-      color:var(--text-primary);
-    }
-    .notification-btn i{
-      font-size:1.25rem;
-    }
     .admin-btn-custom{
       padding:0;
       width:44px;
@@ -121,6 +100,111 @@
     .admin-btn-custom:hover{
       border-color:var(--brand-gold);
       box-shadow:0 0 0 2px rgba(166,134,4,0.1);
+    }
+    .role-chip{
+      font-weight:600;
+      border-radius:999px;
+      padding:.2rem .6rem;
+      font-size:.75rem;
+    }
+    .role-chip.admin{
+      background:#4a4a4a;
+      color:#fff;
+    }
+    .role-chip.librarian{
+      background:#e7f1ff;
+      color:#0d6efd;
+      border:1px solid rgba(13,110,253,.2);
+    }
+    .role-chip.student{
+      background:#efe7ff;
+      color:#6f42c1;
+      border:1px solid rgba(111,66,193,.2);
+    }
+    
+    /* Skeleton Loaders */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-table-row td {
+      padding: 16px 20px;
+    }
+    .skeleton-table-cell {
+      height: 1rem;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-cell.short {
+      width: 60%;
+    }
+    .skeleton-table-cell.medium {
+      width: 80%;
+    }
+    .skeleton-table-cell.long {
+      width: 100%;
+    }
+    .skeleton-cover {
+      width: 50px;
+      height: 65px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-badge {
+      width: 80px;
+      height: 24px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .skeleton-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .btn:disabled,
+    .form-select:disabled,
+    .form-control:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: #e9ecef;
+    }
+    .error-banner {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-banner i {
+      font-size: 1.125rem;
     }
     .admin-btn-custom img{
       width:32px;
@@ -410,33 +494,17 @@
             </div>
           </form>
 
-          <div class="dropdown position-relative">
-            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
-              <i class="bi bi-bell"></i>
-              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
-              <li><h6 class="dropdown-header">Notifications</h6></li>
-              <li><hr class="dropdown-divider"></li>
-              <li id="notificationList">
-                <div class="px-3 py-2 text-center text-muted">
-                  <small>No notifications</small>
-                </div>
-              </li>
-            </ul>
-          </div>
-
           <div class="dropdown">
-            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:50%;">
               <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
+              <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
               <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+              <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>
           </div>
-        </div>
       </div>
     </nav>
 
@@ -478,13 +546,18 @@
             </button>
           </div>
         </div>
+        <div id="errorBanner" class="error-banner d-none" style="margin: 16px;">
+          <i class="bi bi-exclamation-triangle"></i>
+          <span id="errorMessage"></span>
+        </div>
         <div class="table-responsive">
           <table class="table table-modern align-middle mb-0">
             <thead>
               <tr>
+                <th style="width:80px">Cover</th>
                 <th>Member</th>
                 <th>Book</th>
-                <th class="d-none d-lg-table-cell">Loan #</th>
+                <th class="d-none d-lg-table-cell">Loan No.</th>
                 <th>Borrowed</th>
                 <th class="d-none d-lg-table-cell">Due</th>
                 <th>Returned</th>
@@ -492,7 +565,7 @@
                 <th class="text-end" style="width:120px">Actions</th>
               </tr>
             </thead>
-            <tbody id="tbody"><!-- JS --></tbody>
+            <tbody id="tbody"><!-- Data will be loaded here --></tbody>
           </table>
         </div>
 
@@ -519,12 +592,17 @@
         </div>
         <div class="modal-body">
           <div class="vu-head">
-            <div class="vu-id">
-              <div class="vu-name" id="vTitle">—</div>
-              <div class="vu-email" id="vMeta">—</div>
-              <div class="vu-chips">
-                <span id="vStatus" class="chip chip-status">Status</span>
-                <span id="vLoan" class="chip chip-role">Loan #</span>
+            <div style="display:flex;gap:20px;align-items:flex-start;">
+              <img id="vCover" src="assets/img/default-book.png" alt="Book Cover" 
+                   style="width:120px;height:160px;object-fit:cover;border-radius:8px;background:#f0f0f0;box-shadow:0 2px 8px rgba(0,0,0,0.1);flex-shrink:0;"
+                   onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
+              <div class="vu-id" style="flex:1;">
+                <div class="vu-name" id="vTitle">—</div>
+                <div class="vu-email" id="vMeta">—</div>
+                <div class="vu-chips">
+                  <span id="vStatus" class="chip chip-status">Status</span>
+                  <span id="vLoan" class="chip chip-role">Loan No.</span>
+                </div>
               </div>
             </div>
           </div>
@@ -550,6 +628,7 @@
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/logout.js"></script>
   <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-LOANS-COMBINED-V4"></script>
   <script>
     // Initialize with authentication check
@@ -569,18 +648,17 @@
         headerAvatar.src = data.user.avatar;
       }
       
+      // Load user info in dropdown
+      const fullName = [data?.user?.first_name, data?.user?.last_name].filter(Boolean).join(' ');
+      const whoChipEl = document.getElementById('whoChip');
+      if (whoChipEl && data?.user) {
+        const userRole = (data.user.role || '').toLowerCase();
+        whoChipEl.innerHTML = `<span class="badge role-chip ${userRole}">${userRole.toUpperCase()}</span> ${fullName || data.user.email || '—'}`;
+      }
+      
       document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
       
-      // Logout function
-      window.logout = async function() {
-        try {
-          await fetch('/api/logout', {method:'POST', credentials:'include'});
-          localStorage.removeItem('userRole');
-          location.href = 'login.html';
-        } catch(e) {
-          location.href = 'login.html';
-        }
-      };
+      // Logout - handled by logout.js (confirmation dialog)
 
       // Data from backend
       let allLoans = [];
@@ -612,20 +690,116 @@
       return 'borrowed';
     }
     
+    // Render skeleton table rows
+    function renderSkeletonTableRows(count = 8) {
+      return Array.from({length: count}, () => `
+        <tr class="skeleton-table-row">
+          <td><div class="skeleton-cover"></div></td>
+          <td>
+            <div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td>
+            <div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td class="d-none d-lg-table-cell"><div class="skeleton-table-cell short"></div></td>
+          <td><div class="skeleton-table-cell medium"></div></td>
+          <td class="d-none d-lg-table-cell"><div class="skeleton-table-cell short"></div></td>
+          <td><div class="skeleton-table-cell short"></div></td>
+          <td><div class="skeleton-badge"></div></td>
+          <td class="text-end"><div class="skeleton-button"></div></td>
+        </tr>
+      `).join('');
+    }
+    
+    // Disable/enable interactions during loading
+    function setLoadingState(isLoading) {
+      const searchInput = document.getElementById('q');
+      const statusSelect = document.getElementById('fStatus');
+      const memberInput = document.getElementById('fMember');
+      const fromInput = document.getElementById('fFrom');
+      const toInput = document.getElementById('fTo');
+      const exportBtn = document.getElementById('btnExport');
+      const pagerLinks = document.querySelectorAll('#pager .page-link');
+      
+      if (searchInput) searchInput.disabled = isLoading;
+      if (statusSelect) statusSelect.disabled = isLoading;
+      if (memberInput) memberInput.disabled = isLoading;
+      if (fromInput) fromInput.disabled = isLoading;
+      if (toInput) toInput.disabled = isLoading;
+      if (exportBtn) {
+        exportBtn.disabled = isLoading;
+        if (isLoading && exportBtn.dataset.isExporting === 'true') {
+          const originalText = exportBtn.innerHTML;
+          exportBtn.dataset.originalText = originalText;
+          exportBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Exporting...';
+        } else if (!isLoading && exportBtn.dataset.originalText) {
+          exportBtn.innerHTML = exportBtn.dataset.originalText;
+          delete exportBtn.dataset.originalText;
+          delete exportBtn.dataset.isExporting;
+        }
+      }
+      pagerLinks.forEach(link => {
+        const li = link.closest('.page-item');
+        if (li && !li.classList.contains('disabled') && !li.classList.contains('active')) {
+          link.style.pointerEvents = isLoading ? 'none' : 'auto';
+          link.style.opacity = isLoading ? '0.6' : '1';
+        }
+      });
+    }
+    
+    // Show error banner
+    function showError(message) {
+      const errorBanner = document.getElementById('errorBanner');
+      const errorMessage = document.getElementById('errorMessage');
+      if (errorBanner && errorMessage) {
+        errorMessage.textContent = message;
+        errorBanner.classList.remove('d-none');
+      }
+    }
+    
+    // Hide error banner
+    function hideError() {
+      const errorBanner = document.getElementById('errorBanner');
+      if (errorBanner) {
+        errorBanner.classList.add('d-none');
+      }
+    }
+
     async function loadLoans() {
+      // Show skeleton loaders and disable interactions
+      // Show a reasonable number of skeletons (5-8) for loading state
+      const skeletonCount = Math.min(8, pageSize);
+      tbody.innerHTML = renderSkeletonTableRows(skeletonCount);
+      empty.classList.add('d-none');
+      hideError();
+      setLoadingState(true);
+      
       try {
         const url = `/api/loans?page=1&pagesize=1000`;
         const res = await fetch(url, {credentials:'include'});
         const data = await res.json().catch(()=>({ok:false}));
         if (!data.ok) { 
-          console.error('Failed to load loans:', data.error);
+          // Remove skeletons and show error
+          tbody.innerHTML = '';
+          empty.classList.remove('d-none');
+          empty.innerHTML = '<i class="bi bi-clock-history fs-2 d-block mb-2 text-muted fade-in"></i><p class="text-muted mb-0 fade-in">No records match your filters.</p>';
+          showError('Failed to load loans. Please try again.');
           return;
         }
         allLoans = data.items || [];
+        // Render will replace ALL skeletons with only actual data rows
         render();
       } catch(err) {
-        console.error('Error loading loans:', err);
-        alert('Error loading loans: ' + err.message);
+        // Remove skeletons and show error (keep previous data if any)
+        tbody.innerHTML = '';
+        empty.classList.remove('d-none');
+        empty.innerHTML = '<i class="bi bi-clock-history fs-2 d-block mb-2 text-muted fade-in"></i><p class="text-muted mb-0 fade-in">No records match your filters.</p>';
+        showError('Error loading loans: ' + (err.message || 'Network error'));
+      } finally {
+        // Re-enable interactions
+        setLoadingState(false);
       }
     }
     
@@ -652,12 +826,36 @@
       if(currentPage>pages) currentPage=pages;
       const start=(currentPage-1)*pageSize, end=Math.min(start+pageSize,total), slice=list.slice(start,end);
 
-      empty.classList.toggle('d-none', !!slice.length);
-      tbody.innerHTML=slice.map(rowHtml).join('');
+      // Always clear tbody completely and only show actual data rows
+      if (slice.length === 0) {
+        tbody.innerHTML = '';
+        empty.classList.remove('d-none');
+        empty.innerHTML = '<i class="bi bi-clock-history fs-2 d-block mb-2 text-muted fade-in"></i><p class="text-muted mb-0 fade-in">No records match your filters.</p>';
+      } else {
+        empty.classList.add('d-none');
+        // Only render the exact number of data rows (no extra skeletons)
+        tbody.innerHTML = slice.map(loan => {
+          const row = rowHtml(loan);
+          return row.replace('<tr>', '<tr class="fade-in">');
+        }).join('');
+      }
       pageInfo.textContent=`Showing ${total?start+1:0}–${end} of ${total}`;
 
       pager.innerHTML='';
-      const add=(label,page,dis=false,act=false)=>{const li=document.createElement('li'); li.className=`page-item ${dis?'disabled':''} ${act?'active':''}`; li.innerHTML=`<a class="page-link" href="#">${label}</a>`; li.onclick=(e)=>{e.preventDefault(); if(!dis){currentPage=page; render();}}; pager.appendChild(li);};
+      const add=(label,page,dis=false,act=false)=>{const li=document.createElement('li'); li.className=`page-item ${dis?'disabled':''} ${act?'active':''}`; li.innerHTML=`<a class="page-link" href="#">${label}</a>`; li.onclick=(e)=>{e.preventDefault(); if(!dis){
+        currentPage=page;
+        // Show skeleton during pagination (use pageSize or actual expected count)
+        const skeletonCount = Math.min(8, pageSize);
+        tbody.innerHTML = renderSkeletonTableRows(skeletonCount);
+        empty.classList.add('d-none');
+        hideError();
+        setLoadingState(true);
+        // Use setTimeout to allow UI to update before rendering
+        setTimeout(() => {
+          render(); // This will replace ALL skeletons with only actual data rows
+          setLoadingState(false);
+        }, 50);
+      }}; pager.appendChild(li);};
       add('«',1,currentPage===1); add('‹',Math.max(1,currentPage-1),currentPage===1);
       for(let p=1;p<=pages;p++) add(p,p,false,p===currentPage);
       add('›',Math.min(pages,currentPage+1),currentPage===pages); add('»',pages,currentPage===pages);
@@ -672,8 +870,14 @@
       const returnedDate = loan.returned_at ? new Date(loan.returned_at).toLocaleString() : '—';
       const daysLate = loan.returned_at && loan.due_at ? Math.max(0, Math.floor((new Date(loan.returned_at) - new Date(loan.due_at)) / (1000*60*60*24))) : 
                        (!loan.returned_at && loan.due_at && isOverdue(loan)) ? Math.floor((new Date() - new Date(loan.due_at)) / (1000*60*60*24)) : 0;
+      const coverUrl = loan.cover_url || 'assets/img/default-book.png';
       return `
         <tr>
+          <td>
+            <img src="${coverUrl}" alt="${esc(loan.book_title)}" 
+                 style="width:50px;height:65px;object-fit:cover;border-radius:4px;background:#f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,0.1);"
+                 onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
+          </td>
           <td>
             <div class="fw-medium">${esc(loan.student_name)}</div>
             <div class="small text-muted">${esc(loan.student_no || '—')}</div>
@@ -697,31 +901,64 @@
 
     // Export
     document.getElementById('btnExport').onclick=()=>{
-      const rows=applyFilters().map(loan=>{
-        const borrowedDate = loan.borrowed_at || '';
-        const dueDate = (loan.extended_due_at || loan.due_at) || '';
-        const returnedDate = loan.returned_at || '';
-        const daysLate = loan.returned_at && loan.due_at ? Math.max(0, Math.floor((new Date(loan.returned_at) - new Date(loan.due_at)) / (1000*60*60*24))) : 
-                         (!loan.returned_at && loan.due_at && isOverdue(loan)) ? Math.floor((new Date() - new Date(loan.due_at)) / (1000*60*60*24)) : 0;
-        return [loan.loan_id,loan.student_name,loan.student_no||'',loan.book_title,loan.isbn||'',borrowedDate,dueDate,returnedDate,statusOf(loan),daysLate];
-      });
-      const csv=["loan_id,member,studentNo,book,isbn,borrowedAt,dueAt,returnedAt,status,daysLate", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
-      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download="history.csv"; a.click(); URL.revokeObjectURL(a.href);
+      const exportBtn = document.getElementById('btnExport');
+      exportBtn.dataset.isExporting = 'true';
+      setLoadingState(true);
+      try {
+        const rows=applyFilters().map(loan=>{
+          const borrowedDate = loan.borrowed_at || '';
+          const dueDate = (loan.extended_due_at || loan.due_at) || '';
+          const returnedDate = loan.returned_at || '';
+          const daysLate = loan.returned_at && loan.due_at ? Math.max(0, Math.floor((new Date(loan.returned_at) - new Date(loan.due_at)) / (1000*60*60*24))) : 
+                           (!loan.returned_at && loan.due_at && isOverdue(loan)) ? Math.floor((new Date() - new Date(loan.due_at)) / (1000*60*60*24)) : 0;
+          return [loan.loan_id,loan.student_name,loan.student_no||'',loan.book_title,loan.isbn||'',borrowedDate,dueDate,returnedDate,statusOf(loan),daysLate];
+        });
+        const csv=["loan_id,member,studentNo,book,isbn,borrowedAt,dueAt,returnedAt,status,daysLate", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+        const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download="history.csv"; a.click(); URL.revokeObjectURL(a.href);
+      } finally {
+        setTimeout(() => {
+          setLoadingState(false);
+        }, 300);
+      }
     };
 
     // Filters live
-    [q,fStatus,fMember,fFrom,fTo].forEach(el=>el.addEventListener('input',()=>{currentPage=1;render();}));
+    [q,fStatus,fMember,fFrom,fTo].forEach(el=>el.addEventListener('input',()=>{
+      currentPage=1;
+      // Show skeleton during filter/search (use pageSize or reasonable count)
+      const skeletonCount = Math.min(8, pageSize);
+      tbody.innerHTML = renderSkeletonTableRows(skeletonCount);
+      empty.classList.add('d-none');
+      hideError();
+      setLoadingState(true);
+      // Use setTimeout to allow UI to update before rendering
+      setTimeout(() => {
+        render(); // This will replace ALL skeletons with only actual data rows
+        setLoadingState(false);
+      }, 50);
+    }));
 
     // View modal
     window.view=function(loanId){
       const loan=allLoans.find(x=>x.loan_id===loanId); if(!loan) return;
       document.getElementById('vTitle').textContent=loan.book_title;
-      document.getElementById('vMeta').textContent=`${loan.student_name} • Loan #${loan.loan_id}`;
+      document.getElementById('vMeta').textContent=`${loan.student_name} • Loan No. ${loan.loan_id}`;
       const st = statusOf(loan);
       const vs=document.getElementById('vStatus'); 
       vs.textContent=st==='overdue'?'Overdue':st==='returned'?'Returned':'Borrowed';
       vs.className='chip ' + (st==='overdue'?'chip-danger':st==='returned'?'chip-success':'chip-neutral');
-      document.getElementById('vLoan').textContent='Loan #'+loan.loan_id;
+      document.getElementById('vLoan').textContent='Loan No. '+loan.loan_id;
+      
+      // Set book cover
+      const coverImg = document.getElementById('vCover');
+      const coverUrl = loan.cover_url || 'assets/img/default-book.png';
+      coverImg.src = coverUrl;
+      coverImg.alt = esc(loan.book_title);
+      coverImg.onerror = function() {
+        this.src = 'assets/img/default-book.png';
+        this.onerror = null;
+      };
+      
       document.getElementById('vMember').textContent=`${loan.student_name} (${loan.student_no||'—'})`;
       document.getElementById('vBorrowed').textContent=loan.borrowed_at ? new Date(loan.borrowed_at).toLocaleString() : '—';
       document.getElementById('vDue').textContent=(loan.extended_due_at || loan.due_at) ? new Date(loan.extended_due_at || loan.due_at).toLocaleDateString() : '—';

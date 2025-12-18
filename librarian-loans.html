@@ -14,7 +14,7 @@
   <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
   <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
 
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
   <style>
     :root{
       --card-pad:24px;
@@ -84,27 +84,6 @@
     .search-bar-custom:focus-within .input-group-text {
       color: var(--text-primary);
     }
-    .notification-btn{
-      width:44px;
-      height:44px;
-      border-radius:var(--border-radius-sm);
-      border:none;
-      background:transparent;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition:all 0.2s ease;
-      color:var(--text-primary);
-      padding:0;
-      position:relative;
-    }
-    .notification-btn:hover{
-      background:#f8f9fa;
-      color:var(--text-primary);
-    }
-    .notification-btn i{
-      font-size:1.25rem;
-    }
     .admin-btn-custom{
       padding:0;
       width:44px;
@@ -127,6 +106,26 @@
       height:32px;
       border-radius:50%;
       object-fit:cover;
+    }
+    .role-chip{
+      font-weight:600;
+      border-radius:999px;
+      padding:.2rem .6rem;
+      font-size:.75rem;
+    }
+    .role-chip.admin{
+      background:#4a4a4a;
+      color:#fff;
+    }
+    .role-chip.librarian{
+      background:#e7f1ff;
+      color:#0d6efd;
+      border:1px solid rgba(13,110,253,.2);
+    }
+    .role-chip.student{
+      background:#efe7ff;
+      color:#6f42c1;
+      border:1px solid rgba(111,66,193,.2);
     }
 
     /* Stat Cards - Dashboard Style */
@@ -449,29 +448,15 @@
           </form>
 
           <div class="dropdown position-relative">
-            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
-              <i class="bi bi-bell"></i>
-              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
-              <li><h6 class="dropdown-header">Notifications</h6></li>
-              <li><hr class="dropdown-divider"></li>
-              <li id="notificationList">
-                <div class="px-3 py-2 text-center text-muted">
-                  <small>No notifications</small>
-                </div>
-              </li>
-            </ul>
-        </div>
-
           <div class="dropdown">
-            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:50%;">
               <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
+              <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
               <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+              <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>
           </div>
         </div>
@@ -622,6 +607,7 @@
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/logout.js"></script>
   <script src="assets/js/sidebar.js?v=2025-11-17-restructured"></script>
   <script>
     let currentLoan = null;
@@ -651,18 +637,17 @@
         headerAvatar.src = data.user.avatar;
       }
       
+      // Load user info in dropdown
+      const fullName = [data?.user?.first_name, data?.user?.last_name].filter(Boolean).join(' ');
+      const whoChipEl = document.getElementById('whoChip');
+      if (whoChipEl && data?.user) {
+        const userRole = (data.user.role || '').toLowerCase();
+        whoChipEl.innerHTML = `<span class="badge role-chip ${userRole}">${userRole.toUpperCase()}</span> ${fullName || data.user.email || '—'}`;
+      }
+      
       document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
       
-      // Logout function
-      window.logout = async function() {
-        try {
-          await fetch('/api/logout', {method:'POST', credentials:'include'});
-          localStorage.removeItem('userRole');
-          location.href = 'login.html';
-        } catch(e) {
-          location.href = 'login.html';
-        }
-      };
+      // Logout - handled by logout.js (confirmation dialog)
       
       // Filter status management
       filterStatusSelect = document.createElement('select');

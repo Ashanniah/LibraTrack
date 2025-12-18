@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>LibraTrack – Borrowing History</title>
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
@@ -86,25 +86,6 @@
     .search-bar-custom:focus-within .input-group-text {
       color: var(--text-primary);
     }
-    .notification-btn{
-      width:44px;
-      height:44px;
-      border-radius:var(--border-radius-sm);
-      border:none;
-      background:transparent;
-      color:var(--text-primary);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition:all 0.2s ease;
-    }
-    .notification-btn:hover{
-      background:#f8f9fa;
-      color:var(--text-primary);
-    }
-    .notification-btn i{
-      font-size:1.25rem;
-    }
     .admin-btn-custom{
       padding:0;
       width:44px;
@@ -150,6 +131,85 @@
     }
     .table-modern tbody tr:hover{
       background:#f8f9fa;
+    }
+    /* Book Cover in Table */
+    .table-modern tbody td img[alt*="Book"] {
+      width: 50px;
+      height: 65px;
+      object-fit: cover;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      background: #f3f4f6;
+    }
+
+    /* Skeleton Loaders */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-table-row td {
+      padding: var(--cell-pad-y) var(--cell-pad-x);
+    }
+    .skeleton-table-cell {
+      height: 1rem;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-cell.short {
+      width: 60%;
+    }
+    .skeleton-table-cell.medium {
+      width: 80%;
+    }
+    .skeleton-table-cell.long {
+      width: 100%;
+    }
+    .skeleton-cover {
+      width: 50px;
+      height: 65px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-badge {
+      width: 80px;
+      height: 24px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .skeleton-button {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .btn:disabled,
+    .form-control:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: #e9ecef;
     }
 
     /* Filter Buttons */
@@ -341,21 +401,6 @@
           </form>
 
           <div class="dropdown position-relative">
-            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
-              <i class="bi bi-bell"></i>
-              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
-              <li><h6 class="dropdown-header">Notifications</h6></li>
-              <li><hr class="dropdown-divider"></li>
-              <li id="notificationList">
-                <div class="px-3 py-2 text-center text-muted">
-                  <small>No notifications</small>
-                </div>
-              </li>
-            </ul>
-          </div>
-
           <div class="dropdown">
             <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
               <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
@@ -363,7 +408,7 @@
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" href="student-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+              <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>
           </div>
         </div>
@@ -385,6 +430,7 @@
           <table class="table table-modern align-middle mb-0">
             <thead>
               <tr>
+                <th style="width:80px">Cover</th>
                 <th>Book</th>
                 <th>Status</th>
                 <th>Borrowed</th>
@@ -417,13 +463,9 @@
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
+  <script src="assets/js/logout.js"></script>
   <script>
-    async function logout() {
-      try {
-        await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-      } catch {}
-      location.href = 'login.html';
-    }
+    // Logout - handled by logout.js (confirmation dialog)
 
     (async () => {
       try {
@@ -448,12 +490,13 @@
       });
 
       // Search functionality
-      const searchInput = document.getElementById('historySearch');
       if (searchInput) {
         let searchTimeout;
         searchInput.addEventListener('input', (e) => {
+          if (isLoading) return;
+          
           clearTimeout(searchTimeout);
-          const query = e.target.value.trim().toLowerCase();
+          const query = e.target.value.trim();
           searchTimeout = setTimeout(() => {
             filterBySearch(query);
           }, 300);
@@ -462,22 +505,81 @@
     })();
 
     function filterBySearch(query) {
-      const rows = document.querySelectorAll('#historyBody tr');
+      // If search is cleared and we have loans, just show all rows
+      if (!query.trim()) {
+        const rows = document.querySelectorAll('#historyBody tr:not(.skeleton-table-row)');
+        rows.forEach(row => {
+          row.style.display = '';
+        });
+        return;
+      }
+      
+      // Filter existing rows (not skeletons)
+      const rows = document.querySelectorAll('#historyBody tr:not(.skeleton-table-row)');
       rows.forEach(row => {
         const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(query) ? '' : 'none';
+        row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
       });
     }
 
     const filters = document.querySelectorAll('[data-status]');
     const tbody = document.getElementById('historyBody');
     const empty = document.getElementById('historyEmpty');
+    const searchInput = document.getElementById('historySearch');
 
     let currentStatus = '';
     let loans = [];
+    let isLoading = false;
+
+    // Render skeleton table rows
+    function renderSkeletonTableRows(count = 5) {
+      return Array.from({length: count}, () => `
+        <tr class="skeleton-table-row">
+          <td>
+            <div class="skeleton-cover"></div>
+          </td>
+          <td>
+            <div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td>
+            <div class="skeleton-badge"></div>
+          </td>
+          <td>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td>
+            <div class="skeleton-table-cell short" style="width: 30px;"></div>
+          </td>
+          <td class="text-end">
+            <div class="skeleton-button"></div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Disable/enable interactions during loading
+    function setLoadingState(loading) {
+      isLoading = loading;
+      
+      // Disable filter buttons
+      filters.forEach(btn => {
+        btn.disabled = loading;
+      });
+      
+      // Disable search input
+      if (searchInput) {
+        searchInput.disabled = loading;
+      }
+    }
 
     filters.forEach(btn => {
       btn.addEventListener('click', () => {
+        if (isLoading) return;
+        
         filters.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentStatus = btn.dataset.status || '';
@@ -502,8 +604,11 @@
     }
 
     async function loadLoans(status='') {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Loading…</td></tr>';
+      // Show skeleton loading
+      tbody.innerHTML = renderSkeletonTableRows(5);
       empty.classList.add('d-none');
+      setLoadingState(true);
+      
       try {
         const url = new URL('/api/student/my-loans', location.origin);
         url.searchParams.set('pagesize', '200');
@@ -514,19 +619,31 @@
         loans = data.items || [];
         renderRows();
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-danger py-4">${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">${err.message}</td></tr>`;
+        empty.classList.add('d-none');
+      } finally {
+        setLoadingState(false);
       }
     }
 
     function renderRows() {
+      // Remove skeletons and render actual data with fade-in
       if (!loans.length) {
         tbody.innerHTML = '';
         empty.classList.remove('d-none');
         return;
       }
       empty.classList.add('d-none');
-      tbody.innerHTML = loans.map(loan => `
-        <tr>
+      
+      tbody.innerHTML = loans.map(loan => {
+        const cover = loan.cover_url || loan.book_cover || 'assets/img/default-book.png';
+        return `
+        <tr class="fade-in">
+          <td>
+            <img src="${cover}" alt="${(loan.book_title || 'Book').replace(/"/g, '&quot;')}" 
+                 style="width:50px; height:65px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"
+                 onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
+          </td>
           <td>
             <div class="fw-medium">${loan.book_title || '—'}</div>
             <div class="small text-muted">${loan.isbn || ''}</div>
@@ -539,7 +656,8 @@
             <i class="bi bi-eye" style="cursor:pointer; font-size:1.125rem; color:var(--text-primary);" data-id="${loan.id}" title="View Details"></i>
           </td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
 
       tbody.querySelectorAll('i[data-id]').forEach(icon => {
         icon.addEventListener('click', () => openDetails(icon.dataset.id));

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AuditLog;
 
 class AuthController extends Controller
 {
@@ -188,6 +189,23 @@ class AuthController extends Controller
 
         if (!$ok) {
             usleep(250000);
+            
+            // Log failed login attempt
+            $actor = [
+                'id' => null,
+                'first_name' => 'Unknown',
+                'last_name' => 'User',
+                'role' => 'guest',
+                'email' => $email
+            ];
+            AuditLog::logAction(
+                $actor,
+                'LOGIN_FAIL',
+                'auth',
+                null,
+                "Failed login attempt for email: {$email}"
+            );
+            
             return response()->json([
                 'success' => false,
                 'error' => 'Invalid email or password',
@@ -217,6 +235,22 @@ class AuthController extends Controller
         $_SESSION['last_name'] = $user->last_name;
         $_SESSION['logged_in'] = time();
 
+        // Log successful login
+        $actor = [
+            'id' => $user->id,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'role' => strtolower($user->role),
+            'email' => $user->email
+        ];
+        AuditLog::logAction(
+            $actor,
+            'LOGIN_SUCCESS',
+            'auth',
+            $user->id,
+            "User logged in successfully"
+        );
+
         return response()->json([
             'success' => true,
             'redirect' => '/dashboard.html',
@@ -245,6 +279,24 @@ class AuthController extends Controller
                 'samesite' => 'Lax',
             ]);
             session_start();
+        }
+        
+        // Log logout before destroying session
+        if (!empty($_SESSION['uid'])) {
+            $actor = [
+                'id' => $_SESSION['uid'],
+                'first_name' => $_SESSION['first_name'] ?? '',
+                'last_name' => $_SESSION['last_name'] ?? '',
+                'role' => $_SESSION['role'] ?? 'unknown',
+                'email' => $_SESSION['email'] ?? ''
+            ];
+            AuditLog::logAction(
+                $actor,
+                'LOGOUT',
+                'auth',
+                $_SESSION['uid'],
+                "User logged out"
+            );
         }
         
         $_SESSION = [];

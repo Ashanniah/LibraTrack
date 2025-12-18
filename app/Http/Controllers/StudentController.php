@@ -107,10 +107,33 @@ class StudentController extends BaseController
             return response()->json(['ok' => false, 'error' => 'Invalid book ID'], 400);
         }
 
-        $history = DB::table('loans as l')
+        $historyQuery = DB::table('loans as l')
             ->join('users as u', 'u.id', '=', 'l.student_id')
-            ->where('l.book_id', $bookId)
-            ->select([
+            ->join('books as b', 'b.id', '=', 'l.book_id')
+            ->where('l.book_id', $bookId);
+
+        // School filtering for librarians
+        $currentRole = strtolower($user['role'] ?? '');
+        if ($currentRole === 'librarian') {
+            $librarianSchoolId = (int)($user['school_id'] ?? 0);
+            if ($librarianSchoolId > 0) {
+                // Filter by book's school_id (books are now school-specific)
+                $hasBookSchoolId = DB::select("SHOW COLUMNS FROM books LIKE 'school_id'");
+                if (count($hasBookSchoolId) > 0) {
+                    $historyQuery->where('b.school_id', $librarianSchoolId);
+                }
+                
+                // Also filter by student's school_id
+                $historyQuery->where('u.school_id', $librarianSchoolId);
+            } else {
+                return response()->json([
+                    'ok' => true,
+                    'history' => []
+                ]);
+            }
+        }
+
+        $history = $historyQuery->select([
                 'l.id as loan_id',
                 'l.borrowed_at',
                 'l.due_at',

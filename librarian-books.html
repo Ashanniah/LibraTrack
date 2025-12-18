@@ -15,7 +15,7 @@
   <link href="assets/css/librarian-books.css" rel="stylesheet">
   <link href="assets/css/responsive.css" rel="stylesheet">
 
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
   <style>
     :root{
       --brand-gold:#a68604;
@@ -87,6 +87,64 @@
       background: #fff !important;
     }
     
+    /* Skeleton Loaders for Table Rows */
+    .skeleton-table-row td {
+      padding: 16px 20px;
+    }
+    .skeleton-table-cell {
+      height: 1rem;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-cell.short {
+      width: 60%;
+    }
+    .skeleton-table-cell.medium {
+      width: 80%;
+    }
+    .skeleton-table-cell.long {
+      width: 100%;
+    }
+    .skeleton-table-image {
+      width: 50px;
+      height: 65px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-badge {
+      width: 60px;
+      height: 24px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 12px;
+    }
+    .skeleton-table-button {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+      display: inline-block;
+      margin: 0 2px;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
     /* Table Card Design */
     .table-card{
       border-radius:var(--border-radius-lg);
@@ -145,6 +203,26 @@
     .role-admin{background:rgba(33,37,41,.08);color:#212529}
     .role-librarian{background:rgba(13,110,253,.12);color:#0d6efd}
     .role-student{background:rgba(111,66,193,.12);color:#6f42c1}
+    .role-chip{
+      font-weight:600;
+      border-radius:999px;
+      padding:.2rem .6rem;
+      font-size:.75rem;
+    }
+    .role-chip.admin{
+      background:#4a4a4a;
+      color:#fff;
+    }
+    .role-chip.librarian{
+      background:#e7f1ff;
+      color:#0d6efd;
+      border:1px solid rgba(13,110,253,.2);
+    }
+    .role-chip.student{
+      background:#efe7ff;
+      color:#6f42c1;
+      border:1px solid rgba(111,66,193,.2);
+    }
     /* When student, we hide manage UI safely via class */
     .is-student .manage-only{display:none !important}
     
@@ -169,28 +247,6 @@
     }
     
     /* Notification button styling */
-    .notification-btn{
-      color:var(--text-primary) !important;
-      padding:8px 12px;
-      border-radius:var(--border-radius-sm);
-      transition:all 0.2s ease;
-    }
-    .notification-btn:hover{
-      color:var(--text-primary) !important;
-      background-color:#f8f9fa;
-    }
-    .notification-badge{
-      font-size:0.6875rem;
-      padding:3px 7px;
-      font-weight:600;
-      background:var(--brand-gold) !important;
-      color:#fff !important;
-    }
-    .notification-dropdown{
-      border-radius:var(--border-radius-sm);
-      box-shadow:var(--shadow-lg);
-      border:1px solid var(--card-border);
-    }
     .admin-btn-custom {
       padding: 0;
       width: 44px;
@@ -438,17 +494,6 @@
               <input class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search title, author, ISBN…" id="bookSearch">
             </div>
           </form>
-
-          <div class="dropdown me-2">
-            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
-              <i class="bi bi-bell fs-5"></i>
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
-              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
-              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
-            </ul>
-          </div>
 
           <div class="dropdown">
             <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
@@ -710,11 +755,11 @@
 
   <!-- ============= SCRIPTS ============= -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/logout.js"></script>
 
   <!-- Shared sidebar (build-free) -->
   <script src="assets/js/sidebar.js?v=2025-11-17-restructured"></script>
   <!-- Centralized Notifications -->
-  <script src="assets/js/notifications.js"></script>
 
   <script>
     // ---------- Role helpers ----------
@@ -761,7 +806,7 @@
             const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
             const whoChipEl = document.getElementById('whoChip');
             if (whoChipEl) {
-              whoChipEl.innerHTML = `<span class="badge" style="background:#4a4a4a;color:#fff;font-weight:600;">${ROLE.toUpperCase()}</span> ${fullName || me.email}`;
+              whoChipEl.innerHTML = `<span class="badge role-chip ${ROLE}">${ROLE.toUpperCase()}</span> ${fullName || me.email}`;
             }
             
             // Load avatar
@@ -776,14 +821,7 @@
       }
     })();
     
-    // Logout handler
-    document.getElementById('logoutLink')?.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        await fetch('/api/logout', { method: 'POST', credentials: 'include' });
-      } catch {}
-      location.href = '/login';
-    });
+    // Logout - handled by logout.js (confirmation dialog)
     
   </script>
 
@@ -837,8 +875,35 @@
       }
 
       // ---------- API ----------
+      // Render skeleton table rows
+      function renderSkeletonTableRows(count = 8) {
+        return Array.from({length: count}, () => `
+          <tr class="skeleton-table-row">
+            <td><div class="skeleton-table-image"></div></td>
+            <td>
+              <div class="skeleton-table-cell long" style="margin-bottom: 8px;"></div>
+              <div class="skeleton-table-cell short"></div>
+            </td>
+            <td><div class="skeleton-table-cell medium"></div></td>
+            <td><div class="skeleton-table-cell short"></div></td>
+            <td><div class="skeleton-table-badge"></div></td>
+            <td><div class="skeleton-table-cell short"></div></td>
+            <td><div class="skeleton-table-badge"></div></td>
+            <td>
+              <div class="skeleton-table-button"></div>
+              <div class="skeleton-table-button"></div>
+              <div class="skeleton-table-button"></div>
+              <div class="skeleton-table-button"></div>
+              <div class="skeleton-table-button"></div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
       async function loadBooks() {
-        tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Loading books...</td></tr>';
+        // Show skeleton loaders while fetching
+        tableBody.innerHTML = renderSkeletonTableRows(8);
+        
         try {
           const res = await fetch(`/api/books?pagesize=1000`, { credentials: 'include', cache: 'no-store' });
           const json = await res.json();
@@ -853,7 +918,7 @@
           }));
           render();
         } catch (e) {
-          tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-4">Error: ${e.message}</td></tr>`;
+          tableBody.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-4 fade-in">Error: ${e.message}</td></tr>`;
         }
       }
 
@@ -916,7 +981,7 @@
         }
 
         if (!filtered.length) {
-          tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No books found.</td></tr>';
+          tableBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4 fade-in">No books found.</td></tr>';
           empty.classList.remove('d-none');
           booksTable.classList.add('d-none');
           return;
@@ -978,7 +1043,7 @@
           `;
           
           return `
-            <tr>
+            <tr class="fade-in">
               <td>
                 <img src="${coverImg}" alt="${titleEscaped}" 
                      style="width:50px;height:65px;object-fit:cover;border-radius:4px;background:#f0f0f0;"

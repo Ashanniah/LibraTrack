@@ -15,7 +15,7 @@
   <link href="assets/css/librarian-add-book.css" rel="stylesheet">
   <link href="assets/css/books.css" rel="stylesheet">
   <link href="assets/css/responsive.css" rel="stylesheet">
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
 
   <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
 
@@ -50,6 +50,59 @@
       font-weight:700;
       font-size:1.25rem;
       letter-spacing:0.01em;
+    }
+    
+    /* Skeleton Loaders for Book Cards */
+    .skeleton-book-card {
+      animation: skeleton-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes skeleton-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .skeleton-cover {
+      width: 100%;
+      height: 240px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 8px;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-line {
+      height: 16px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .skeleton-line.short {
+      width: 60%;
+    }
+    .skeleton-line.medium {
+      width: 80%;
+    }
+    .skeleton-line.long {
+      width: 100%;
+    }
+    .skeleton-button {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 6px;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     
     /* Consistent Search Bar Design */
@@ -145,23 +198,6 @@
     }
     
     /* Notification button styling */
-    .notification-btn{
-      color:var(--text-primary) !important;
-      padding:8px 12px;
-      border-radius:var(--border-radius-sm);
-      transition:all 0.2s ease;
-    }
-    .notification-btn:hover{
-      color:var(--text-primary) !important;
-      background-color:#f8f9fa;
-    }
-    .notification-badge{
-      font-size:0.6875rem;
-      padding:3px 7px;
-      font-weight:600;
-      background:var(--brand-gold) !important;
-      color:#fff !important;
-    }
     .admin-btn-custom {
       padding:0 !important;
       width:44px !important;
@@ -692,6 +728,444 @@
       background: #f3f4f6;
       box-shadow: var(--shadow-sm);
     }
+    /* Borrow Modal Enhanced Styling */
+    .borrow-modal-body {
+      padding: 24px;
+    }
+    .borrow-cover-section {
+      position: sticky;
+      top: 20px;
+    }
+    .borrow-modal-cover {
+      width: 100%;
+      max-width: 180px;
+      height: auto;
+      aspect-ratio: 2/3;
+      object-fit: cover;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-md);
+      background: var(--card-bg);
+      border: 2px solid var(--card-border);
+      margin: 0 auto;
+      transition: all 0.2s ease;
+      display: block;
+    }
+    .borrow-modal-cover:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--gold);
+    }
+    .book-cover-wrapper {
+      position: relative;
+      margin-bottom: 16px;
+    }
+    .cover-overlay {
+      display: none;
+    }
+    
+    /* Availability Card - Consistent Colors */
+    .availability-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: var(--border-radius-sm);
+      background: #d1fae5;
+      border: 1.5px solid rgba(5,150,105,0.2);
+      box-shadow: var(--shadow-sm);
+    }
+    .availability-card.warning {
+      background: #fef3c7;
+      border-color: rgba(146,64,14,0.2);
+    }
+    .availability-card.danger {
+      background: #fee2e2;
+      border-color: rgba(153,27,27,0.2);
+    }
+    .availability-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      font-size: 1.125rem;
+      color: #065f46;
+    }
+    .availability-card.warning .availability-icon {
+      color: #92400e;
+    }
+    .availability-card.danger .availability-icon {
+      color: #991b1b;
+    }
+    .availability-content {
+      flex: 1;
+    }
+    .availability-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+    .availability-text {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #065f46;
+    }
+    .availability-card.warning .availability-text {
+      color: #92400e;
+    }
+    .availability-card.danger .availability-text {
+      color: #991b1b;
+    }
+    
+    /* Rating Display - Consistent Colors */
+    .rating-display {
+      text-align: center;
+      padding: 10px;
+      background: var(--card-bg);
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--card-border);
+    }
+    .rating-label {
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .rating-stars {
+      display: flex;
+      justify-content: center;
+      gap: 3px;
+      font-size: 1rem;
+    }
+    .rating-stars .bi-star-fill {
+      color: #fbbf24;
+    }
+    .rating-stars .bi-star {
+      color: #d1d5db;
+    }
+    
+    /* Borrow Book Header - Consistent Colors */
+    .borrow-book-header {
+      margin-bottom: 20px;
+    }
+    .book-title-section {
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--card-border);
+    }
+    .borrow-book-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+      margin: 0 0 8px 0;
+    }
+    .borrow-book-author {
+      font-size: 1rem;
+      color: var(--text-secondary);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .borrow-book-author::before {
+      content: 'by';
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    
+    /* Borrow Details Container - Consistent Colors */
+    .borrow-details-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .borrow-details-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: 1.5px solid var(--card-border);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+    .borrow-details-card:hover {
+      border-color: var(--gold);
+      box-shadow: var(--shadow-md);
+    }
+    .card-header-section {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1.5px solid var(--card-border);
+    }
+    .card-header-section i {
+      color: var(--gold);
+      font-size: 1.125rem;
+    }
+    .borrow-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    .borrow-detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .borrow-detail-item.full-width {
+      grid-column: 1 / -1;
+    }
+    .borrow-detail-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .borrow-detail-label i {
+      color: var(--gold);
+      font-size: 0.875rem;
+      width: 18px;
+      text-align: center;
+    }
+    .borrow-detail-value {
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+      font-weight: 500;
+      padding: 10px 14px;
+      background: #f3f4f6;
+      border-radius: var(--border-radius-sm);
+      border: 1.5px solid #e5e7eb;
+      min-height: 42px;
+      display: flex;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    .borrow-detail-value:hover {
+      background: #e5e7eb;
+    }
+    .borrow-detail-value:empty::before {
+      content: 'Not available';
+      color: var(--text-muted);
+      font-style: italic;
+      font-weight: 400;
+    }
+    .quantity-display {
+      font-size: 0.875rem !important;
+      font-weight: 700 !important;
+      color: #065f46 !important;
+      text-align: center;
+      background: #d1fae5 !important;
+      border-color: #10b981 !important;
+    }
+    
+    /* Borrow Duration Card - Consistent Colors */
+    .borrow-duration-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      border: 1.5px solid var(--card-border);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .duration-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .borrow-duration-select {
+      padding: 12px 16px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      border: 1.5px solid var(--gold);
+      border-radius: var(--border-radius-sm);
+      background: var(--card-bg);
+      color: var(--text-primary);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .borrow-duration-select:hover {
+      border-color: var(--gold-dark);
+    }
+    .borrow-duration-select:focus {
+      border-color: var(--gold-dark);
+      box-shadow: 0 0 0 3px rgba(166,134,4,0.1);
+      outline: none;
+    }
+    .duration-options {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .duration-option {
+      flex: 1;
+      min-width: 90px;
+      padding: 10px 14px;
+      border-radius: var(--border-radius-sm);
+      border: 1.5px solid var(--card-border);
+      background: var(--card-bg);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .duration-option:hover {
+      border-color: #a68604;
+      background: #fffef0;
+    }
+    .duration-option.active {
+      border-color: #a68604 !important;
+      background: #a68604 !important;
+      color: #fff !important;
+      box-shadow: 0 2px 8px rgba(166,134,4,0.3) !important;
+    }
+    .duration-option.active i {
+      color: #fff !important;
+    }
+    .duration-option.active span {
+      color: #fff !important;
+    }
+    .duration-option i {
+      font-size: 1.25rem;
+      color: var(--text-primary);
+      transition: color 0.2s ease;
+    }
+    .duration-option span {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      transition: color 0.2s ease;
+    }
+    .borrow-duration-help {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      padding: 8px 12px;
+      background: var(--card-bg);
+      border-radius: var(--border-radius-sm);
+      border: 1px solid var(--card-border);
+    }
+    .borrow-duration-help i {
+      color: var(--gold);
+      font-size: 0.9375rem;
+    }
+    
+    /* Borrow Action Section */
+    .borrow-action-section {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 2px solid var(--card-border);
+      text-align: center;
+    }
+    .btn-borrow-request {
+      padding: 12px 32px;
+      font-size: 0.9375rem;
+      font-weight: 700;
+      border-radius: var(--border-radius-sm);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #a68604 !important;
+      border: 2px solid #a68604 !important;
+      color: #fff !important;
+    }
+    .btn-borrow-request:not(:hover):not(:active):not(:focus):not(:disabled) {
+      background: #a68604 !important;
+      border-color: #a68604 !important;
+      color: #fff !important;
+    }
+    .btn-borrow-request:hover:not(:disabled) {
+      background: #8d7003 !important;
+      border-color: #8d7003 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(166,134,4,0.3);
+      color: #fff !important;
+    }
+    .btn-borrow-request:active:not(:disabled) {
+      transform: translateY(0);
+      background: #8d7003 !important;
+      border-color: #8d7003 !important;
+      color: #fff !important;
+    }
+    .btn-borrow-request:focus {
+      background: #a68604 !important;
+      border-color: #a68604 !important;
+      color: #fff !important;
+      box-shadow: 0 0 0 3px rgba(166,134,4,0.25);
+    }
+    .btn-borrow-request:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: var(--text-muted) !important;
+      border-color: var(--text-muted) !important;
+      color: #fff !important;
+    }
+    .borrow-action-help {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-top: 12px;
+      text-align: center;
+    }
+    .borrow-action-help i {
+      color: var(--gold);
+      font-size: 0.9375rem;
+    }
+    
+    @media (min-width: 992px) {
+      .borrow-modal-cover {
+        max-width: 160px;
+      }
+      .borrow-details-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 991.98px) {
+      .borrow-modal-body {
+        padding: 20px;
+      }
+      .borrow-cover-section {
+        position: relative;
+        top: 0;
+      }
+      .borrow-details-grid {
+        grid-template-columns: 1fr;
+      }
+      .borrow-book-title {
+        font-size: 1.25rem;
+      }
+      .duration-options {
+        flex-direction: column;
+      }
+      .duration-option {
+        width: 100%;
+      }
+    }
     .request-section {
       margin-bottom: 28px;
     }
@@ -980,14 +1454,34 @@
       font-size:1.25rem;
       letter-spacing:-0.01em;
     }
-    #borrowModal .modal-header-dark .btn-close{
+    #borrowModal .modal-header-dark .btn-close,
+    #borrowModal .modal-header-dark .btn-close-custom{
       filter:invert(1) grayscale(1);
-      opacity:0.7;
+      opacity:0.8;
       transition:opacity 0.2s ease;
-      padding:8px;
+      padding:4px;
+      background:none !important;
+      border:none !important;
+      box-shadow:none !important;
+      width:1.25rem;
+      height:1.25rem;
+      background-size:1rem 1rem !important;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
-    #borrowModal .modal-header-dark .btn-close:hover{
+    #borrowModal .modal-header-dark .btn-close::before,
+    #borrowModal .modal-header-dark .btn-close-custom::before{
+      content:'×';
+      font-size:1.5rem;
+      line-height:1;
+      font-weight:300;
+    }
+    #borrowModal .modal-header-dark .btn-close:hover,
+    #borrowModal .modal-header-dark .btn-close-custom:hover{
       opacity:1;
+      background:none !important;
+      box-shadow:none !important;
     }
 
     /* Modern Form Styling */
@@ -1129,17 +1623,6 @@
       <div class="fw-bold h5 mb-0" id="pageTitle">Books</div>
 
       <div class="ms-auto d-flex align-items-center gap-2">
-        <div class="dropdown me-2">
-          <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
-            <i class="bi bi-bell fs-5"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
-            <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
-            <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
-          </ul>
-    </div>
-
         <div class="dropdown">
           <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:50%;">
             <img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
@@ -1194,20 +1677,6 @@
             <span class="badge px-3 py-2" style="background:var(--brand-gold); color:#fff; font-size:0.875rem; font-weight:600; border-radius:999px; white-space:nowrap;" id="countInfo">0 total</span>
           </div>
         </div>
-      </div>
-
-      <!-- Recommendation Section -->
-      <div class="section-spacing">
-        <div class="d-flex align-items-center justify-content-between mb-3">
-          <span class="badge" style="background:var(--brand-gold); color:#fff; padding:8px 16px; font-size:0.875rem; font-weight:600; border-radius:999px;">
-            Recommendation
-          </span>
-          <button id="seeAll" class="btn btn-link btn-sm p-0 d-flex align-items-center gap-1" style="color:var(--brand-gold); text-decoration:none; font-weight:600; transition:all 0.2s ease;">
-            <span>See All</span>
-            <i class="bi bi-arrow-right"></i>
-          </button>
-        </div>
-        <div id="recStrip" class="h-scroll gap-3"></div>
       </div>
 
       <!-- Categories Section -->
@@ -1297,8 +1766,9 @@
 
                   <div class="col-12 col-md-6">
                     <label class="form-label fw-medium">ISBN</label>
-                    <input id="isbn" name="isbn" type="text" class="form-control form-control-enhanced" placeholder="e.g., 978-0-123456-78-9" required>
-                    <div class="invalid-feedback">ISBN is required.</div>
+                    <input id="isbn" name="isbn" type="text" class="form-control form-control-enhanced" placeholder="e.g., 978-0-123456-78-9" maxlength="20" required>
+                    <div class="invalid-feedback" id="isbnError">ISBN is required.</div>
+                    <small id="isbnFormatHelp" class="form-text text-muted">You can enter ISBN-13 with or without dashes (e.g., 978-0-123456-78-9 or 9780123456789)</small>
                     <small id="isbnHelpText" class="form-text text-muted" style="display: none;">
                       <i class="bi bi-lock-fill me-1"></i>ISBN cannot be changed when editing a book.
                     </small>
@@ -1335,8 +1805,9 @@
                     <div class="invalid-feedback">Publisher is required.</div>
                   </div>
                   <div class="col-12 col-md-6">
-                    <label class="form-label fw-medium">Date Published</label>
-                    <input id="publishedAt" name="date_published" type="date" class="form-control form-control-enhanced">
+                    <label class="form-label fw-medium">Date Published <span class="text-danger">*</span></label>
+                    <input id="publishedAt" name="date_published" type="date" class="form-control form-control-enhanced" required>
+                    <div class="invalid-feedback">Date Published is required.</div>
                     <small id="datePublishedHelpText" class="form-text text-muted" style="display: none;">
                       <i class="bi bi-lock-fill me-1"></i>Date Published cannot be changed when editing a book.
                     </small>
@@ -1423,32 +1894,8 @@
               <div id="modalCatChips" class="chips-container"></div>
             </div>
 
-            <!-- Tabs Navigation -->
-            <ul class="nav nav-tabs mb-4" id="allBooksTabs" role="tablist" style="justify-content:center; gap:24px; border-bottom:2px solid #e5e7eb;">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="recommendation-tab" data-bs-toggle="tab" data-bs-target="#recommendation-pane" type="button" role="tab" aria-controls="recommendation-pane" aria-selected="true">
-                  Recommendation
-                </button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="booklist-tab" data-bs-toggle="tab" data-bs-target="#booklist-pane" type="button" role="tab" aria-controls="booklist-pane" aria-selected="false">
-                  Book List Grid
-                </button>
-              </li>
-            </ul>
-
-            <!-- Tab Content -->
-            <div class="tab-content" id="allBooksTabContent">
-              <!-- Recommendation Tab Pane -->
-              <div class="tab-pane fade show active" id="recommendation-pane" role="tabpanel" aria-labelledby="recommendation-tab" tabindex="0">
-                <div id="modalRecStrip" class="book-grid" style="gap:16px; justify-content:center;"></div>
-              </div>
-
-              <!-- Book List Grid Tab Pane -->
-              <div class="tab-pane fade" id="booklist-pane" role="tabpanel" aria-labelledby="booklist-tab" tabindex="0">
-                <div id="modalBookGrid" class="book-grid" style="gap:16px; justify-content:center;"></div>
-              </div>
-            </div>
+            <!-- Book List Grid -->
+            <div id="modalBookGrid" class="book-grid" style="gap:16px; justify-content:center;"></div>
           </div>
         </div>
       </div>
@@ -1456,37 +1903,148 @@
 
     <!-- Borrow Request Modal (Student only) -->
     <div class="modal fade" id="borrowModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header modal-header-dark">
             <h5 class="modal-title">Request to Borrow Book</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close btn-close-custom" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
-          <div class="modal-body">
-            <div class="book-info-item">
-              <div class="info-label">Book</div>
-              <div class="info-value fw-semibold" id="borrowBookTitle">—</div>
-            </div>
-            <div class="book-info-item">
-              <div class="info-label">Author</div>
-              <div class="info-value" id="borrowBookAuthor">—</div>
-            </div>
-            <div class="book-info-item">
-              <div class="info-label">Quantity Available</div>
-              <div class="info-value" id="borrowBookQuantity">—</div>
-            </div>
-            <div class="book-info-item">
-              <label class="form-label">Borrow Duration</label>
-              <select id="borrowDuration" class="form-select" required>
-                <option value="3">3 days</option>
-                <option value="7" selected>7 days</option>
-                <option value="14">14 days</option>
-              </select>
+          <div class="modal-body borrow-modal-body">
+            <div class="row g-4">
+              <!-- Book Cover Column -->
+              <div class="col-12 col-lg-4">
+                <div class="borrow-cover-section">
+                  <div class="book-cover-wrapper mb-4">
+                    <img id="borrowBookCover" src="assets/img/no-cover.png" alt="Book cover" class="borrow-modal-cover" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+                    <div class="cover-overlay">
+                      <i class="bi bi-book"></i>
+                    </div>
+                  </div>
+                  <div class="availability-card" id="borrowAvailabilityBadge">
+                    <div class="availability-icon">
+                      <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                    <div class="availability-content">
+                      <div class="availability-label">Status</div>
+                      <div class="availability-text" id="borrowAvailabilityText">Available for Request</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- Book Info Column -->
+              <div class="col-12 col-lg-8">
+                <!-- Main Book Info -->
+                <div class="borrow-book-header">
+                  <div class="book-title-section">
+                    <h4 class="borrow-book-title" id="borrowBookTitle">—</h4>
+                    <div class="borrow-book-author" id="borrowBookAuthor">—</div>
+                  </div>
+                </div>
+
+                <!-- Book Details Cards -->
+                <div class="borrow-details-container">
+                  <div class="borrow-details-card">
+                    <div class="card-header-section">
+                      <i class="bi bi-info-circle-fill"></i>
+                      <span>Book Information</span>
+                    </div>
+                    <div class="borrow-details-grid">
+                      <div class="borrow-detail-item">
+                        <div class="borrow-detail-label">
+                          <i class="bi bi-upc-scan"></i>
+                          <span>ISBN</span>
+                        </div>
+                        <div class="borrow-detail-value" id="borrowBookIsbn">—</div>
+                      </div>
+                      <div class="borrow-detail-item">
+                        <div class="borrow-detail-label">
+                          <i class="bi bi-tag-fill"></i>
+                          <span>Category</span>
+                        </div>
+                        <div class="borrow-detail-value" id="borrowBookCategory">—</div>
+                      </div>
+                      <div class="borrow-detail-item">
+                        <div class="borrow-detail-label">
+                          <i class="bi bi-building"></i>
+                          <span>Publisher</span>
+                        </div>
+                        <div class="borrow-detail-value" id="borrowBookPublisher">—</div>
+                      </div>
+                      <div class="borrow-detail-item">
+                        <div class="borrow-detail-label">
+                          <i class="bi bi-calendar3"></i>
+                          <span>Published Date</span>
+                        </div>
+                        <div class="borrow-detail-value" id="borrowBookPublished">—</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="borrow-details-card">
+                    <div class="card-header-section">
+                      <i class="bi bi-box-seam-fill"></i>
+                      <span>Availability</span>
+                    </div>
+                    <div class="borrow-details-grid">
+                      <div class="borrow-detail-item full-width">
+                        <div class="borrow-detail-label">
+                          <i class="bi bi-stack"></i>
+                          <span>Copies Available</span>
+                        </div>
+                        <div class="borrow-detail-value quantity-display" id="borrowBookQuantity">—</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Requested Borrow Duration Section -->
+                <div class="borrow-duration-card">
+                  <div class="card-header-section">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Requested Borrow Duration</span>
+                  </div>
+                  <div class="duration-content">
+                    <select id="borrowDuration" class="form-select borrow-duration-select" required>
+                      <option value="3">3 days</option>
+                      <option value="7" selected>7 days</option>
+                      <option value="14">14 days</option>
+                    </select>
+                    <div class="duration-options">
+                      <div class="duration-option" data-days="3">
+                        <i class="bi bi-calendar-day"></i>
+                        <span>3 Days</span>
+                      </div>
+                      <div class="duration-option active" data-days="7">
+                        <i class="bi bi-calendar-week"></i>
+                        <span>7 Days</span>
+                      </div>
+                      <div class="duration-option" data-days="14">
+                        <i class="bi bi-calendar-month"></i>
+                        <span>14 Days</span>
+                      </div>
+                    </div>
+                    <small class="borrow-duration-help">
+                      <i class="bi bi-info-circle me-1"></i>
+                      Select your preferred borrow duration. Final approval and due date will be confirmed by the librarian.
+                    </small>
+                  </div>
+                </div>
+
+                <!-- Primary Action Button -->
+                <div class="borrow-action-section">
+                  <button type="button" class="btn btn-borrow-request" id="btnSubmitBorrowRequest" style="background: #a68604 !important; border-color: #a68604 !important; color: #fff !important;">
+                    <i class="bi bi-book me-2"></i>
+                    <span>Request to Borrow</span>
+                  </button>
+                  <small class="borrow-action-help">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Your request will be reviewed by a librarian before approval.
+                  </small>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-primary" id="btnConfirmBorrow">Confirm Borrow</button>
+          <div class="modal-footer d-none">
           </div>
         </div>
       </div>
@@ -1614,6 +2172,7 @@
 
 <!-- Vendor JS -->
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/logout.js"></script>
 
 <script>
 async function getMe(){
@@ -1647,6 +2206,57 @@ function initBooks(role){
   const API_FAVORITE = '/api/favorites/toggle';
 
   const canManage = () => role === 'librarian';
+
+  // ISBN Validation Functions (ISBN-13 only)
+  function validateISBN(isbn) {
+    // 1. Required Field
+    if (!isbn || !isbn.trim()) {
+      return { valid: false, error: 'ISBN is required.' };
+    }
+
+    // Auto-trim whitespace
+    isbn = isbn.trim();
+
+    // 2. Allowed Characters (only digits, hyphens, and spaces - no X allowed for ISBN-13)
+    if (!/^[0-9\s\-]+$/.test(isbn)) {
+      return { valid: false, error: 'ISBN can only contain numbers, hyphens, and spaces.' };
+    }
+
+    // 3. Clean Format: Remove hyphens and spaces
+    let cleaned = isbn.replace(/[\s\-]/g, '');
+
+    // 4. Check length (must be exactly 13 digits)
+    if (cleaned.length !== 13) {
+      return { valid: false, error: 'ISBN must contain exactly 13 digits.' };
+    }
+
+    // 5. Validate ISBN-13
+    return validateISBN13(cleaned);
+  }
+
+  function validateISBN13(isbn) {
+    // Character rules: ISBN-13 must be digits only (no X allowed)
+    if (!/^[0-9]{13}$/.test(isbn)) {
+      return { valid: false, error: 'Invalid character in ISBN. ISBN-13 must contain only digits.' };
+    }
+
+    // Checksum validation for ISBN-13
+    let sum = 0;
+    for (let i = 0; i < 12; i++) {
+      const digit = parseInt(isbn[i]);
+      const multiplier = (i % 2 === 0) ? 1 : 3;
+      sum += digit * multiplier;
+    }
+
+    const checkDigit = (10 - (sum % 10)) % 10;
+    const actualCheckDigit = parseInt(isbn[12]);
+
+    if (checkDigit !== actualCheckDigit) {
+      return { valid: false, error: 'Please enter a valid ISBN-13.' };
+    }
+
+    return { valid: true, error: null };
+  }
 
   const tabDiscover = document.getElementById('tabDiscover');
   const tabAdd      = document.getElementById('tabAdd');
@@ -1702,7 +2312,6 @@ function initBooks(role){
   btnGoDiscover && (btnGoDiscover.onclick = showDiscover);
 
   const qInput    = document.getElementById('q');
-  const recStrip  = document.getElementById('recStrip');
   const grid      = document.getElementById('grid');
   const catChips  = document.getElementById('catChips');
 
@@ -1828,10 +2437,12 @@ function initBooks(role){
     if (!url) return 'assets/img/no-cover.png';
     // If already a full URL or starts with /, use as-is
     if (url.startsWith('http') || url.startsWith('/')) {
-      return url;
+      // Add a tiny cache-buster to ensure updated covers appear immediately
+      const cb = `cb=${Date.now()}`;
+      return url.includes('?') ? `${url}&${cb}` : `${url}?${cb}`;
     }
     // Otherwise, assume it's a filename and prepend the path
-    return '/uploads/covers/' + url;
+    return `/uploads/covers/${url}?cb=${Date.now()}`;
   };
   const renderHeart = (book)=>{
     if (role!=='student') return '';
@@ -1852,28 +2463,6 @@ function initBooks(role){
     });
   }
 
-  async function loadRecommended(){
-    const url = `${API_LIST}?page=1&pagesize=12&q=&category=`;
-    const data = await fetch(url,{credentials:'include'}).then(r=>r.json()).catch(()=>({ok:false}));
-    if (!data.ok){ recStrip.innerHTML = `<div class="empty w-100">Failed to load.</div>`; return; }
-    recStrip.innerHTML = data.items.map(b=>{
-      const cover = fixCoverUrl(b.cover_url);
-      const t = esc(b.title||''), a = esc(b.author||'');
-      return `
-        <div class="rec-card p-2">
-          <div class="cover-wrap position-relative" role="button" onclick='showDetails(${b.id})'>
-            <img src="${cover}" alt="${t}">
-            ${renderHeart(b)}
-          </div>
-          <div class="p-1">
-            <div class="title text-truncate" title="${t}">${t}</div>
-            <div class="meta text-truncate">${a||'Unknown'}</div>
-            <div class="stars mt-1">${renderStars(b.rating || 4)}</div>
-          </div>
-        </div>`;
-    }).join('');
-    bindFavoriteButtons();
-  }
 
   // Sort items based on state.sort
   function sortItems(items) {
@@ -1891,7 +2480,34 @@ function initBooks(role){
     }
   }
 
+  // Render skeleton book cards
+  function renderSkeletonCards(count = 8) {
+    return Array.from({length: count}, () => `
+      <div class="grid-item">
+        <div class="book-card p-2 skeleton-book-card">
+          <div class="cover-wrap position-relative">
+            <div class="skeleton-cover"></div>
+          </div>
+          <div class="p-2 details">
+            <div class="skeleton-line long"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line short" style="width: 50%; margin-top: 4px;"></div>
+          </div>
+          ${canManage() ? `
+          <div class="card-actions">
+            <div class="skeleton-button"></div>
+            <div class="skeleton-button"></div>
+          </div>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
   async function loadGrid(){
+    // Show skeleton loaders while fetching
+    grid.innerHTML = renderSkeletonCards(8);
+    
     const url = `${API_LIST}?page=${state.page}&pagesize=${state.pagesize}&q=${encodeURIComponent(state.q)}&category=${encodeURIComponent(state.cat)}`;
     const data = await fetch(url,{credentials:'include'}).then(r=>r.json()).catch(()=>({ok:false}));
     if (!data.ok){ grid.innerHTML = `<div class="empty w-100">Failed to load.</div>`; return; }
@@ -1904,16 +2520,17 @@ function initBooks(role){
       const cover = fixCoverUrl(b.cover_url);
       const t = esc(b.title||''), a = esc(b.author||''), c = esc(b.category||''), i = esc(b.isbn||'');
       return `
-        <div class="grid-item">
+        <div class="grid-item fade-in">
           <div class="book-card p-2">
             <div class="cover-wrap position-relative" role="button" onclick='showDetails(${b.id})'>
               <img class="thumb-lg" src="${cover}" alt="${t}" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
               ${renderHeart(b)}
             </div>
-            <div class="p-2">
-              <div class="title text-truncate" title="${t}">${t}</div>
-              <div class="meta text-truncate">${a||'Unknown author'}</div>
-              <div class="meta">${c}${c&&i?' • ':''}${i?('ISBN: '+i):''}</div>
+            <div class="p-2 details">
+              <div class="title clamp-2" title="${t}">${t}</div>
+              <div class="meta author">${a||'Unknown author'}</div>
+              <div class="meta genre">${c||'—'}</div>
+              ${i ? `<div class="meta isbn">ISBN: ${i}</div>` : ''}
             </div>
             ${canManage() ? `
             <div class="card-actions">
@@ -1922,7 +2539,7 @@ function initBooks(role){
             </div>` : ''}
           </div>
         </div>`;
-    }).join('') : `<div class="empty w-100">No books found.</div>`;
+    }).join('') : `<div class="empty w-100 fade-in">No books found.</div>`;
 
     document.getElementById('countInfo').textContent = `${data.total.toLocaleString()} total`;
     const start=(data.page-1)*data.pagesize+1, end=Math.min(data.total, data.page*data.pagesize);
@@ -2140,7 +2757,6 @@ btn.onclick = async (e)=>{
 
           if (data?.ok){
             await loadGrid();
-            await loadRecommended();
 
             // success modal
             const modalEl = document.getElementById('deleteSuccessModal');
@@ -2175,12 +2791,22 @@ btn.onclick = async (e)=>{
   async function startEdit(b){
     // If b is a number (ID), fetch fresh data from API
     if (typeof b === 'number' || (typeof b === 'string' && /^\d+$/.test(b))) {
+      // Convert to number and validate
+      const bookId = typeof b === 'number' ? b : parseInt(b, 10);
+      if (isNaN(bookId) || bookId <= 0) {
+        alert('Error: Invalid book ID. Please try again.');
+        console.error('Invalid book ID in startEdit:', b);
+        return;
+      }
       try {
-        const bookRes = await fetch(`${API_EDIT}/${b}`, {
+        const bookRes = await fetch(`${API_EDIT}/${bookId}`, {
           method: 'GET',
           credentials: 'include',
           headers: { 'Accept': 'application/json' }
         });
+        if (!bookRes.ok) {
+          throw new Error(`HTTP ${bookRes.status}: ${bookRes.statusText}`);
+        }
         const bookData = await bookRes.json();
         if (bookData.ok && bookData.data) {
           b = bookData.data;
@@ -2190,6 +2816,7 @@ btn.onclick = async (e)=>{
         }
       } catch (err) {
         alert('Failed to load book data: ' + err.message);
+        console.error('Error fetching book data:', err);
         return;
       }
     }
@@ -2221,6 +2848,7 @@ btn.onclick = async (e)=>{
     }
     const isbnField = document.getElementById('isbn');
     const isbnHelpText = document.getElementById('isbnHelpText');
+    const isbnFormatHelp = document.getElementById('isbnFormatHelp');
     isbnField.value = b.isbn || '';
     // Disable ISBN field when editing - ISBN cannot be changed
     isbnField.readOnly = true;
@@ -2231,6 +2859,10 @@ btn.onclick = async (e)=>{
     isbnField.style.opacity = '0.8';
     // Remove required attribute when editing since ISBN cannot be changed
     isbnField.removeAttribute('required');
+    // Hide format help text when editing
+    if (isbnFormatHelp) {
+      isbnFormatHelp.style.display = 'none';
+    }
     // Show helper text
     if (isbnHelpText) {
       isbnHelpText.style.display = 'block';
@@ -2283,6 +2915,7 @@ btn.onclick = async (e)=>{
     // Disable Date Published field when editing - Date Published cannot be changed
     datePublishedField.readOnly = true;
     datePublishedField.setAttribute('readonly', 'readonly');
+    datePublishedField.removeAttribute('required'); // Remove required when editing
     datePublishedField.classList.add('bg-light');
     datePublishedField.style.backgroundColor = '#f3f4f6';
     datePublishedField.style.cursor = 'not-allowed';
@@ -2359,44 +2992,12 @@ btn.onclick = async (e)=>{
 
   // Load all books into modal
   async function loadAllBooksModal() {
-    const modalRecStrip = document.getElementById('modalRecStrip');
     const modalBookGrid = document.getElementById('modalBookGrid');
     const modalCatChips = document.getElementById('modalCatChips');
     
     // Render category chips
     renderModalChips();
     
-    // Load recommended books
-    try {
-      const recUrl = `${API_LIST}?page=1&pagesize=100&q=&category=`;
-      const recData = await fetch(recUrl, {credentials:'include'}).then(r=>r.json()).catch(()=>({ok:false}));
-      if (recData.ok && recData.items) {
-        modalRecStrip.innerHTML = recData.items.map(b=>{
-          const cover = fixCoverUrl(b.cover_url);
-          const t = esc(b.title||''), a = esc(b.author||'');
-          return `
-            <div class="grid-item">
-              <div class="book-card p-2">
-                <div class="cover-wrap position-relative" role="button" onclick='showDetails(${b.id}); bootstrap.Modal.getInstance("#allBooksModal")?.hide();'>
-                  <img class="thumb-lg" src="${cover}" alt="${t}" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
-                  ${renderHeart(b)}
-                </div>
-                <div class="p-2">
-                  <div class="title text-truncate" title="${t}">${t}</div>
-                  <div class="meta text-truncate">${a||'Unknown author'}</div>
-                  <div class="meta">${esc(b.category||'')}${b.category&&b.isbn?' • ':''}${b.isbn?('ISBN: '+esc(b.isbn)) : ''}</div>
-                </div>
-              </div>
-            </div>`;
-        }).join('');
-        bindFavoriteButtons();
-      } else {
-        modalRecStrip.innerHTML = '<div class="empty w-100">No recommended books found.</div>';
-      }
-    } catch (e) {
-      modalRecStrip.innerHTML = '<div class="empty w-100">Failed to load recommended books.</div>';
-    }
-
     // Load all books
     try {
       const allUrl = `${API_LIST}?page=1&pagesize=1000&q=&category=`;
@@ -2474,11 +3075,6 @@ btn.onclick = async (e)=>{
     renderModalChips();
   }
 
-  document.getElementById('seeAll').onclick = async ()=>{
-    const allBooksModal = new bootstrap.Modal('#allBooksModal');
-    await loadAllBooksModal();
-    allBooksModal.show();
-  };
   qInput.addEventListener('input', e=>{ state.q=e.target.value.trim(); state.page=1; loadGrid(); });
 
   // details offcanvas
@@ -2487,23 +3083,42 @@ btn.onclick = async (e)=>{
   window.showDetails = async function(b){
     // If b is a number (ID), fetch fresh data from API
     if (typeof b === 'number' || (typeof b === 'string' && /^\d+$/.test(b))) {
+      // Convert to number and validate
+      const bookId = typeof b === 'number' ? b : parseInt(b, 10);
+      if (isNaN(bookId) || bookId <= 0) {
+        console.error('Invalid book ID in showDetails:', b);
+        alert('Error: Invalid book ID. Please try again.');
+        return;
+      }
       try {
-        const bookRes = await fetch(`${API_EDIT}/${b}`, {
+        const bookRes = await fetch(`${API_EDIT}/${bookId}`, {
           method: 'GET',
           credentials: 'include',
           headers: { 'Accept': 'application/json' }
         });
+        if (!bookRes.ok) {
+          throw new Error(`HTTP ${bookRes.status}: ${bookRes.statusText}`);
+        }
         const bookData = await bookRes.json();
         if (bookData.ok && bookData.data) {
           b = bookData.data; // Use fresh data from API
         } else {
           console.error('Failed to fetch book details:', bookData.error || 'Unknown error');
+          alert('Failed to load book details: ' + (bookData.error || 'Unknown error'));
           return;
         }
       } catch (err) {
         console.error('Error fetching book details:', err);
+        alert('Failed to load book details: ' + err.message);
         return;
       }
+    }
+    
+    // Validate that b has an id property
+    if (!b || !b.id) {
+      console.error('Invalid book object in showDetails:', b);
+      alert('Error: Invalid book data. Please try again.');
+      return;
     }
     
     const cover = fixCoverUrl(b.cover_url);
@@ -2589,10 +3204,144 @@ btn.onclick = async (e)=>{
           const bookTitle = btnBorrow.dataset.bookTitle;
           
           // Populate borrow modal
+          const cover = fixCoverUrl(b.cover_url);
+          const quantity = b.quantity ?? 0;
+          
+          // Set cover image
+          document.getElementById('borrowBookCover').src = cover || 'assets/img/no-cover.png';
+          
+          // Set main info
           document.getElementById('borrowBookTitle').textContent = bookTitle;
           document.getElementById('borrowBookAuthor').textContent = b.author || '—';
-          document.getElementById('borrowBookQuantity').textContent = (b.quantity ?? 0) + ' available';
-          document.getElementById('borrowDuration').value = '7'; // Reset to default
+          
+          // Set additional details
+          document.getElementById('borrowBookIsbn').textContent = b.isbn || '—';
+          document.getElementById('borrowBookCategory').textContent = b.category || '—';
+          document.getElementById('borrowBookPublisher').textContent = b.publisher || '—';
+          if (b.published_at || b.date_published) {
+            const pubDate = new Date(b.published_at || b.date_published);
+            document.getElementById('borrowBookPublished').textContent = pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+          } else {
+            document.getElementById('borrowBookPublished').textContent = '—';
+          }
+          document.getElementById('borrowBookQuantity').textContent = `${quantity} ${quantity === 1 ? 'copy' : 'copies'} available`;
+          
+          // Set availability badge
+          const availabilityBadge = document.getElementById('borrowAvailabilityBadge');
+          const availabilityText = document.getElementById('borrowAvailabilityText');
+          const availabilityIcon = availabilityBadge.querySelector('.availability-icon i');
+          const submitButton = document.getElementById('btnSubmitBorrowRequest');
+          
+          if (quantity > 5) {
+            availabilityBadge.className = 'availability-card';
+            availabilityText.textContent = 'Available for Request';
+            if (availabilityIcon) {
+              availabilityIcon.className = 'bi bi-check-circle-fill';
+            }
+            if (submitButton) {
+              submitButton.disabled = false;
+            }
+          } else if (quantity > 0) {
+            availabilityBadge.className = 'availability-card warning';
+            availabilityText.textContent = 'Low Stock (Request Required)';
+            if (availabilityIcon) {
+              availabilityIcon.className = 'bi bi-exclamation-triangle-fill';
+            }
+            if (submitButton) {
+              submitButton.disabled = false;
+            }
+          } else {
+            availabilityBadge.className = 'availability-card danger';
+            availabilityText.textContent = 'Not Available';
+            if (availabilityIcon) {
+              availabilityIcon.className = 'bi bi-x-circle-fill';
+            }
+            if (submitButton) {
+              submitButton.disabled = true;
+              submitButton.innerHTML = '<i class="bi bi-x-circle me-2"></i><span>Not Available</span>';
+            }
+          }
+          
+          // Check if student already has an active loan for this book
+          // This would need to be checked via API call
+          // For now, we'll enable/disable based on quantity only
+          
+          // Duration option click handlers
+          const durationOptions = document.querySelectorAll('.duration-option');
+          const durationSelect = document.getElementById('borrowDuration');
+          durationOptions.forEach(option => {
+            option.addEventListener('click', function() {
+              const days = this.dataset.days;
+              durationSelect.value = days;
+              durationOptions.forEach(opt => opt.classList.remove('active'));
+              this.classList.add('active');
+            });
+          });
+          
+          // Update active state when select changes
+          durationSelect.addEventListener('change', function() {
+            durationOptions.forEach(opt => {
+              opt.classList.toggle('active', opt.dataset.days === this.value);
+            });
+          });
+          
+          // Reset duration to default
+          document.getElementById('borrowDuration').value = '7';
+          durationOptions.forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.days === '7');
+          });
+          
+          // Submit borrow request button handler - attach to new button
+          const newSubmitButton = document.getElementById('btnSubmitBorrowRequest');
+          if (newSubmitButton) {
+            newSubmitButton.addEventListener('click', async function() {
+              const bookId = modalEl?.dataset.currentBookId;
+              if (!bookId) return;
+              
+              const duration = parseInt(document.getElementById('borrowDuration').value);
+              if (!duration || duration < 1) {
+                alert('Please select a valid borrow duration.');
+                return;
+              }
+              
+              // Disable button during request
+              newSubmitButton.disabled = true;
+              const originalText = newSubmitButton.innerHTML;
+              newSubmitButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Submitting...';
+              
+              try {
+                const fd = new FormData();
+                fd.set('book_id', bookId);
+                fd.set('duration_days', String(duration));
+                
+                const res = await fetch('/api/borrow-requests', {
+                  method: 'POST',
+                  body: fd,
+                  credentials: 'include'
+                });
+                
+                const data = await res.json().catch(() => null);
+                if (data?.ok) {
+                  bootstrap.Modal.getInstance('#borrowModal')?.hide();
+                  bootstrap.Offcanvas.getInstance('#bookDetails')?.hide();
+                  alert('Borrow request submitted successfully! The librarian will review your request.');
+                  // Reload page or update UI
+                  if (typeof loadGrid === 'function') {
+                    loadGrid();
+                  }
+                } else {
+                  alert(data?.error || 'Failed to submit borrow request. Please try again.');
+                  newSubmitButton.disabled = false;
+                  newSubmitButton.innerHTML = originalText;
+                }
+              } catch (err) {
+                console.error('Error submitting borrow request:', err);
+                alert('Network error: ' + err.message);
+                newSubmitButton.disabled = false;
+                newSubmitButton.innerHTML = originalText;
+              }
+            });
+          }
           
           // Store book data for submit
           const borrowModal = new bootstrap.Modal('#borrowModal');
@@ -2611,13 +3360,26 @@ btn.onclick = async (e)=>{
       if (btnEdit) {
         btnEdit.onclick = async function() {
           const bookId = btnEdit.dataset.bookId;
+          // Validate bookId before proceeding
+          if (!bookId || bookId === 'undefined' || bookId === 'null' || isNaN(bookId)) {
+            console.error('Invalid book ID:', bookId);
+            alert('Error: Invalid book ID. Please try again.');
+            return;
+          }
+          // Convert to number for consistency
+          const bookIdNum = parseInt(bookId, 10);
+          if (isNaN(bookIdNum) || bookIdNum <= 0) {
+            console.error('Invalid book ID:', bookId);
+            alert('Error: Invalid book ID. Please try again.');
+            return;
+          }
           // Store that we're editing from the panel before closing it
           // This helps the refresh logic know to reopen the panel after edit
           window.editingFromPanel = true;
-          window.editingPanelBookId = bookId;
+          window.editingPanelBookId = bookIdNum;
           bootstrap.Offcanvas.getInstance('#bookDetails')?.hide();
           // Fetch fresh data from API before editing
-          await startEdit(bookId);
+          await startEdit(bookIdNum);
         };
       }
       
@@ -2647,7 +3409,6 @@ btn.onclick = async (e)=>{
             if (data?.ok) {
               bootstrap.Offcanvas.getInstance('#bookDetails')?.hide();
               await loadGrid();
-              await loadRecommended();
               
               // success modal
               const modalEl = document.getElementById('deleteSuccessModal');
@@ -2759,6 +3520,24 @@ btn.onclick = async (e)=>{
       // Only validate form when creating new books (all fields required)
       // When editing, fields are optional - librarian can update any field they want
       if (!isEditing) {
+        // Validate ISBN before form submission
+        const isbnField = document.getElementById('isbn');
+        if (isbnField) {
+          const isbnValidation = validateISBN(isbnField.value);
+          if (!isbnValidation.valid) {
+            isbnField.setCustomValidity(isbnValidation.error);
+            isbnField.classList.add('is-invalid');
+            const isbnError = document.getElementById('isbnError');
+            if (isbnError) {
+              isbnError.textContent = isbnValidation.error;
+            }
+            form.classList.add('was-validated');
+            return;
+          } else {
+            isbnField.setCustomValidity('');
+            isbnField.classList.remove('is-invalid');
+          }
+        }
         form.classList.add('was-validated');
         if (!form.checkValidity()) return;
       }
@@ -2785,48 +3564,36 @@ btn.onclick = async (e)=>{
         return;
       }
       
-      // Create FormData and only include fields that have values
-      const fd = new FormData();
+      // For editing: use FormData with _method=PUT so Laravel parses fields; for creating: FormData with file
+      let fd = new FormData();
       
-      // For editing: only send fields that have values (librarian can update any field they want)
-      // For creating: all fields are required (handled by form validation)
       if (isEditing) {
-        // Only include fields that have values - librarian can update any field they want
+        // Collect all editable fields
         const titleValue = (titleField.value || '').trim();
         const authorValue = (authorField.value || '').trim();
         const categoryValue = (categoryField.value || '').trim();
         const publisherValue = (publisherField.value || '').trim();
-        // Parse quantity - handle empty string, null, or valid number (including 0)
-        let quantityValue = null;
+        let quantityValue = 0;
         const quantityInput = quantityField.value.trim();
         if (quantityInput !== '') {
           const parsed = parseInt(quantityInput, 10);
-          if (!isNaN(parsed) && parsed >= 0) {
-            quantityValue = parsed;
-          }
+          if (!isNaN(parsed) && parsed >= 0) quantityValue = parsed;
         }
-        
-        // When editing, send all fields that have values (even if unchanged)
-        // This allows updating any combination of fields
-        if (titleValue) fd.set('title', titleValue);
-        if (authorValue) fd.set('author', authorValue);
-        if (categoryValue) fd.set('category', categoryValue);
-        if (publisherValue) fd.set('publisher', publisherValue);
-        // Always send quantity if it's a valid number (including 0)
-        if (quantityValue !== null && quantityValue !== undefined) {
-          fd.set('quantity', String(quantityValue));
-          console.log('Sending quantity in update:', quantityValue, '(from input:', quantityField.value, ')');
-        } else {
-          console.warn('Quantity value is invalid or empty. Input value:', quantityField.value, 'Parsed:', quantityValue);
+        // Send all editable fields
+        fd.set('title', titleValue);
+        fd.set('author', authorValue);
+        fd.set('category', categoryValue);
+        fd.set('publisher', publisherValue);
+        fd.set('quantity', String(quantityValue));
+        // Include cover if user selected a new one during edit
+        const coverInput = document.getElementById('coverInput');
+        if (coverInput && coverInput.files && coverInput.files.length > 0) {
+          fd.set('cover', coverInput.files[0]);
         }
-        
-        // Ensure at least one field is being updated
-        if (fd.has('title') || fd.has('author') || fd.has('category') || fd.has('publisher') || fd.has('quantity') || (coverInput && coverInput.files && coverInput.files.length > 0)) {
-          // At least one field has a value, proceed with update
-        } else {
-          alert('Please update at least one field.');
-          return;
-        }
+        // Method spoofing for Laravel
+        fd.set('_method', 'PUT');
+        console.log('Sending FormData for update:');
+        for (let [k,v] of fd.entries()) console.log(' ', k, v);
       } else {
         // For creating: all fields are required (form validation handles this)
         const titleValue = (titleField.value || '').trim();
@@ -2842,33 +3609,28 @@ btn.onclick = async (e)=>{
         fd.set('quantity', String(Math.max(0, quantityValue)));
       }
       
-      // Handle cover file if present
+      // Handle cover file if present (only for create)
       const coverInput = document.getElementById('coverInput');
-      if (coverInput && coverInput.files && coverInput.files.length > 0) {
+      if (!isEditing && coverInput && coverInput.files && coverInput.files.length > 0) {
         fd.set('cover', coverInput.files[0]);
       }
       
       // For editing: ISBN and date_published are NOT included (they cannot be changed)
-      // Explicitly remove them from FormData to ensure they're not sent
-      if (isEditing) {
-        fd.delete('isbn');
-        fd.delete('date_published');
-      } else {
-        // For creating: include ISBN (it's already in the form, but we'll set it explicitly)
+      if (!isEditing) {
+        // For creating: include ISBN and date_published
         const isbnField = document.getElementById('isbn');
         if (isbnField) fd.set('isbn', (isbnField.value || '').trim());
         const datePublishedField = document.getElementById('publishedAt');
-        if (datePublishedField && datePublishedField.value) {
+        if (datePublishedField) {
+          // Validate that date is required when creating
+          if (!datePublishedField.value || datePublishedField.value.trim() === '') {
+            datePublishedField.classList.add('is-invalid');
+            datePublishedField.focus();
+            form.classList.add('was-validated');
+            return;
+          }
           fd.set('date_published', datePublishedField.value);
         }
-      }
-      
-      // Add ID for editing
-      if (isEditing && editingId) {
-        // Note: ID is in URL path, not FormData for PUT requests
-        // Ensure ISBN is not in FormData
-        fd.delete('isbn');
-        fd.delete('date_published');
       }
 
       // Debug: Log what we're sending
@@ -2881,7 +3643,7 @@ btn.onclick = async (e)=>{
       
       try{
         const res = await fetch(url, {
-          method: isEditing ? 'PUT' : 'POST',
+          method: 'POST', // use POST for both; _method=PUT handles updates
           body: fd,
           credentials: 'include',
           headers: {
@@ -2893,14 +3655,8 @@ btn.onclick = async (e)=>{
         let data = null;
         try{ data = JSON.parse(raw); }catch{ alert(`HTTP ${res.status} ${res.statusText}\n\n${raw.slice(0,800)}`); return; }
         
-        // Log the update response
-        if (isEditing) {
-          console.log('Update response:', data);
-          if (data.updated_data) {
-            console.log('Updated data from server:', data.updated_data);
-            console.log('Quantity after update:', data.updated_data.quantity);
-          }
-        }
+        // Log the response for debugging
+        console.log(isEditing ? 'Update response:' : 'Create response:', data);
         
         // Handle validation errors (422) and other errors
         if (!res.ok || !data.ok){
@@ -2919,9 +3675,12 @@ btn.onclick = async (e)=>{
               errorMsg = errorList.join('\n');
             }
           }
+          console.error('Book save error:', errorMsg, data);
           alert(errorMsg);
           return;
         }
+        
+        console.log('Book saved successfully:', data);
 
         // Save the book ID before clearing editingId (needed for refreshing details panel)
         const updatedBookId = editingId;
@@ -2931,109 +3690,39 @@ btn.onclick = async (e)=>{
         
         // Refresh the book list to show updated data
         if (isEditing && updatedBookId) {
-          await loadGrid();
-          await loadRecommended();
+          // Check if we edited from the panel (panel was closed when edit button was clicked)
+          const editedFromPanel = window.editingFromPanel && window.editingPanelBookId === updatedBookId;
+          const wasPanelOpen = currentPanelBookId === updatedBookId;
           
-          // Always refresh the book details panel with updated data
+          // Always re-fetch fresh data from API to avoid stale values in the panel
+          await loadGrid(); // refresh cards
           try {
-            const bookRes = await fetch(`${API_EDIT}/${updatedBookId}`, {
-              method: 'GET',
-              credentials: 'include',
-              headers: { 'Accept': 'application/json' }
-            });
-            const bookData = await bookRes.json();
-            if (bookData.ok && bookData.data) {
-              console.log('Fetched updated book data:', bookData.data);
-              console.log('Updated quantity from API:', bookData.data.quantity);
-              console.log('Updated publisher from API:', bookData.data.publisher);
-              
-              // Verify the data is correct
-              if (bookData.data.quantity === 0 && updatedBookId) {
-                console.warn('WARNING: API returned quantity as 0. Checking update response...');
-              }
-              
-              // Check if we edited from the panel (panel was closed when edit button was clicked)
-              const editedFromPanel = window.editingFromPanel && window.editingPanelBookId === updatedBookId;
-              
-              // Check current panel state BEFORE updating content
-              const bookDetailsEl = document.getElementById('bookDetails');
-              const wasPanelOpen = bookDetailsEl && (bookDetailsEl.classList.contains('show') || bookDetailsEl.classList.contains('showing'));
-              const wasShowingThisBook = currentPanelBookId === updatedBookId;
-              
-              // ALWAYS update the panel content with fresh data
-              // This ensures the panel shows the latest data
-              showDetails(bookData.data);
-              
-              // Verify the update
-              console.log('Panel updated. Current panel book ID:', currentPanelBookId);
-              
-              // Check current panel state AFTER updating content
-              const isPanelOpen = bookDetailsEl && (bookDetailsEl.classList.contains('show') || bookDetailsEl.classList.contains('showing'));
-              const isShowingThisBook = currentPanelBookId === updatedBookId;
-              
-              // If we edited from the panel, always reopen it to show updated data
-              if (editedFromPanel) {
-                setTimeout(() => {
-                  const offcanvas = bootstrap.Offcanvas.getInstance('#bookDetails') || new bootstrap.Offcanvas('#bookDetails');
-                  offcanvas.show();
-                }, 200);
-                // Clear the flags after a delay to ensure they're used
-                setTimeout(() => {
-                  window.editingFromPanel = false;
-                  window.editingPanelBookId = null;
-                }, 300);
-              } else if (wasPanelOpen && wasShowingThisBook) {
-                // Panel was open and showing this book - force refresh by toggling
-                const offcanvas = bootstrap.Offcanvas.getInstance('#bookDetails');
-                if (offcanvas) {
-                  // Force a visual refresh by hiding and showing
-                  setTimeout(() => {
-                    if (offcanvas._isShown) {
-                      offcanvas.hide();
-                      setTimeout(() => {
-                        // Re-call showDetails to ensure fresh data is displayed
-                        showDetails(bookData.data);
-                        offcanvas.show();
-                        // Verify the content after showing
-                        setTimeout(() => {
-                          const quantityBadge = document.querySelector('#detailsBody .badge');
-                          if (quantityBadge) {
-                            const expectedText = `Quantity: ${bookData.data.quantity} (${(bookData.data.quantity ?? 0) > 5 ? 'In Stock' : (bookData.data.quantity ?? 0) > 0 ? 'Low Stock' : 'Out of Stock'})`;
-                            console.log('Expected quantity text:', expectedText);
-                            console.log('Actual quantity badge text:', quantityBadge.textContent);
-                            if (!quantityBadge.textContent.includes(String(bookData.data.quantity))) {
-                              console.warn('Quantity mismatch! Forcing refresh again...');
-                              showDetails(bookData.data);
-                            }
-                          }
-                        }, 100);
-                      }, 150);
-                    } else {
-                      // Panel instance exists but not shown - show it with fresh data
-                      showDetails(bookData.data);
-                      setTimeout(() => offcanvas.show(), 100);
-                    }
-                  }, 50);
-                }
-              } else if (!wasPanelOpen && wasShowingThisBook) {
-                // Panel was closed but was showing this book - reopen it
-                setTimeout(() => {
-                  const offcanvas = bootstrap.Offcanvas.getInstance('#bookDetails') || new bootstrap.Offcanvas('#bookDetails');
-                  offcanvas.show();
-                }, 150);
-              }
-              // If panel is open but showing a different book, don't change it
-              // The updated data is stored, so when user clicks this book again, it will show updated data
-            } else {
-              console.error('Failed to fetch updated book:', bookData.error || 'Unknown error');
-            }
+            await showDetails(updatedBookId); // fetch fresh details from API and render panel
           } catch (err) {
-            console.error('Failed to refresh book details:', err);
+            console.error('Failed to refresh book details after update:', err);
           }
+          
+          // If we edited from the panel or it was showing this book, reopen it to show fresh data
+          if (editedFromPanel || wasPanelOpen) {
+            setTimeout(() => {
+              const offcanvas = bootstrap.Offcanvas.getInstance('#bookDetails') || new bootstrap.Offcanvas('#bookDetails');
+              offcanvas.show();
+            }, 100);
+          }
+          
+          // Clear the flags
+          window.editingFromPanel = false;
+          window.editingPanelBookId = null;
         } else {
-          // For new books, just refresh the grid
+          // For new books, reset filters and refresh the grid
+          state.q = '';
+          state.cat = '';
+          state.page = 1;
+          qInput.value = '';
+          renderChips();
           await loadGrid();
-          await loadRecommended();
+          // Switch back to discover panel to show the updated book list
+          showDiscover();
         }
         
         // Show success modal instead of toast
@@ -3053,6 +3742,7 @@ btn.onclick = async (e)=>{
         // Re-enable ISBN field (it was disabled during editing)
         const isbnField = document.getElementById('isbn');
         const isbnHelpText = document.getElementById('isbnHelpText');
+        const isbnFormatHelp = document.getElementById('isbnFormatHelp');
         isbnField.readOnly = false;
         isbnField.removeAttribute('readonly');
         isbnField.setAttribute('required', 'required'); // Re-add required for new books
@@ -3060,6 +3750,10 @@ btn.onclick = async (e)=>{
         isbnField.style.backgroundColor = '';
         isbnField.style.cursor = '';
         isbnField.style.opacity = '';
+        // Show format help text when creating new book
+        if (isbnFormatHelp) {
+          isbnFormatHelp.style.display = 'block';
+        }
         // Hide helper text
         if (isbnHelpText) {
           isbnHelpText.style.display = 'none';
@@ -3070,6 +3764,7 @@ btn.onclick = async (e)=>{
         const datePublishedHelpText = document.getElementById('datePublishedHelpText');
         datePublishedField.readOnly = false;
         datePublishedField.removeAttribute('readonly');
+        datePublishedField.setAttribute('required', 'required'); // Re-add required when creating
         datePublishedField.classList.remove('bg-light');
         datePublishedField.style.backgroundColor = '';
         datePublishedField.style.cursor = '';
@@ -3101,7 +3796,7 @@ btn.onclick = async (e)=>{
         document.getElementById('statusBadge').innerHTML = '<i class="bi bi-check-circle me-1"></i> In Stock';
 
         tabDiscover.click();
-        state.page=1; await loadGrid(); await loadRecommended();
+        state.page=1; await loadGrid();
       }catch(err){ alert('Network/server error: '+err.message); }
     });
   }
@@ -3168,13 +3863,11 @@ btn.onclick = async (e)=>{
     if (catChips || document.getElementById('catChips')) {
       renderChips();
     }
-    loadRecommended();
     loadGrid();
     showDiscover();
   }).catch(() => {
     // If categories fail to load, still show the page with default categories
     renderChips();
-    loadRecommended();
     loadGrid();
     showDiscover();
   });

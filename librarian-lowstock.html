@@ -15,7 +15,7 @@
   <link href="assets/css/librarian-borrow-return.css" rel="stylesheet">
   <link href="assets/css/responsive.css" rel="stylesheet">
 
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
   <style>
     :root{
       --card-pad:24px;
@@ -85,27 +85,6 @@
     .search-bar-custom:focus-within .input-group-text {
       color: var(--text-primary);
     }
-    .notification-btn{
-      width:44px;
-      height:44px;
-      border-radius:var(--border-radius-sm);
-      border:none;
-      background:transparent;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition:all 0.2s ease;
-      color:var(--text-primary);
-      padding:0;
-      position:relative;
-    }
-    .notification-btn:hover{
-      background:#f8f9fa;
-      color:var(--text-primary);
-    }
-    .notification-btn i{
-      font-size:1.25rem;
-    }
     .admin-btn-custom{
       padding:0;
       width:44px;
@@ -122,11 +101,111 @@
       border-color:var(--brand-gold);
       box-shadow:0 0 0 2px rgba(166,134,4,0.1);
     }
+    
+    /* Skeleton Loaders */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-value {
+      height: 1.75rem;
+      width: 40%;
+      margin: 0 auto;
+    }
+    .skeleton-table-row td {
+      padding: 16px 20px;
+    }
+    .skeleton-table-cell {
+      height: 1rem;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-cell.short {
+      width: 60%;
+    }
+    .skeleton-table-cell.medium {
+      width: 80%;
+    }
+    .skeleton-table-cell.long {
+      width: 100%;
+    }
+    .skeleton-checkbox {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .skeleton-pill {
+      width: 80px;
+      height: 24px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .skeleton-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .form-select:disabled,
+    .form-control:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: #e9ecef;
+    }
     .admin-btn-custom img{
       width:32px;
       height:32px;
       border-radius:50%;
       object-fit:cover;
+    }
+    .role-chip{
+      font-weight:600;
+      border-radius:999px;
+      padding:.2rem .6rem;
+      font-size:.75rem;
+    }
+    .role-chip.admin{
+      background:#4a4a4a;
+      color:#fff;
+    }
+    .role-chip.librarian{
+      background:#e7f1ff;
+      color:#0d6efd;
+      border:1px solid rgba(13,110,253,.2);
+    }
+    .role-chip.student{
+      background:#efe7ff;
+      color:#6f42c1;
+      border:1px solid rgba(111,66,193,.2);
     }
 
     /* Stat Cards - Dashboard Style */
@@ -514,29 +593,15 @@
           </form>
 
           <div class="dropdown position-relative">
-            <button id="btnNotifications" class="btn notification-btn" data-bs-toggle="dropdown" title="Notifications" aria-expanded="false">
-              <i class="bi bi-bell"></i>
-              <span id="notificationBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill d-none" style="background:var(--brand-gold); color:#fff; font-size:0.65rem; padding:2px 6px; font-weight:600; border:2px solid #fff;">0</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end" id="notificationDropdown" style="min-width: 320px; max-width: 400px;">
-              <li><h6 class="dropdown-header">Notifications</h6></li>
-              <li><hr class="dropdown-divider"></li>
-              <li id="notificationList">
-                <div class="px-3 py-2 text-center text-muted">
-                  <small>No notifications</small>
-                </div>
-              </li>
-            </ul>
-          </div>
-
           <div class="dropdown">
-            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius:50%;">
               <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
             </button>
             <ul class="dropdown-menu dropdown-menu-end">
+              <li class="px-3 py-2 small text-muted" id="whoChip">—</li>
               <li><a class="dropdown-item" href="librarian-profile.html"><i class="bi bi-person me-2"></i>Profile</a></li>
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" href="#" onclick="logout(); return false;"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+              <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>
           </div>
         </div>
@@ -549,19 +614,19 @@
         <div class="col-6 col-md-4">
           <div class="sb-card elevated text-center card-warning">
             <div class="sb-card-title"><i class="bi bi-box-seam"></i>Titles Low</div>
-            <div class="sb-card-value" id="stTitles">0</div>
+            <div class="sb-card-value" id="stTitles"><div class="skeleton skeleton-value"></div></div>
           </div>
         </div>
         <div class="col-6 col-md-4">
           <div class="sb-card elevated text-center card-danger">
             <div class="sb-card-title"><i class="bi bi-exclamation-triangle"></i>Critical (0-1)</div>
-            <div class="sb-card-value" id="stCritical">0</div>
+            <div class="sb-card-value" id="stCritical"><div class="skeleton skeleton-value"></div></div>
           </div>
         </div>
         <div class="col-6 col-md-4">
           <div class="sb-card elevated text-center card-info">
             <div class="sb-card-title"><i class="bi bi-clipboard2-check"></i>Needed Copies</div>
-            <div class="sb-card-value" id="stNeeded">0</div>
+            <div class="sb-card-value" id="stNeeded"><div class="skeleton skeleton-value"></div></div>
           </div>
         </div>
       </section>
@@ -622,7 +687,16 @@
                 <th class="text-end" style="width:180px">Actions</th>
               </tr>
             </thead>
-            <tbody id="tbody"><!-- JS --></tbody>
+            <tbody id="tbody">
+              <tr class="skeleton-table-row"><td><div class="skeleton-checkbox"></div></td><td><div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-pill"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 50px; margin: 0 auto; background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite;"></div></td><td class="text-end"><div class="d-flex align-items-center gap-2 justify-content-end"><div class="skeleton-button"></div><div class="skeleton-button"></div><div class="skeleton-button"></div></div></td></tr>
+              <tr class="skeleton-table-row"><td><div class="skeleton-checkbox"></div></td><td><div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-pill"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 50px; margin: 0 auto; background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite;"></div></td><td class="text-end"><div class="d-flex align-items-center gap-2 justify-content-end"><div class="skeleton-button"></div><div class="skeleton-button"></div><div class="skeleton-button"></div></div></td></tr>
+              <tr class="skeleton-table-row"><td><div class="skeleton-checkbox"></div></td><td><div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-pill"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 50px; margin: 0 auto; background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite;"></div></td><td class="text-end"><div class="d-flex align-items-center gap-2 justify-content-end"><div class="skeleton-button"></div><div class="skeleton-button"></div><div class="skeleton-button"></div></div></td></tr>
+              <tr class="skeleton-table-row"><td><div class="skeleton-checkbox"></div></td><td><div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-pill"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 50px; margin: 0 auto; background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite;"></div></td><td class="text-end"><div class="d-flex align-items-center gap-2 justify-content-end"><div class="skeleton-button"></div><div class="skeleton-button"></div><div class="skeleton-button"></div></div></td></tr>
+              <tr class="skeleton-table-row"><td><div class="skeleton-checkbox"></div></td><td><div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-pill"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 50px; margin: 0 auto; background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite;"></div></td><td class="text-end"><div class="d-flex align-items-center gap-2 justify-content-end"><div class="skeleton-button"></div><div class="skeleton-button"></div><div class="skeleton-button"></div></div></td></tr>
+              <tr class="skeleton-table-row"><td><div class="skeleton-checkbox"></div></td><td><div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-pill"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 50px; margin: 0 auto; background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite;"></div></td><td class="text-end"><div class="d-flex align-items-center gap-2 justify-content-end"><div class="skeleton-button"></div><div class="skeleton-button"></div><div class="skeleton-button"></div></div></td></tr>
+              <tr class="skeleton-table-row"><td><div class="skeleton-checkbox"></div></td><td><div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-pill"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 50px; margin: 0 auto; background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite;"></div></td><td class="text-end"><div class="d-flex align-items-center gap-2 justify-content-end"><div class="skeleton-button"></div><div class="skeleton-button"></div><div class="skeleton-button"></div></div></td></tr>
+              <tr class="skeleton-table-row"><td><div class="skeleton-checkbox"></div></td><td><div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-table-cell short"></div></td><td><div class="skeleton-pill"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td><td class="text-center"><div class="skeleton-table-cell short" style="width: 50px; margin: 0 auto; background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite;"></div></td><td class="text-end"><div class="d-flex align-items-center gap-2 justify-content-end"><div class="skeleton-button"></div><div class="skeleton-button"></div><div class="skeleton-button"></div></div></td></tr>
+            </tbody>
           </table>
         </div>
 
@@ -702,7 +776,7 @@
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-LOANS-COMBINED-V4"></script>
   <!-- Centralized Notifications -->
-  <script src="assets/js/notifications.js"></script>
+  <script src="assets/js/logout.js"></script>
   <script>
     // Initialize with authentication check
     (async () => {
@@ -719,6 +793,14 @@
       const headerAvatar = document.querySelector('#userBtn img.avatar-32');
       if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') {
         headerAvatar.src = data.user.avatar;
+      }
+      
+      // Load user info in dropdown
+      const fullName = [data?.user?.first_name, data?.user?.last_name].filter(Boolean).join(' ');
+      const whoChipEl = document.getElementById('whoChip');
+      if (whoChipEl && data?.user) {
+        const userRole = (data.user.role || '').toLowerCase();
+        whoChipEl.innerHTML = `<span class="badge role-chip ${userRole}">${userRole.toUpperCase()}</span> ${fullName || data.user.email || '—'}`;
       }
       
       // Attach sidebar toggle listener
@@ -744,16 +826,8 @@
         });
       }
       
-      // Logout function
-      window.logout = async function() {
-        try {
-          await fetch('/api/logout', {method:'POST', credentials:'include'});
-          localStorage.removeItem('userRole');
-          location.href = 'login.html';
-        } catch(e) {
-          location.href = 'login.html';
-        }
-      };
+      // Logout - handled by logout.js (confirmation dialog)
+      // Remove old logout function, use showLogoutConfirmation() instead
 
     // Data
     let books = [];
@@ -799,10 +873,85 @@
         return hit && catOk && sevOk;
       });
     }
+    // Helper function to update KPI cards with fade-in
+    function updateCard(id, value) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.innerHTML = '';
+        el.textContent = value;
+        el.classList.add('fade-in');
+      }
+    }
+    
+    // Render skeleton KPI cards
+    function renderSkeletonKPIs() {
+      document.getElementById('stTitles').innerHTML = '<div class="skeleton skeleton-value"></div>';
+      document.getElementById('stCritical').innerHTML = '<div class="skeleton skeleton-value"></div>';
+      document.getElementById('stNeeded').innerHTML = '<div class="skeleton skeleton-value"></div>';
+    }
+    
+    // Render skeleton table rows
+    function renderSkeletonTableRows(count = 8) {
+      return Array.from({length: count}, () => `
+        <tr class="skeleton-table-row">
+          <td><div class="skeleton-checkbox"></div></td>
+          <td>
+            <div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td><div class="skeleton-table-cell short"></div></td>
+          <td><div class="skeleton-pill"></div></td>
+          <td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td>
+          <td class="text-center"><div class="skeleton-table-cell short" style="width: 40px; margin: 0 auto;"></div></td>
+          <td class="text-center"><div class="skeleton-table-cell short" style="width: 50px; margin: 0 auto; background: linear-gradient(90deg, #fef3c7 25%, #fde68a 50%, #fef3c7 75%); background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite;"></div></td>
+          <td class="text-end">
+            <div class="d-flex align-items-center gap-2 justify-content-end">
+              <div class="skeleton-button"></div>
+              <div class="skeleton-button"></div>
+              <div class="skeleton-button"></div>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+    
+    // Disable/enable interactions during loading
+    function setLoadingState(isLoading) {
+      const searchInput = document.getElementById('q');
+      const categorySelect = document.getElementById('fCat');
+      const severitySelect = document.getElementById('fSeverity');
+      const restockBtn = document.getElementById('btnRestock');
+      const emailBtn = document.getElementById('btnEmail');
+      const deleteBtn = document.getElementById('btnDelete');
+      const exportBtn = document.getElementById('btnExport');
+      
+      if (searchInput) searchInput.disabled = isLoading;
+      if (categorySelect) categorySelect.disabled = isLoading;
+      if (severitySelect) severitySelect.disabled = isLoading;
+      if (restockBtn) restockBtn.disabled = isLoading;
+      if (emailBtn) emailBtn.disabled = isLoading;
+      if (deleteBtn) deleteBtn.disabled = isLoading;
+      if (exportBtn) {
+        exportBtn.disabled = isLoading;
+        if (isLoading) {
+          const originalText = exportBtn.innerHTML;
+          exportBtn.dataset.originalText = originalText;
+          exportBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Exporting...';
+        } else {
+          const originalText = exportBtn.dataset.originalText;
+          if (originalText) {
+            exportBtn.innerHTML = originalText;
+            delete exportBtn.dataset.originalText;
+          }
+        }
+      }
+    }
+
     function updateStats(list){
-      stTitles.textContent=list.length;
-      stCritical.textContent=list.filter(b=>getAvailable(b)<=1).length;
-      stNeeded.textContent=list.reduce((sum,b)=> sum + Math.max(0,threshold-getAvailable(b)),0);
+      // Replace skeletons with real values (fade-in)
+      updateCard('stTitles', list.length);
+      updateCard('stCritical', list.filter(b=>getAvailable(b)<=1).length);
+      updateCard('stNeeded', list.reduce((sum,b)=> sum + Math.max(0,threshold-getAvailable(b)),0));
     }
     function render(){
       const list=applyFilters(); updateStats(list);
@@ -811,10 +960,28 @@
       const start=(currentPage-1)*pageSize, end=Math.min(start+pageSize,total), slice=list.slice(start,end);
 
       empty.classList.toggle('d-none', !!slice.length);
-      tbody.innerHTML=slice.map(rowHtml).join('');
+      if (slice.length === 0) {
+        empty.innerHTML = '<i class="bi bi-box2-heart fs-2 d-block mb-2 text-muted fade-in"></i><p class="text-muted mb-0 fade-in">Nothing low right now. Great job keeping stock healthy!</p>';
+      }
+      tbody.innerHTML=slice.map(b => {
+        const row = rowHtml(b);
+        return row.replace('<tr>', '<tr class="fade-in">');
+      }).join('');
       pageInfo.textContent=`Showing ${total?start+1:0}-${end} of ${total}`;
       pager.innerHTML='';
-      const add=(label,page,dis=false,act=false)=>{ const li=document.createElement('li'); li.className=`page-item ${dis?'disabled':''} ${act?'active':''}`; li.innerHTML=`<a class="page-link" href="#">${label}</a>`; li.onclick=(e)=>{e.preventDefault(); if(!dis){currentPage=page; render();}}; pager.appendChild(li); };
+      const add=(label,page,dis=false,act=false)=>{ const li=document.createElement('li'); li.className=`page-item ${dis?'disabled':''} ${act?'active':''}`; li.innerHTML=`<a class="page-link" href="#">${label}</a>`; li.onclick=(e)=>{e.preventDefault(); if(!dis){
+        currentPage=page;
+        // Show skeleton during pagination
+        renderSkeletonKPIs();
+        tbody.innerHTML = renderSkeletonTableRows(8);
+        empty.classList.add('d-none');
+        setLoadingState(true);
+        // Use setTimeout to allow UI to update before rendering
+        setTimeout(() => {
+          render();
+          setLoadingState(false);
+        }, 50);
+      }}; pager.appendChild(li); };
       add('«',1,currentPage===1); add('‹',Math.max(1,currentPage-1),currentPage===1);
       for(let p=1;p<=pages;p++) add(p,p,false,p===currentPage);
       add('›',Math.min(pages,currentPage+1),currentPage===pages); add('»',pages,currentPage===pages);
@@ -864,14 +1031,31 @@
     }
 
     // Events
-    [q,fCat,fSeverity].forEach(el=>el.addEventListener('input',()=>{currentPage=1;render();}));
+    [q,fCat,fSeverity].forEach(el=>el.addEventListener('input',()=>{
+      currentPage=1;
+      // Show skeleton during filter/search
+      renderSkeletonKPIs();
+      tbody.innerHTML = renderSkeletonTableRows(8);
+      empty.classList.add('d-none');
+      setLoadingState(true);
+      // Use setTimeout to allow UI to update before rendering
+      setTimeout(() => {
+        render();
+        setLoadingState(false);
+      }, 50);
+    }));
     document.getElementById('btnExport').onclick=()=>{
-      const rows=applyFilters().map(b=>{
-        const available = getAvailable(b);
-        return [b.id,b.title,b.author,b.isbn,b.category,available,threshold];
-      });
-      const csv=["id,title,author,isbn,category,available,threshold", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
-      const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download="lowstock.csv"; a.click(); URL.revokeObjectURL(a.href);
+      setLoadingState(true);
+      try {
+        const rows=applyFilters().map(b=>{
+          const available = getAvailable(b);
+          return [b.id,b.title,b.author,b.isbn,b.category,available,threshold];
+        });
+        const csv=["id,title,author,isbn,category,available,threshold", ...rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(","))].join("\n");
+        const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download="lowstock.csv"; a.click(); URL.revokeObjectURL(a.href);
+      } finally {
+        setLoadingState(false);
+      }
     };
     const selectedIds=()=>{ const ids=[]; document.querySelectorAll('.row-check:checked').forEach(cb=>ids.push(Number(cb.value))); return ids; };
     checkAll.addEventListener('change',()=>{ document.querySelectorAll('.row-check').forEach(cb=>cb.checked=checkAll.checked); });
@@ -1102,6 +1286,12 @@
 
     // Load data
     async function loadData() {
+      // Show skeleton loaders and disable interactions
+      renderSkeletonKPIs();
+      tbody.innerHTML = renderSkeletonTableRows(8);
+      empty.classList.add('d-none');
+      setLoadingState(true);
+      
       try {
         // Load settings (threshold)
         try {
@@ -1138,7 +1328,14 @@
         render();
       } catch(e) {
         console.error('Failed to load data:', e);
-        render();
+        // Remove skeletons and show error (keep previous data if any)
+        tbody.innerHTML = '';
+        empty.classList.remove('d-none');
+        empty.innerHTML = '<div class="alert alert-danger mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Error loading data: ' + (e.message || 'Network error') + '</div>';
+        updateStats([]);
+      } finally {
+        // Re-enable interactions
+        setLoadingState(false);
       }
     }
 

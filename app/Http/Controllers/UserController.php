@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Helpers\AuditLog;
 
 class UserController extends BaseController
 {
@@ -87,48 +88,177 @@ class UserController extends BaseController
             return response()->json(['success' => false, 'message' => 'Librarian must be assigned to a school.'], 400);
         }
 
-        $request->validate([
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'email' => 'required|email',
-            'student_no' => 'required|string|regex:/^\d{8}$/',
-            'course' => 'required|string',
-            'year_level' => 'required|string',
-            'section' => 'required|string',
-            'status' => 'required|string',
-            'password' => ['required', 'min:8', 'regex:/[A-Z]/', 'regex:/[^a-zA-Z0-9]/'],
-            'middle_name' => 'nullable|string',
-            'suffix' => 'nullable|string',
-            'notes' => 'nullable|string',
-        ]);
+        // Validate school exists and is active
+        $school = DB::table('schools')->where('id', $schoolId)->first();
+        if (!$school) {
+            return response()->json(['success' => false, 'message' => 'Invalid school assigned to librarian.'], 400);
+        }
 
-        // Check unique email
-        if (DB::table('users')->where('email', $request->input('email'))->exists()) {
+        // Normalize inputs
+        $firstName = trim($request->input('first_name', ''));
+        $middleName = trim($request->input('middle_name', ''));
+        $lastName = trim($request->input('last_name', ''));
+        $suffix = trim($request->input('suffix', ''));
+        $email = strtolower(trim($request->input('email', '')));
+        $studentNo = trim($request->input('student_no', ''));
+        $course = trim($request->input('course', ''));
+        $yearLevel = trim($request->input('year_level', ''));
+        $section = trim($request->input('section', ''));
+        $status = strtolower(trim($request->input('status', 'active')));
+        $password = $request->input('password', '');
+
+        // 🧍 Personal Info Validation
+        if (empty($firstName)) {
+            return response()->json(['success' => false, 'message' => 'First name is required.', 'field' => 'first_name'], 422);
+        }
+        if (strlen($firstName) < 2 || strlen($firstName) > 50) {
+            return response()->json(['success' => false, 'message' => 'First name must be 2-50 characters.', 'field' => 'first_name'], 422);
+        }
+        if (!preg_match('/^[a-zA-Z\s\-\']+$/', $firstName)) {
+            return response()->json(['success' => false, 'message' => 'First name can only contain letters, spaces, hyphens, or apostrophes.', 'field' => 'first_name'], 422);
+        }
+
+        if (!empty($middleName)) {
+            if (strlen($middleName) < 2 || strlen($middleName) > 50) {
+                return response()->json(['success' => false, 'message' => 'Middle name must be 2-50 characters.', 'field' => 'middle_name'], 422);
+            }
+            if (!preg_match('/^[a-zA-Z\s\-\']+$/', $middleName)) {
+                return response()->json(['success' => false, 'message' => 'Middle name can only contain letters, spaces, hyphens, or apostrophes.', 'field' => 'middle_name'], 422);
+            }
+        }
+
+        if (empty($lastName)) {
+            return response()->json(['success' => false, 'message' => 'Last name is required.', 'field' => 'last_name'], 422);
+        }
+        if (strlen($lastName) < 2 || strlen($lastName) > 50) {
+            return response()->json(['success' => false, 'message' => 'Last name must be 2-50 characters.', 'field' => 'last_name'], 422);
+        }
+        if (!preg_match('/^[a-zA-Z\s\-\']+$/', $lastName)) {
+            return response()->json(['success' => false, 'message' => 'Last name can only contain letters, spaces, hyphens, or apostrophes.', 'field' => 'last_name'], 422);
+        }
+
+        $allowedSuffixes = ['', 'N/A', 'Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+        if (!empty($suffix) && !in_array($suffix, $allowedSuffixes)) {
+            return response()->json(['success' => false, 'message' => 'Invalid suffix. Please select from the allowed values.', 'field' => 'suffix'], 422);
+        }
+
+        // 📧 Account & Status Validation
+        if (empty($email)) {
+            return response()->json(['success' => false, 'message' => 'Email is required.', 'field' => 'email'], 422);
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return response()->json(['success' => false, 'message' => 'Enter a valid email address.', 'field' => 'email'], 422);
+        }
+
+        if (!in_array($status, ['active', 'disabled', 'inactive'])) {
+            return response()->json(['success' => false, 'message' => 'Status must be Active or Disabled.', 'field' => 'status'], 422);
+        }
+
+        if (empty($password)) {
+            return response()->json(['success' => false, 'message' => 'Password is required.', 'field' => 'password'], 422);
+        }
+        if (strlen($password) < 8) {
+            return response()->json(['success' => false, 'message' => 'Password must be at least 8 characters.', 'field' => 'password'], 422);
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            return response()->json(['success' => false, 'message' => 'Password must contain at least 1 uppercase letter.', 'field' => 'password'], 422);
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            return response()->json(['success' => false, 'message' => 'Password must contain at least 1 lowercase letter.', 'field' => 'password'], 422);
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            return response()->json(['success' => false, 'message' => 'Password must contain at least 1 number.', 'field' => 'password'], 422);
+        }
+        // Password must NOT be identical to email or student ID
+        if (strtolower($password) === strtolower($email)) {
+            return response()->json(['success' => false, 'message' => 'Password cannot be the same as your email.', 'field' => 'password'], 422);
+        }
+        if ($password === $studentNo) {
+            return response()->json(['success' => false, 'message' => 'Password cannot be the same as your student ID.', 'field' => 'password'], 422);
+        }
+
+        // 🏫 Academic Info Validation
+        if (empty($studentNo)) {
+            return response()->json(['success' => false, 'message' => 'School ID / Student No. is required.', 'field' => 'student_no'], 422);
+        }
+        if (!preg_match('/^\d{8}$/', $studentNo)) {
+            return response()->json(['success' => false, 'message' => 'Student number must be exactly 8 digits.', 'field' => 'student_no'], 422);
+        }
+
+        if (empty($course)) {
+            return response()->json(['success' => false, 'message' => 'Course is required.', 'field' => 'course'], 422);
+        }
+        // Validate course is from allowed list
+        $allowedCourses = [
+            'Bachelor of Science in Computer Science',
+            'Bachelor of Science in Information Technology',
+            'Bachelor of Science in Information Systems',
+            'Bachelor of Science in Computer Engineering',
+            'Bachelor of Science in Software Engineering',
+            'Bachelor of Science in Business Administration',
+            'Bachelor of Science in Accountancy',
+            'Bachelor of Science in Education',
+            'Bachelor of Arts in Psychology',
+            'Bachelor of Science in Nursing',
+            'Bachelor of Science in Engineering',
+            'Bachelor of Science in Mathematics'
+        ];
+        if (!in_array($course, $allowedCourses)) {
+            return response()->json(['success' => false, 'message' => 'Please select a valid course from the list.', 'field' => 'course'], 422);
+        }
+
+        if (empty($yearLevel)) {
+            return response()->json(['success' => false, 'message' => 'Year level is required.', 'field' => 'year_level'], 422);
+        }
+        $allowedYears = ['1st', '2nd', '3rd', '4th', '5th'];
+        if (!in_array($yearLevel, $allowedYears)) {
+            return response()->json(['success' => false, 'message' => 'Please select a valid year level.', 'field' => 'year_level'], 422);
+        }
+
+        if (empty($section)) {
+            return response()->json(['success' => false, 'message' => 'Section is required.', 'field' => 'section'], 422);
+        }
+        $allowedSections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        if (!in_array($section, $allowedSections)) {
+            return response()->json(['success' => false, 'message' => 'Please select a valid section.', 'field' => 'section'], 422);
+        }
+
+        // Check unique email (globally)
+        if (DB::table('users')->where('email', $email)->exists()) {
             return response()->json(['success' => false, 'message' => 'This email is already registered.', 'field' => 'email'], 409);
         }
 
         // Check unique student_no within school
-        if (DB::table('users')->where('student_no', $request->input('student_no'))->where('school_id', $schoolId)->exists()) {
+        if (DB::table('users')->where('student_no', $studentNo)->where('school_id', $schoolId)->exists()) {
             return response()->json(['success' => false, 'message' => 'This Student No. already exists in this school.', 'field' => 'student_no'], 409);
         }
 
         $userId = DB::table('users')->insertGetId([
-            'first_name' => $request->input('first_name'),
-            'middle_name' => $request->input('middle_name') ?: null,
-            'last_name' => $request->input('last_name'),
-            'suffix' => $request->input('suffix') ?: null,
-            'email' => strtolower(trim($request->input('email'))),
-            'password' => Hash::make($request->input('password')),
-            'student_no' => $request->input('student_no'),
-            'course' => $request->input('course'),
-            'year_level' => $request->input('year_level'),
-            'section' => $request->input('section'),
-            'status' => strtolower($request->input('status')),
-            'notes' => $request->input('notes') ?: null,
+            'first_name' => $firstName,
+            'middle_name' => !empty($middleName) ? $middleName : null,
+            'last_name' => $lastName,
+            'suffix' => !empty($suffix) ? $suffix : null,
+            'email' => $email,
+            'password' => Hash::make($password),
+            'student_no' => $studentNo,
+            'course' => $course,
+            'year_level' => $yearLevel,
+            'section' => $section,
+            'status' => $status,
+            'notes' => trim($request->input('notes', '') ?: null),
             'role' => 'student',
             'school_id' => $schoolId,
             'created_at' => now(),
         ]);
+
+        // Log student creation
+        AuditLog::logAction(
+            $user,
+            'USER_CREATE',
+            'user',
+            $userId,
+            "Created student: {$firstName} {$lastName} ({$email}, Student No: {$studentNo})"
+        );
 
         return response()->json(['success' => true, 'id' => $userId]);
     }
@@ -137,36 +267,124 @@ class UserController extends BaseController
     {
         $user = $this->requireRole(['admin']);
 
-        $request->validate([
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'email' => 'required|email',
-            'password' => ['required', 'min:8', 'regex:/[A-Z]/', 'regex:/[^a-zA-Z0-9]/'],
-            'status' => 'required|string|in:active,disabled',
-            'school_id' => 'required|integer|exists:schools,id',
-            'middle_name' => 'nullable|string',
-            'suffix' => 'nullable|string',
-            'notes' => 'nullable|string',
-        ]);
+        // Normalize inputs
+        $firstName = trim($request->input('first_name', ''));
+        $middleName = trim($request->input('middle_name', ''));
+        $lastName = trim($request->input('last_name', ''));
+        $suffix = trim($request->input('suffix', ''));
+        $email = strtolower(trim($request->input('email', '')));
+        $password = $request->input('password', '');
+        $status = strtolower(trim($request->input('status', 'active')));
+        $schoolId = (int)$request->input('school_id', 0);
 
-        // Check unique email
-        if (DB::table('users')->where('email', strtolower(trim($request->input('email'))))->exists()) {
-            return response()->json(['success' => false, 'message' => 'This email is already registered.', 'field' => 'email'], 409);
+        // 🧍 Personal Info Validation
+        if (empty($firstName)) {
+            return response()->json(['success' => false, 'message' => 'First name is required.', 'field' => 'first_name'], 422);
+        }
+        if (strlen($firstName) < 2 || strlen($firstName) > 50) {
+            return response()->json(['success' => false, 'message' => 'First name must be 2-50 characters.', 'field' => 'first_name'], 422);
+        }
+        if (!preg_match('/^[a-zA-Z\s\-\']+$/', $firstName)) {
+            return response()->json(['success' => false, 'message' => 'First name can only contain letters, spaces, hyphens, or apostrophes.', 'field' => 'first_name'], 422);
+        }
+
+        if (!empty($middleName)) {
+            if (strlen($middleName) < 2 || strlen($middleName) > 50) {
+                return response()->json(['success' => false, 'message' => 'Middle name must be 2-50 characters.', 'field' => 'middle_name'], 422);
+            }
+            if (!preg_match('/^[a-zA-Z\s\-\']+$/', $middleName)) {
+                return response()->json(['success' => false, 'message' => 'Middle name contains invalid characters.', 'field' => 'middle_name'], 422);
+            }
+        }
+
+        if (empty($lastName)) {
+            return response()->json(['success' => false, 'message' => 'Last name is required.', 'field' => 'last_name'], 422);
+        }
+        if (strlen($lastName) < 2 || strlen($lastName) > 50) {
+            return response()->json(['success' => false, 'message' => 'Last name must be 2-50 characters.', 'field' => 'last_name'], 422);
+        }
+        if (!preg_match('/^[a-zA-Z\s\-\']+$/', $lastName)) {
+            return response()->json(['success' => false, 'message' => 'Last name can only contain letters, spaces, hyphens, or apostrophes.', 'field' => 'last_name'], 422);
+        }
+
+        $allowedSuffixes = ['', 'N/A', 'Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+        if (!empty($suffix) && !in_array($suffix, $allowedSuffixes)) {
+            return response()->json(['success' => false, 'message' => 'Invalid suffix. Please select from the allowed values.', 'field' => 'suffix'], 422);
+        }
+
+        // 📧 Account Details Validation
+        if (empty($email)) {
+            return response()->json(['success' => false, 'message' => 'Email is required.', 'field' => 'email'], 422);
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return response()->json(['success' => false, 'message' => 'Please enter a valid email address.', 'field' => 'email'], 422);
+        }
+
+        if (!in_array($status, ['active', 'disabled', 'inactive'])) {
+            return response()->json(['success' => false, 'message' => 'Invalid status value.', 'field' => 'status'], 422);
+        }
+
+        if (empty($password)) {
+            return response()->json(['success' => false, 'message' => 'Password is required.', 'field' => 'password'], 422);
+        }
+        if (strlen($password) < 8) {
+            return response()->json(['success' => false, 'message' => 'Password must be at least 8 characters.', 'field' => 'password'], 422);
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            return response()->json(['success' => false, 'message' => 'Password must contain at least 1 uppercase letter.', 'field' => 'password'], 422);
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            return response()->json(['success' => false, 'message' => 'Password must contain at least 1 lowercase letter.', 'field' => 'password'], 422);
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            return response()->json(['success' => false, 'message' => 'Password must contain at least 1 number.', 'field' => 'password'], 422);
+        }
+        // Password must NOT be identical to email
+        if (strtolower($password) === strtolower($email)) {
+            return response()->json(['success' => false, 'message' => 'Password cannot be the same as your email.', 'field' => 'password'], 422);
+        }
+
+        // 🏫 School Assignment Validation
+        if ($schoolId <= 0) {
+            return response()->json(['success' => false, 'message' => 'School is required for librarians.', 'field' => 'school_id'], 422);
+        }
+        // Check if school exists and is active
+        $school = DB::table('schools')->where('id', $schoolId)->first();
+        if (!$school) {
+            return response()->json(['success' => false, 'message' => 'Invalid school selected.', 'field' => 'school_id'], 422);
+        }
+        // Check if school is active (if status column exists)
+        if (isset($school->status) && $school->status !== 'active') {
+            return response()->json(['success' => false, 'message' => 'Selected school is not active.', 'field' => 'school_id'], 422);
+        }
+
+        // Check unique email (globally across all users)
+        if (DB::table('users')->where('email', $email)->exists()) {
+            return response()->json(['success' => false, 'message' => 'This email is already in use.', 'field' => 'email'], 409);
         }
 
         $userId = DB::table('users')->insertGetId([
-            'first_name' => $request->input('first_name'),
-            'middle_name' => $request->input('middle_name') ?: null,
-            'last_name' => $request->input('last_name'),
-            'suffix' => $request->input('suffix') ?: null,
-            'email' => strtolower(trim($request->input('email'))),
-            'password' => Hash::make($request->input('password')),
-            'status' => strtolower($request->input('status')),
-            'notes' => $request->input('notes') ?: null,
+            'first_name' => $firstName,
+            'middle_name' => !empty($middleName) ? $middleName : null,
+            'last_name' => $lastName,
+            'suffix' => !empty($suffix) ? $suffix : null,
+            'email' => $email,
+            'password' => Hash::make($password),
+            'status' => $status,
+            'notes' => trim($request->input('notes', '') ?: null),
             'role' => 'librarian',
-            'school_id' => $request->input('school_id'),
+            'school_id' => $schoolId,
             'created_at' => now(),
         ]);
+
+        // Log librarian creation
+        AuditLog::logAction(
+            $user,
+            'USER_CREATE',
+            'user',
+            $userId,
+            "Created librarian: {$firstName} {$lastName} ({$email}, School ID: {$schoolId})"
+        );
 
         return response()->json(['success' => true, 'id' => $userId, 'message' => 'Librarian account created successfully!']);
     }
@@ -174,55 +392,200 @@ class UserController extends BaseController
     public function update(Request $request, $id)
     {
         $user = $this->requireLogin();
+        $id = (int)$id;
 
-        $request->validate([
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'email' => 'required|email',
-            'status' => 'required|string',
-            'middle_name' => 'nullable|string',
-            'suffix' => 'nullable|string',
-            'student_no' => 'nullable|string',
-            'course' => 'nullable|string',
-            'year_level' => 'nullable|string',
-            'section' => 'nullable|string',
-            'notes' => 'nullable|string',
-            'school_id' => 'nullable|integer',
-            'password' => 'nullable|min:8',
-        ]);
+        // Get the existing user
+        $existingUser = DB::table('users')->where('id', $id)->first();
+        if (!$existingUser) {
+            return response()->json(['success' => false, 'message' => 'User not found.'], 404);
+        }
 
+        // Check if user is a student (for student-specific validations)
+        $isStudent = strtolower($existingUser->role ?? '') === 'student';
+        $schoolId = (int)($existingUser->school_id ?? 0);
+
+        // Normalize inputs
+        $firstName = trim($request->input('first_name', ''));
+        $middleName = trim($request->input('middle_name', ''));
+        $lastName = trim($request->input('last_name', ''));
+        $suffix = trim($request->input('suffix', ''));
+        $email = strtolower(trim($request->input('email', '')));
+        $status = strtolower(trim($request->input('status', 'active')));
+        $password = $request->input('password', '');
+        $studentNo = trim($request->input('student_no', ''));
+        $course = trim($request->input('course', ''));
+        $yearLevel = trim($request->input('year_level', ''));
+        $section = trim($request->input('section', ''));
+
+        // 🧍 Personal Info Validation
+        if (empty($firstName)) {
+            return response()->json(['success' => false, 'message' => 'First name is required.', 'field' => 'first_name'], 422);
+        }
+        if (strlen($firstName) < 2 || strlen($firstName) > 50) {
+            return response()->json(['success' => false, 'message' => 'First name must be 2-50 characters.', 'field' => 'first_name'], 422);
+        }
+        if (!preg_match('/^[a-zA-Z\s\-\']+$/', $firstName)) {
+            return response()->json(['success' => false, 'message' => 'First name can only contain letters, spaces, hyphens, or apostrophes.', 'field' => 'first_name'], 422);
+        }
+
+        if (!empty($middleName)) {
+            if (strlen($middleName) < 2 || strlen($middleName) > 50) {
+                return response()->json(['success' => false, 'message' => 'Middle name must be 2-50 characters.', 'field' => 'middle_name'], 422);
+            }
+            if (!preg_match('/^[a-zA-Z\s\-\']+$/', $middleName)) {
+                return response()->json(['success' => false, 'message' => 'Middle name can only contain letters, spaces, hyphens, or apostrophes.', 'field' => 'middle_name'], 422);
+            }
+        }
+
+        if (empty($lastName)) {
+            return response()->json(['success' => false, 'message' => 'Last name is required.', 'field' => 'last_name'], 422);
+        }
+        if (strlen($lastName) < 2 || strlen($lastName) > 50) {
+            return response()->json(['success' => false, 'message' => 'Last name must be 2-50 characters.', 'field' => 'last_name'], 422);
+        }
+        if (!preg_match('/^[a-zA-Z\s\-\']+$/', $lastName)) {
+            return response()->json(['success' => false, 'message' => 'Last name can only contain letters, spaces, hyphens, or apostrophes.', 'field' => 'last_name'], 422);
+        }
+
+        $allowedSuffixes = ['', 'N/A', 'Jr.', 'Sr.', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+        if (!empty($suffix) && !in_array($suffix, $allowedSuffixes)) {
+            return response()->json(['success' => false, 'message' => 'Invalid suffix. Please select from the allowed values.', 'field' => 'suffix'], 422);
+        }
+
+        // 📧 Account & Status Validation
+        if (empty($email)) {
+            return response()->json(['success' => false, 'message' => 'Email is required.', 'field' => 'email'], 422);
+        }
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return response()->json(['success' => false, 'message' => 'Enter a valid email address.', 'field' => 'email'], 422);
+        }
+
+        if (!in_array($status, ['active', 'disabled', 'inactive'])) {
+            return response()->json(['success' => false, 'message' => 'Status must be Active or Disabled.', 'field' => 'status'], 422);
+        }
+
+        // Password validation: Optional in edit mode, but if provided, must meet requirements
+        if (!empty($password)) {
+            if (strlen($password) < 8) {
+                return response()->json(['success' => false, 'message' => 'Password must be at least 8 characters.', 'field' => 'password'], 422);
+            }
+            if (!preg_match('/[A-Z]/', $password)) {
+                return response()->json(['success' => false, 'message' => 'Password must contain at least 1 uppercase letter.', 'field' => 'password'], 422);
+            }
+            if (!preg_match('/[a-z]/', $password)) {
+                return response()->json(['success' => false, 'message' => 'Password must contain at least 1 lowercase letter.', 'field' => 'password'], 422);
+            }
+            if (!preg_match('/[0-9]/', $password)) {
+                return response()->json(['success' => false, 'message' => 'Password must contain at least 1 number.', 'field' => 'password'], 422);
+            }
+            // Password must NOT be identical to email or student ID
+            if (strtolower($password) === strtolower($email)) {
+                return response()->json(['success' => false, 'message' => 'Password cannot be the same as your email.', 'field' => 'password'], 422);
+            }
+            if ($isStudent && $password === $studentNo) {
+                return response()->json(['success' => false, 'message' => 'Password cannot be the same as your student ID.', 'field' => 'password'], 422);
+            }
+        }
+
+        // 🏫 Academic Info Validation (for students)
+        if ($isStudent) {
+            if (empty($studentNo)) {
+                return response()->json(['success' => false, 'message' => 'School ID / Student No. is required.', 'field' => 'student_no'], 422);
+            }
+            if (!preg_match('/^\d{8}$/', $studentNo)) {
+                return response()->json(['success' => false, 'message' => 'Student number must be exactly 8 digits.', 'field' => 'student_no'], 422);
+            }
+
+            if (empty($course)) {
+                return response()->json(['success' => false, 'message' => 'Course is required.', 'field' => 'course'], 422);
+            }
+            $allowedCourses = [
+                'Bachelor of Science in Computer Science',
+                'Bachelor of Science in Information Technology',
+                'Bachelor of Science in Information Systems',
+                'Bachelor of Science in Computer Engineering',
+                'Bachelor of Science in Software Engineering',
+                'Bachelor of Science in Business Administration',
+                'Bachelor of Science in Accountancy',
+                'Bachelor of Science in Education',
+                'Bachelor of Arts in Psychology',
+                'Bachelor of Science in Nursing',
+                'Bachelor of Science in Engineering',
+                'Bachelor of Science in Mathematics'
+            ];
+            if (!in_array($course, $allowedCourses)) {
+                return response()->json(['success' => false, 'message' => 'Please select a valid course from the list.', 'field' => 'course'], 422);
+            }
+
+            if (empty($yearLevel)) {
+                return response()->json(['success' => false, 'message' => 'Year level is required.', 'field' => 'year_level'], 422);
+            }
+            $allowedYears = ['1st', '2nd', '3rd', '4th', '5th'];
+            if (!in_array($yearLevel, $allowedYears)) {
+                return response()->json(['success' => false, 'message' => 'Please select a valid year level.', 'field' => 'year_level'], 422);
+            }
+
+            if (empty($section)) {
+                return response()->json(['success' => false, 'message' => 'Section is required.', 'field' => 'section'], 422);
+            }
+            $allowedSections = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+            if (!in_array($section, $allowedSections)) {
+                return response()->json(['success' => false, 'message' => 'Please select a valid section.', 'field' => 'section'], 422);
+            }
+        }
+
+        // Check unique email (globally, excluding current user)
+        $emailExists = DB::table('users')
+            ->where('email', $email)
+            ->where('id', '!=', $id)
+            ->exists();
+        if ($emailExists) {
+            return response()->json(['success' => false, 'message' => 'This email is already registered.', 'field' => 'email'], 409);
+        }
+
+        // Check unique student_no within school (excluding current student)
+        if ($isStudent && !empty($studentNo)) {
+            $studentNoExists = DB::table('users')
+                ->where('student_no', $studentNo)
+                ->where('school_id', $schoolId)
+                ->where('id', '!=', $id)
+                ->exists();
+            if ($studentNoExists) {
+                return response()->json(['success' => false, 'message' => 'This Student No. already exists in this school.', 'field' => 'student_no'], 409);
+            }
+        }
+
+        // Build update data
         $updateData = [
-            'first_name' => $request->input('first_name'),
-            'middle_name' => $request->input('middle_name') ?: null,
-            'last_name' => $request->input('last_name'),
-            'suffix' => $request->input('suffix') ?: null,
-            'email' => $request->input('email'),
-            'status' => $request->input('status'),
-            // Note: updated_at column doesn't exist in the users table
+            'first_name' => $firstName,
+            'middle_name' => !empty($middleName) ? $middleName : null,
+            'last_name' => $lastName,
+            'suffix' => !empty($suffix) ? $suffix : null,
+            'email' => $email,
+            'status' => $status,
         ];
 
-        if ($request->has('student_no')) {
-            $updateData['student_no'] = $request->input('student_no');
+        if ($isStudent) {
+            $updateData['student_no'] = $studentNo;
+            $updateData['course'] = $course;
+            $updateData['year_level'] = $yearLevel;
+            $updateData['section'] = $section;
         }
-        if ($request->has('course')) {
-            $updateData['course'] = $request->input('course');
-        }
-        if ($request->has('year_level')) {
-            $updateData['year_level'] = $request->input('year_level');
-        }
-        if ($request->has('section')) {
-            $updateData['section'] = $request->input('section');
-        }
+
         if ($request->has('notes')) {
-            $updateData['notes'] = $request->input('notes');
+            $updateData['notes'] = trim($request->input('notes', '') ?: null);
         }
+
         if ($request->has('school_id') && $user['role'] === 'admin') {
             $updateData['school_id'] = $request->input('school_id');
         }
-        if ($request->has('password') && $request->input('password')) {
-            $updateData['password'] = Hash::make($request->input('password'));
+
+        // Only update password if provided
+        if (!empty($password)) {
+            $updateData['password'] = Hash::make($password);
         }
 
+        $oldStatus = $existingUser->status;
         $updated = DB::table('users')->where('id', $id)->update($updateData);
         
         if ($updated === false) {
@@ -233,6 +596,48 @@ class UserController extends BaseController
         $updatedUser = DB::table('users')->where('id', $id)->first();
         if (!$updatedUser) {
             return response()->json(['success' => false, 'message' => 'User not found after update'], 500);
+        }
+
+        // Log user update
+        $logDetails = [];
+        if (isset($updateData['status']) && $updateData['status'] !== $oldStatus) {
+            if ($updateData['status'] === 'disabled' || $updateData['status'] === 'inactive') {
+                AuditLog::logAction(
+                    $user,
+                    'USER_DEACTIVATE',
+                    'user',
+                    $id,
+                    "Deactivated user: {$updatedUser->email} (Status: {$oldStatus} → {$updateData['status']})"
+                );
+            } elseif (($oldStatus === 'disabled' || $oldStatus === 'inactive') && $updateData['status'] === 'active') {
+                AuditLog::logAction(
+                    $user,
+                    'USER_REACTIVATE',
+                    'user',
+                    $id,
+                    "Reactivated user: {$updatedUser->email}"
+                );
+            }
+        }
+        if (!empty($password)) {
+            AuditLog::logAction(
+                $user,
+                'USER_RESET_PASSWORD',
+                'user',
+                $id,
+                "Reset password for user: {$updatedUser->email}"
+            );
+        }
+        if (!isset($updateData['status']) || $updateData['status'] === $oldStatus) {
+            // Regular update (not status change)
+            $updatedFields = array_keys($updateData);
+            AuditLog::logAction(
+                $user,
+                'USER_UPDATE',
+                'user',
+                $id,
+                "Updated user ID {$id}: " . implode(', ', $updatedFields)
+            );
         }
 
         return response()->json([
@@ -305,14 +710,32 @@ class UserController extends BaseController
 
         // Search books
         if ($type === 'both' || $type === 'books') {
-            $books = DB::table('books')
+            $booksQuery = DB::table('books')
                 ->where(function($qry) use ($q) {
                     $qry->where('title', 'LIKE', "%{$q}%")
                         ->orWhere('author', 'LIKE', "%{$q}%")
                         ->orWhere('isbn', 'LIKE', "%{$q}%")
                         ->orWhere('category', 'LIKE', "%{$q}%");
-                })
-                ->select('id', 'title', 'author', 'isbn', 'category')
+                });
+
+            // Librarian-level filtering - librarians only see books they added
+            $currentRole = strtolower($user['role'] ?? '');
+            if ($currentRole === 'librarian') {
+                $userId = (int)($user['id'] ?? 0);
+                if ($userId > 0) {
+                    // Check if books table has added_by column
+                    $hasAddedBy = DB::select("SHOW COLUMNS FROM books LIKE 'added_by'");
+                    if (count($hasAddedBy) > 0) {
+                        $booksQuery->where('books.added_by', $userId);
+                    }
+                } else {
+                    // Librarian without ID - return empty books
+                    $booksQuery->whereRaw('1 = 0'); // Never match anything
+                }
+            }
+            // Admin sees all books (no filter)
+
+            $books = $booksQuery->select('id', 'title', 'author', 'isbn', 'category')
                 ->limit(20)
                 ->get();
 

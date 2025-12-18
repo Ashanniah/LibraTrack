@@ -20,6 +20,7 @@ class Book extends Model
         'cover',
         'rating',
         'archived',
+        'school_id',
     ];
 
     protected $casts = [

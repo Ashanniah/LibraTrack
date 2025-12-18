@@ -11,7 +11,7 @@
 
   <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
 
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
 
   <style>
     :root{
@@ -122,29 +122,6 @@
     }
     
     /* Notification Button */
-    .notification-btn{
-      color:var(--text-primary) !important;
-      padding:8px 12px;
-      border-radius:var(--border-radius-sm);
-      transition:all 0.2s ease;
-    }
-    .notification-btn:hover{
-      color:var(--text-primary) !important;
-      background-color:#f8f9fa;
-    }
-    .notification-badge{
-      font-size:0.6875rem;
-      padding:3px 7px;
-      font-weight:600;
-      background:var(--brand-gold) !important;
-      color:#fff !important;
-    }
-    .notification-dropdown{
-      border-radius:var(--border-radius-sm);
-      box-shadow:var(--shadow-lg);
-      border:1px solid var(--card-border);
-    }
-    
     /* Admin Button */
     .admin-btn-custom {
       padding:0 !important;
@@ -377,6 +354,69 @@
       right:20px;
       z-index:9999;
     }
+
+    /* Skeleton Loaders */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-table-row td {
+      padding: 16px var(--cell-pad-x);
+    }
+    .skeleton-table-cell {
+      height: 1rem;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-cell.short {
+      width: 60%;
+    }
+    .skeleton-table-cell.medium {
+      width: 80%;
+    }
+    .skeleton-table-cell.long {
+      width: 100%;
+    }
+    .skeleton-badge {
+      width: 40px;
+      height: 24px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .skeleton-button {
+      width: 70px;
+      height: 32px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+      margin: 0 4px;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .btn:disabled,
+    .form-control:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background-color: #e9ecef;
+    }
   </style>
 </head>
 <body class="sb-body sb-expanded">
@@ -397,17 +437,6 @@
               <input class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search categories..." id="searchInput">
 						</div>
 					</form>
-
-          <div class="dropdown me-2">
-            <button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
-              <i class="bi bi-bell fs-5"></i>
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
-              <li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
-              <li id="notificationList" class="px-3 py-2"><div class="text-muted small">No notifications</div></li>
-            </ul>
-          </div>
 
 					<div class="dropdown">
             <button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:var(--border-radius-sm);">
@@ -449,21 +478,13 @@
                   <th class="text-end">Actions</th>
 								</tr>
 							</thead>
-              <tbody id="tbody">
-                <tr>
-                  <td colspan="5" class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status">
-                      <span class="visually-hidden">Loading...</span>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
+              <tbody id="tbody"></tbody>
 						</table>
 					</div>
           <div id="empty" class="empty-state d-none">
             <i class="bi bi-tags"></i>
-            <h5 class="mt-3 mb-2">No categories found</h5>
-            <p class="mb-0">Get started by adding your first category.</p>
+            <h5 class="mt-3 mb-2">No categories yet</h5>
+            <p class="mb-0">Add your first category to organize books.</p>
 					</div>
 				</div>
 			</div>
@@ -563,6 +584,7 @@
 
 	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js"></script>
+	<script src="assets/js/logout.js"></script>
 	<script>
 		async function getMe() {
 			const authUrl = '/api/check-auth';
@@ -640,20 +662,71 @@
         whoChipEl.innerHTML = `<span class="badge" style="background:#4a4a4a;color:#fff;font-weight:600;">${role.toUpperCase()}</span> ${fullName || me.email}`;
       }
 
-			document.getElementById('logoutLink')?.addEventListener('click', async e => {
-				e.preventDefault();
-				try { await fetch('/api/logout', { method:'POST', credentials:'include' }); } catch {}
-				location.href = '/login';
-			});
+			// Logout - handled by logout.js (confirmation dialog)
 
 			const tbody = document.getElementById('tbody');
 			const empty = document.getElementById('empty');
 			const catModal = new bootstrap.Modal(document.getElementById('catModal'));
 			const delModal = new bootstrap.Modal(document.getElementById('delModal'));
+			const btnAdd = document.getElementById('btnAdd');
+			const searchInput = document.getElementById('searchInput');
 			let deleteId = null;
       let categoriesData = [];
+      let isLoading = false;
+
+      // Render skeleton table rows
+      function renderSkeletonTableRows(count = 4) {
+        return Array.from({length: count}, () => `
+          <tr class="skeleton-table-row">
+            <td>
+              <div class="skeleton-table-cell medium"></div>
+            </td>
+            <td>
+              <div class="skeleton-table-cell long"></div>
+            </td>
+            <td class="text-center">
+              <div class="skeleton-badge"></div>
+            </td>
+            <td>
+              <div class="skeleton-table-cell short"></div>
+            </td>
+            <td class="text-end">
+              <div class="d-inline-flex align-items-center">
+                <div class="skeleton-button"></div>
+                <div class="skeleton-button"></div>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Disable/enable interactions during loading
+      function setLoadingState(loading) {
+        isLoading = loading;
+        
+        // Disable Add Category button
+        if (btnAdd) {
+          btnAdd.disabled = loading;
+        }
+        
+        // Disable search input
+        if (searchInput) {
+          searchInput.disabled = loading;
+        }
+        
+        // Disable action buttons in table
+        const actionButtons = tbody.querySelectorAll('.action-btn');
+        actionButtons.forEach(btn => {
+          btn.disabled = loading;
+        });
+      }
 
       async function loadCategories(search = '') {
+        // Show skeleton loading
+        tbody.innerHTML = renderSkeletonTableRows(4);
+        empty.classList.add('d-none');
+        setLoadingState(true);
+        
         try {
           const url = '/api/categories' + (search ? `?search=${encodeURIComponent(search)}` : '');
           const res = await fetch(url, { credentials: 'include' });
@@ -668,10 +741,16 @@
         } catch (error) {
           console.error('Error loading categories:', error);
           tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">Error loading categories. Please refresh the page.</td></tr>`;
+          empty.classList.add('d-none');
+        } finally {
+          setLoadingState(false);
         }
       }
 
       function renderTable(categories) {
+        // Hide empty state during render
+        empty.classList.add('d-none');
+        
         if (categories.length === 0) {
           tbody.innerHTML = '';
           empty.classList.remove('d-none');
@@ -679,11 +758,11 @@
           return;
         }
 
-        empty.classList.add('d-none');
         document.getElementById('categoryCount').textContent = categories.length;
 
+        // Render categories with fade-in
         tbody.innerHTML = categories.map(cat => `
-          <tr>
+          <tr class="fade-in">
             <td>
               <div class="fw-semibold">${escapeHtml(cat.name || '')}</div>
             </td>
@@ -712,7 +791,9 @@
 
       // Search functionality
       let searchTimeout;
-      document.getElementById('searchInput').addEventListener('input', (e) => {
+      searchInput.addEventListener('input', (e) => {
+        if (isLoading) return;
+        
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
           loadCategories(e.target.value.trim());

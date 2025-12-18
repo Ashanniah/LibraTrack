@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack - Notifications</title>
+
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
+  
+  <style>
+    .notification-item {
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .notification-item:hover {
+      background-color: #f8f9fa;
+    }
+    .notification-item.unread {
+      background-color: #f0f7ff;
+      border-left: 3px solid #0d6efd;
+    }
+    .notification-icon {
+      font-size: 1.5rem;
+      width: 40px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="sb-body">
+  <div id="sidebar-root"></div>
+  <div class="sb-wrapper">
+    <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+      <div class="container-fluid">
+        <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+        <div class="fw-bold h5 mb-0" id="pageTitle">Notifications</div>
+
+        <div class="ms-auto d-flex align-items-center gap-2">
+          <div class="dropdown">
+            <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="#" id="profileLink"><i class="bi bi-person me-2"></i>Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container-fluid py-4" style="padding:24px!important;">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center gap-3">
+            <h5 class="mb-0"><i class="bi bi-bell me-2"></i>Notifications</h5>
+            <div class="btn-group btn-group-sm" role="group">
+              <input type="radio" class="btn-check" name="statusFilter" id="filterAll" value="all" checked>
+              <label class="btn btn-outline-primary" for="filterAll">All</label>
+              
+              <input type="radio" class="btn-check" name="statusFilter" id="filterUnread" value="unread">
+              <label class="btn btn-outline-primary" for="filterUnread">Unread</label>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button id="btnMarkAllRead" class="btn btn-sm btn-outline-secondary">Mark All Read</button>
+            <button id="btnRefresh" class="btn btn-sm btn-light"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div id="notificationsContainer">
+            <div class="text-center text-muted py-5">
+              <i class="bi bi-hourglass-split fs-2 d-block mb-2"></i>
+              Loading notifications...
+            </div>
+          </div>
+          <div id="paginationContainer" class="card-footer"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/notifications.js"></script>
+  <script src="assets/js/logout.js"></script>
+  <script>
+    let currentPage = 1;
+    const pageSize = 20;
+    let currentStatus = 'all';
+    let currentType = '';
+
+    // Initialize
+    (async () => {
+      const res = await fetch('/api/check-auth', {credentials:'include'});
+      if (!res.ok) { location.href = 'login.html'; return; }
+      const data = await res.json().catch(()=>null);
+      const role = (data?.user?.role || '').toLowerCase();
+      if (!role) { location.href = 'login.html'; return; }
+
+      renderSidebar('notifications', role, false);
+      localStorage.setItem('userRole', role);
+      
+      // Set profile link based on role
+      const profileLink = document.getElementById('profileLink');
+      if (profileLink) {
+        if (role === 'admin') profileLink.href = 'admin-profile.html';
+        else if (role === 'librarian') profileLink.href = 'librarian-profile.html';
+        else profileLink.href = 'student-profile.html';
+      }
+      
+      // Logout
+      // Logout - handled by logout.js (confirmation dialog)
+
+      // Load avatar
+      const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+      if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') {
+        headerAvatar.src = data.user.avatar;
+      }
+
+      document.getElementById('sidebarToggle')?.addEventListener('click', toggleSidebar);
+      
+      loadNotifications();
+    })();
+
+    // Filter handlers
+    document.querySelectorAll('input[name="statusFilter"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        currentStatus = e.target.value;
+        currentPage = 1;
+        loadNotifications();
+      });
+    });
+
+    // Mark all read
+    document.getElementById('btnMarkAllRead')?.addEventListener('click', async () => {
+      try {
+        const res = await fetch('/api/notifications/mark-all-read', {
+          method: 'POST',
+          credentials: 'include'
+        });
+        const data = await res.json();
+        if (data.ok) {
+          loadNotifications();
+          if (window.updateNotificationBadge) updateNotificationBadge();
+        }
+      } catch (e) {
+        alert('Error marking notifications as read');
+      }
+    });
+
+    // Refresh
+    document.getElementById('btnRefresh')?.addEventListener('click', () => {
+      loadNotifications();
+    });
+
+    // Load notifications
+    async function loadNotifications() {
+      const container = document.getElementById('notificationsContainer');
+      const pagination = document.getElementById('paginationContainer');
+      
+      container.innerHTML = '<div class="text-center text-muted py-5"><i class="bi bi-hourglass-split fs-2 d-block mb-2"></i>Loading...</div>';
+      pagination.innerHTML = '';
+
+      try {
+        const params = new URLSearchParams({
+          status: currentStatus,
+          page: currentPage,
+          limit: pageSize
+        });
+        if (currentType) params.set('type', currentType);
+
+        const res = await fetch(`/api/notifications/list?${params}`, {credentials:'include'});
+        const data = await res.json().catch(()=>({items:[], total:0}));
+
+        if (data.items && data.items.length > 0) {
+          renderNotifications(data.items);
+          renderPagination(data.page, data.pages, data.total);
+        } else {
+          container.innerHTML = `
+            <div class="text-center text-muted py-5">
+              <i class="bi bi-bell-slash fs-2 d-block mb-2"></i>
+              No notifications found.
+            </div>
+          `;
+        }
+      } catch (err) {
+        container.innerHTML = `<div class="alert alert-danger m-3">Error loading notifications: ${err.message}</div>`;
+      }
+    }
+
+    function renderNotifications(items) {
+      const container = document.getElementById('notificationsContainer');
+      
+      container.innerHTML = items.map(notif => {
+        const timeAgo = getTimeAgo(notif.created_at);
+        const icon = getNotificationIcon(notif.type);
+        const link = notif.deep_link || '#';
+        const unreadClass = notif.is_read ? '' : 'unread';
+        
+        return `
+          <div class="notification-item ${unreadClass} p-3 border-bottom" data-id="${notif.id}" style="cursor: pointer;" onclick="handleNotificationClick(${notif.id}, '${link}')">
+            <div class="d-flex align-items-start gap-3">
+              <div class="notification-icon">${getIconHtml(icon)}</div>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                  <h6 class="mb-0 fw-semibold">${escapeHtml(notif.title)}</h6>
+                  ${!notif.is_read ? '<span class="badge bg-primary">New</span>' : ''}
+                </div>
+                <p class="text-muted mb-1 small">${escapeHtml(notif.message)}</p>
+                <div class="text-muted" style="font-size: 0.75rem;">${timeAgo}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getNotificationIcon(type) {
+      const icons = {
+        'BORROW_REQUEST_SUBMITTED': 'bi-file-earmark-plus text-primary',
+        'BORROW_REQUEST_APPROVED': 'bi-check-circle text-success',
+        'BORROW_REQUEST_REJECTED': 'bi-x-circle text-danger',
+        'NEW_BORROW_REQUEST': 'bi-bell text-info',
+        'DUE_SOON': 'bi-clock text-warning',
+        'OVERDUE': 'bi-exclamation-triangle text-danger',
+        'LOW_STOCK': 'bi-exclamation-circle text-warning',
+        'OVERDUE_SUMMARY': 'bi-list-ul text-info',
+        'SETTINGS_CHANGED': 'bi-gear text-secondary',
+        'SECURITY_ALERT': 'bi-shield-exclamation text-danger',
+        'EMAIL_FAILURE': 'bi-envelope-x text-danger',
+      };
+      return icons[type] || 'bi-bell text-secondary';
+    }
+
+    function getIconHtml(iconClass) {
+      return `<i class="bi ${iconClass}"></i>`;
+    }
+
+    function getTimeAgo(dateString) {
+      const date = new Date(dateString);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMs / 3600000);
+      const diffDays = Math.floor(diffMs / 86400000);
+
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffHours < 24) return `${diffHours}h ago`;
+      if (diffDays < 7) return `${diffDays}d ago`;
+      return date.toLocaleDateString();
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    async function handleNotificationClick(notifId, link) {
+      // Mark as read
+      try {
+        await fetch('/api/notifications/mark-read', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          credentials: 'include',
+          body: JSON.stringify({notification_id: notifId})
+        });
+      } catch (e) {
+        console.error('Error marking as read:', e);
+      }
+
+      // Navigate
+      if (link && link !== '#') {
+        window.location.href = link;
+      } else {
+        // Reload to update read status
+        loadNotifications();
+        if (window.updateNotificationBadge) updateNotificationBadge();
+      }
+    }
+
+    function renderPagination(page, pages, total) {
+      const pagination = document.getElementById('paginationContainer');
+      if (pages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+
+      let html = `<div class="d-flex justify-content-between align-items-center px-3 py-2">
+        <div class="text-muted small">Showing ${((page - 1) * pageSize) + 1}-${Math.min(page * pageSize, total)} of ${total}</div>
+        <nav>
+          <ul class="pagination pagination-sm mb-0">`;
+
+      // Previous
+      html += `<li class="page-item ${page === 1 ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="event.preventDefault(); if(${page} > 1) { currentPage = ${page - 1}; loadNotifications(); }">Previous</a>
+      </li>`;
+
+      // Page numbers
+      for (let i = 1; i <= pages; i++) {
+        if (i === 1 || i === pages || (i >= page - 2 && i <= page + 2)) {
+          html += `<li class="page-item ${i === page ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="event.preventDefault(); currentPage = ${i}; loadNotifications();">${i}</a>
+          </li>`;
+        } else if (i === page - 3 || i === page + 3) {
+          html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+      }
+
+      // Next
+      html += `<li class="page-item ${page === pages ? 'disabled' : ''}">
+        <a class="page-link" href="#" onclick="event.preventDefault(); if(${page} < ${pages}) { currentPage = ${page + 1}; loadNotifications(); }">Next</a>
+      </li>`;
+
+      html += `</ul></nav></div>`;
+      pagination.innerHTML = html;
+    }
+  </script>
+</body>
+</html>
+

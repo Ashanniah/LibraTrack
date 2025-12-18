@@ -1,7 +1,7 @@
 // Role-aware shared sidebar - Unified for Admin, Librarian, and Student
 // Version: 2025-11-17-unified
 (function () {
-  const APP_BASE = '/libratrack/';
+  const APP_BASE = '/';
 
   const ROUTES = {
     admin: {
@@ -31,7 +31,6 @@
     student: {
       dashboard: 'dashboard.html',
       books: 'books.html',
-      search: 'student-search.html',
       history: 'student-history.html',
       favorites: 'favorites.html',
       overdue: 'student-overdue.html',
@@ -59,7 +58,6 @@
     'librarian-history.html': 'history',
     'librarian-emails.html': 'emails',
     'librarian-profile.html': 'profile',
-    'student-search.html': 'search',
     'student-history.html': 'history',
     'student-favorite.html': 'favorites',
     'student-favorites.html': 'favorites',
@@ -108,7 +106,6 @@
         <div class="sb-label">Main</div>
         ${link(ROUTES.student.dashboard,'bi-speedometer2','Dashboard',current==='dashboard')}
         ${link(ROUTES.student.books,'bi-journal-text','Books',current==='books')}
-        ${link(ROUTES.student.search,'bi-search','Search Books',current==='search')}
         ${link(ROUTES.student.history,'bi-clock-history','History',current==='history')}
         ${link(ROUTES.student.favorites,'bi-heart','Favorites',current==='favorites')}
         ${link(ROUTES.student.overdue,'bi-exclamation-triangle','Overdue',current==='overdue')}
@@ -182,15 +179,28 @@
 
     patchLegacyLinks();
 
-    // Logout handler
+    // Logout handler - use confirmation modal if available, otherwise direct logout
     root.querySelectorAll('a[href*="login.html"]').forEach(link => {
       if (link.textContent.trim().toLowerCase().includes('logout')) {
+        // Set id for logout.js to handle
+        link.id = 'logoutLink';
+        link.href = '#';
+        // Keep logout link white (don't add text-danger class)
+        
+        // Always check for confirmation function when clicked (in case logout.js loads after sidebar.js)
         link.addEventListener('click', async (e) => {
           e.preventDefault();
-          try {
-            await fetch('/api/logout', { method: 'POST', credentials: 'include', headers: { 'Accept': 'application/json' } });
-          } catch {}
-          location.href = url('login.html');
+          
+          // If logout.js is loaded, use confirmation modal
+          if (typeof window.showLogoutConfirmation === 'function') {
+            window.showLogoutConfirmation();
+          } else {
+            // Fallback: direct logout if logout.js not loaded
+            try {
+              await fetch('/api/logout', { method: 'POST', credentials: 'include', headers: { 'Accept': 'application/json' } });
+            } catch {}
+            location.href = url('login.html');
+          }
         });
       }
     });

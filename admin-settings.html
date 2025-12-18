@@ -1,15 +1,33 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>LibraTrack – System Settings</title>
-	<link rel="icon" href="assets/img/LibraTrack-logo.png">
+	<link rel="icon" href="assets/img/logo.png" type="image/png">
 	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="assets/vendor/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.css">
-	<link rel="stylesheet" href="assets/css/sidebar.css">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+	<link rel="stylesheet" href="assets/css/sidebar.css">
+	<link href="assets/css/responsive.css" rel="stylesheet">
 	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		html {
+			margin: 0 !important;
+			padding: 0 !important;
+		}
+		body {
+			margin: 0 !important;
+			padding: 0 !important;
+		}
+		body.sb-body {
+			margin: 0 !important;
+			padding: 0 !important;
+		}
 		:root{
 			--gold:#a68604;
 			--gold-dark:#8d7003;
@@ -29,13 +47,54 @@
 			--shadow-lg:0 6px 18px rgba(0,0,0,.12);
 		}
 		
-		/* Consistent Header Design */
 		.admin-header-gold {
 			background: var(--header-bg) !important;
 			color: var(--text-primary) !important;
 			border-bottom:1px solid var(--card-border);
 			box-shadow:var(--shadow-sm);
 			padding:12px 0;
+			margin-top: 0 !important;
+			margin-bottom: 0 !important;
+		}
+		.sb-topbar {
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+			top: 0 !important;
+			margin-bottom: 0 !important;
+		}
+		.sb-topbar.navbar {
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+			margin-bottom: 0 !important;
+		}
+		.sb-wrapper {
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+		}
+		body.sb-body {
+			margin: 0 !important;
+			padding: 0 !important;
+		}
+		.navbar {
+			margin-top: 0 !important;
+			padding-top: 0 !important;
+		}
+		.sticky-top {
+			top: 0 !important;
+			margin-top: 0 !important;
+		}
+		.admin-header-gold .container-fluid,
+		.sb-topbar .container-fluid {
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+			margin-left: 0 !important;
+			margin-right: 0 !important;
+		}
+		.admin-header-gold .container-fluid > button:first-child {
+			margin-left: 16px !important;
+		}
+		.admin-header-gold .container-fluid > *:last-child {
+			margin-right: 16px !important;
 		}
 		.admin-header-gold .fw-bold,
 		.admin-header-gold .h5,
@@ -54,58 +113,6 @@
 		.admin-header-gold .btn-link:hover {
 			color: var(--text-primary) !important;
 			background-color:#f8f9fa;
-		}
-		
-		/* Consistent Search Bar Design */
-		.search-bar-custom {
-			height: 42px;
-		}
-		.search-bar-custom .input-group-text,
-		.search-bar-custom .form-control {
-			height: 42px;
-			padding: 10px 16px;
-			font-size:0.875rem;
-		}
-		.search-bar-custom .input-group-text {
-			border-top-left-radius: var(--border-radius-sm);
-			border-bottom-left-radius: var(--border-radius-sm);
-			background: var(--table-header-bg) !important;
-			border: 1px solid var(--card-border);
-			border-right: none !important;
-			outline: none !important;
-			color:var(--text-secondary);
-		}
-		.search-bar-custom .form-control {
-			border-top-right-radius: var(--border-radius-sm);
-			border-bottom-right-radius: var(--border-radius-sm);
-			background: var(--table-header-bg) !important;
-			border: 1px solid var(--card-border);
-			border-left: none !important;
-			color: var(--text-primary);
-			outline: none !important;
-			box-shadow: none !important;
-		}
-		.search-bar-custom .form-control:focus {
-			outline: none !important;
-			box-shadow: none !important;
-			border-color: var(--card-border) !important;
-		}
-		.search-bar-custom .form-control::placeholder {
-			color: var(--text-muted);
-		}
-		.search-bar-custom:focus-within {
-			box-shadow: 0 0 0 3px rgba(166, 134, 4, 0.15);
-			border-radius: var(--border-radius-sm);
-		}
-		.search-bar-custom:focus-within .input-group-text {
-			border-color: var(--gold);
-			border-right: none !important;
-			background: #fff !important;
-		}
-		.search-bar-custom:focus-within .form-control {
-			border-color: var(--gold);
-			border-left: none !important;
-			background: #fff !important;
 		}
 		
 		/* Consistent Admin Button - Avatar */
@@ -139,37 +146,12 @@
 			object-fit: cover;
 		}
 		
-		/* Notification Button */
-		.notification-btn{
-			color:var(--text-primary) !important;
-			padding:8px 12px;
-			border-radius:var(--border-radius-sm);
-			transition:all 0.2s ease;
-		}
-		.notification-btn:hover{
-			color:var(--text-primary) !important;
-			background-color:#f8f9fa;
-		}
-		.notification-badge{
-			font-size:0.6875rem;
-			padding:3px 7px;
-			font-weight:600;
-			background:var(--gold) !important;
-			color:#fff !important;
-		}
-		.notification-dropdown{
-			border-radius:var(--border-radius);
-			box-shadow:var(--shadow-lg);
-			border:1px solid var(--card-border);
-			margin-top:8px;
-		}
-		
-		/* Consistent Card Design */
 		.card{
 			border-radius:var(--border-radius-lg);
 			border:1px solid var(--card-border);
 			box-shadow:var(--shadow-sm);
 			overflow:hidden;
+			margin-bottom:24px;
 		}
 		.card-header{
 			background:var(--sidebar-bg);
@@ -183,90 +165,153 @@
 			padding:24px;
 			background:#fff;
 		}
+		
+		html{font-size:14px;}
+		body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+		
+		main.sb-content.container-fluid{
+			padding:24px !important;
+		}
+		
 		.form-label{
-			font-weight:600;
-			font-size:0.875rem;
-			color:#374151;
+			font-weight:500;
+			color:var(--text-primary);
 			margin-bottom:8px;
+			font-size:0.875rem;
 		}
-		.form-control,
-		.form-select{
+		.form-control, .form-select{
+			border-radius:var(--border-radius-sm);
+			border:1px solid var(--card-border);
 			padding:10px 14px;
-			font-size:0.9375rem;
-			border:1.5px solid #e5e7eb;
-			border-radius:var(--border-radius-sm);
-			background:#fff;
-			color:#111827;
-			transition:all 0.2s ease;
+			font-size:0.875rem;
 		}
-		.form-control:focus,
-		.form-select:focus{
+		.form-control:focus, .form-select:focus{
 			border-color:var(--gold);
-			box-shadow:0 0 0 3px rgba(166,134,4,0.1);
-			outline:none;
+			box-shadow:0 0 0 0.2rem rgba(166, 134, 4, 0.25);
 		}
+		
 		.btn-primary{
-			background:var(--gold) !important;
-			border-color:var(--gold) !important;
-			color:#fff !important;
+			background-color:var(--gold);
+			border-color:var(--gold);
+			font-weight:500;
+			padding:10px 20px;
 			border-radius:var(--border-radius-sm);
-			font-weight:600;
-			padding:10px 24px;
 		}
 		.btn-primary:hover{
-			background:var(--gold-dark) !important;
-			border-color:var(--gold-dark) !important;
+			background-color:var(--gold-dark);
+			border-color:var(--gold-dark);
 		}
 		.btn-outline-primary{
 			border-color:var(--gold);
 			color:var(--gold);
-			border-radius:var(--border-radius-sm);
 		}
 		.btn-outline-primary:hover{
-			background:var(--gold);
+			background-color:var(--gold);
 			border-color:var(--gold);
 			color:#fff;
 		}
-		main.container-fluid{
-			padding:24px !important;
+		
+		.alert{
+			border-radius:var(--border-radius-sm);
 		}
-		h3{
-			font-weight:700;
-			font-size:1.5rem;
-			color:var(--text-primary);
-			margin-bottom:8px;
+		
+		.form-check-input:checked{
+			background-color:var(--gold);
+			border-color:var(--gold);
 		}
-		small.text-secondary{
-			color:var(--text-secondary);
-			font-size:0.875rem;
+		
+		/* Validation Error Styling */
+		.form-control.is-invalid,
+		.form-select.is-invalid {
+			border-color: #dc3545 !important;
+			box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 		}
-		.role-chip{
-			font-weight:600;
-			border-radius:999px;
-			padding:.2rem .6rem;
-			font-size:.75rem;
+		.form-control.is-invalid:focus,
+		.form-select.is-invalid:focus {
+			border-color: #dc3545 !important;
+			box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 		}
-		.role-chip.admin{
-			background:#4a4a4a;
-			color:#fff;
+		.field-error {
+			display: block;
+			width: 100%;
+			margin-top: 0.25rem;
+			font-size: 0.875rem;
+			color: #dc3545;
+			font-weight: 400;
 		}
-		.role-chip.librarian{
-			background:#e7f1ff;
-			color:#0d6efd;
-			border:1px solid rgba(13,110,253,.2);
+		.field-error-wrapper {
+			margin-bottom: 0;
 		}
-		.role-chip.student{
-			background:#efe7ff;
-			color:#6f42c1;
-			border:1px solid rgba(111,66,193,.2);
+		.form-label + .field-error-wrapper {
+			margin-top: 0;
+		}
+
+		/* Skeleton Loaders */
+		.skeleton {
+			background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+			background-size: 200% 100%;
+			animation: skeleton-shimmer 1.5s ease-in-out infinite;
+			border-radius: 4px;
+		}
+		@keyframes skeleton-shimmer {
+			0% { background-position: 200% 0; }
+			100% { background-position: -200% 0; }
+		}
+		.skeleton-input {
+			height: 38px;
+			background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+			background-size: 200% 100%;
+			animation: skeleton-shimmer 1.5s ease-in-out infinite;
+			border-radius: var(--border-radius-sm);
+			border: 1px solid var(--card-border);
+		}
+		.skeleton-select {
+			height: 38px;
+			background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+			background-size: 200% 100%;
+			animation: skeleton-shimmer 1.5s ease-in-out infinite;
+			border-radius: var(--border-radius-sm);
+			border: 1px solid var(--card-border);
+		}
+		.skeleton-toggle {
+			width: 48px;
+			height: 24px;
+			background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+			background-size: 200% 100%;
+			animation: skeleton-shimmer 1.5s ease-in-out infinite;
+			border-radius: 12px;
+			display: inline-block;
+		}
+		.btn-loading {
+			position: relative;
+			pointer-events: none;
+		}
+		.btn-loading .spinner-border-sm {
+			width: 1rem;
+			height: 1rem;
+			border-width: 0.15em;
+		}
+		.fade-in {
+			animation: fadeIn 0.3s ease-in;
+		}
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+		.form-control:disabled,
+		.form-select:disabled,
+		.form-check-input:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+			background-color: #e9ecef;
 		}
 	</style>
 </head>
-<body class="sb-body sb-expanded">
-	<div id="sidebar-root"></div>
+<body class="sb-body sb-expanded" style="margin:0; padding:0;">
+	<div id="sidebar-root" style="margin:0; padding:0;"></div>
 
-	<div class="sb-wrapper">
-		<nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
+	<div class="sb-wrapper" style="margin-top:0; padding-top:0;">
+		<nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold" style="margin-top:0 !important; padding-top:0 !important; top:0 !important;">
 			<div class="container-fluid">
 				<button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
 					<i class="bi bi-list fs-4"></i>
@@ -274,27 +319,9 @@
 				<div class="fw-bold h5 mb-0" id="pageTitle">System Settings</div>
 
 				<div class="ms-auto d-flex align-items-center gap-2">
-					<form class="d-none d-md-flex" role="search" style="max-width:520px;width:100%;">
-						<div class="input-group input-group-sm search-bar-custom">
-							<span class="input-group-text bg-light border-0 search-icon-wrapper"><i class="bi bi-search"></i></span>
-							<input class="form-control border-0 bg-light search-input-custom" type="search" placeholder="Search">
-						</div>
-					</form>
-
-					<div class="dropdown me-2">
-						<button class="btn btn-link btn-sm position-relative notification-btn" data-bs-toggle="dropdown" id="notificationBtn" aria-label="Notifications">
-							<i class="bi bi-bell fs-5"></i>
-							<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge d-none" id="notificationBadge">0</span>
-						</button>
-						<ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="min-width:320px;max-height:400px;overflow-y:auto;">
-							<li class="px-3 py-2 border-bottom"><h6 class="mb-0 fw-semibold">System Alerts</h6></li>
-							<li id="notificationList" class="px-3 py-2"><div class="text-muted small">No alerts</div></li>
-						</ul>
-					</div>
-
 					<div class="dropdown">
 						<button class="btn btn-light border btn-icon admin-btn-custom" data-bs-toggle="dropdown" id="userBtn" style="padding:0; width:44px; height:44px; border-radius:var(--border-radius-sm);">
-							<img src="assets/img/default-avatar.png" alt="Profile" class="avatar-32" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+							<img src="assets/img/default-avatar.png" alt="Profile" id="adminAvatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover;" onerror="this.src='assets/img/default-avatar.png'">
 						</button>
 						<ul class="dropdown-menu dropdown-menu-end">
 							<li class="px-3 py-2 small text-muted" id="whoChip">—</li>
@@ -308,187 +335,747 @@
 		</nav>
 
 		<main class="sb-content container-fluid">
-			<form id="settingsForm" class="row g-4">
-				<div class="col-lg-6">
-					<div class="card h-100">
-						<div class="card-header"><i class="bi bi-envelope me-2"></i>Email / SMTP Settings</div>
+			<div id="alertContainer" style="margin-bottom:24px;"></div>
+			
+			<div class="card">
+				<div class="card-header">
+					<i class="bi bi-envelope-at me-2"></i>SMTP Configuration
+				</div>
 						<div class="card-body">
-							<div class="mb-3">
+					<form id="smtpForm">
+						<div class="row g-3">
+							<div class="col-md-6">
 								<label class="form-label">SMTP Host</label>
-								<input type="text" class="form-control" name="smtp_host">
+								<div class="field-error-wrapper">
+									<input type="text" class="form-control" id="smtp_host" name="smtp_host" placeholder="smtp.gmail.com">
+									<div class="field-error" id="smtp_host_error" style="display:none;"></div>
+								</div>
 							</div>
-							<div class="mb-3">
+							<div class="col-md-6">
 								<label class="form-label">SMTP Port</label>
-								<input type="number" class="form-control" name="smtp_port" value="587">
+								<div class="field-error-wrapper">
+									<input type="number" class="form-control" id="smtp_port" name="smtp_port" placeholder="587" value="587">
+									<div class="field-error" id="smtp_port_error" style="display:none;"></div>
+								</div>
 							</div>
-							<div class="mb-3">
-								<label class="form-label">Username</label>
-								<input type="text" class="form-control" name="smtp_user">
+							<div class="col-md-6">
+								<label class="form-label">SMTP Username</label>
+								<div class="field-error-wrapper">
+									<input type="text" class="form-control" id="smtp_user" name="smtp_user" placeholder="your-email@gmail.com">
+									<div class="field-error" id="smtp_user_error" style="display:none;"></div>
+								</div>
 							</div>
-							<div class="mb-3">
-								<label class="form-label">Password</label>
-								<input type="password" class="form-control" name="smtp_pass">
+							<div class="col-md-6">
+								<label class="form-label">SMTP Password</label>
+								<div class="field-error-wrapper">
+									<input type="password" class="form-control" id="smtp_pass" name="smtp_pass" placeholder="••••••••">
+									<div class="field-error" id="smtp_pass_error" style="display:none;"></div>
 							</div>
-							<div class="mb-3">
+							</div>
+							<div class="col-md-6">
 								<label class="form-label">From Email</label>
-								<input type="email" class="form-control" name="smtp_from">
+								<div class="field-error-wrapper">
+									<input type="email" class="form-control" id="smtp_from" name="smtp_from" placeholder="noreply@libratrack.com">
+									<div class="field-error" id="smtp_from_error" style="display:none;"></div>
+								</div>
 							</div>
-							<div class="mb-3">
+							<div class="col-md-6">
+								<label class="form-label">From Name</label>
+								<div class="field-error-wrapper">
+									<input type="text" class="form-control" id="smtp_from_name" name="smtp_from_name" placeholder="LibraTrack" value="LibraTrack">
+									<div class="field-error" id="smtp_from_name_error" style="display:none;"></div>
+								</div>
+							</div>
+							<div class="col-md-6">
 								<label class="form-label">Encryption</label>
-								<select class="form-select" name="smtp_secure">
-									<option value="tls">TLS</option>
+								<div class="field-error-wrapper">
+									<select class="form-select" id="smtp_secure" name="smtp_secure">
+										<option value="tls" selected>TLS</option>
 									<option value="ssl">SSL</option>
+										<option value="none">None</option>
 								</select>
-							</div>
-							<div class="d-flex gap-2">
-								<button type="button" id="btnTest" class="btn btn-outline-primary"><i class="bi bi-send me-2"></i>Test SMTP Connection</button>
-								<div id="smtpStatus" class="align-self-center small text-muted"></div>
+									<div class="field-error" id="smtp_secure_error" style="display:none;"></div>
 							</div>
 						</div>
 					</div>
+						<div class="mt-4 d-flex gap-2">
+							<button type="button" class="btn btn-outline-primary" id="testSmtpBtn">
+								<i class="bi bi-check-circle me-2"></i>Test Connection
+							</button>
+							<button type="submit" class="btn btn-primary">
+								<i class="bi bi-save me-2"></i>Save SMTP Settings
+							</button>
 				</div>
-
-				<div class="col-lg-6">
-					<div class="card mb-4">
-						<div class="card-header"><i class="bi bi-box-seam me-2"></i>Inventory Settings</div>
+					</form>
+							</div>
+						</div>
+			
+			<div class="card">
+				<div class="card-header">
+					<i class="bi bi-bell me-2"></i>Email Notification Preferences
+					</div>
 						<div class="card-body">
 							<div class="mb-3">
-								<label class="form-label">Low-stock Threshold</label>
-								<input type="number" class="form-control" name="low_stock_threshold" value="3">
-							</div>
-							<div class="mb-3">
-								<label class="form-label">Critical Threshold</label>
-								<input type="number" class="form-control" name="critical_threshold" value="1">
-							</div>
-						</div>
-					</div>
-					<div class="card">
-						<div class="card-header"><i class="bi bi-shield-lock me-2"></i>Password Policy</div>
-						<div class="card-body">
-							<div class="mb-3">
-								<label class="form-label">Minimum Password Length</label>
-								<input type="number" class="form-control" name="pwd_min" value="8">
-							</div>
-							<div class="form-check mb-2">
-								<input class="form-check-input" type="checkbox" name="pwd_upper" id="pwd_upper">
-								<label class="form-check-label" for="pwd_upper">Require Uppercase</label>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" name="pwd_special" id="pwd_special">
-								<label class="form-check-label" for="pwd_special">Require Special Character</label>
+						<div class="form-check form-switch">
+							<input class="form-check-input" type="checkbox" id="email_optional_enabled" name="email_optional_enabled">
+							<label class="form-check-label" for="email_optional_enabled">
+								Enable optional email notifications
+							</label>
+							<small class="form-text text-muted d-block mt-1">
+								When enabled, emails will be sent for borrow request approvals, rejections, and due soon reminders.
+							</small>
 							</div>
 						</div>
+					<div class="alert alert-info">
+						<strong>Note:</strong> Overdue notifications and low stock alerts are always sent (required notifications).
+					</div>
+					<button type="button" class="btn btn-primary" id="saveEmailPrefsBtn">
+						<i class="bi bi-save me-2"></i>Save Preferences
+					</button>
 					</div>
 				</div>
-
-				<div class="col-12">
-					<button type="submit" class="btn btn-primary"><i class="bi bi-save me-2"></i>Save Settings</button>
-					<span id="saveMsg" class="small ms-2"></span>
-				</div>
-			</form>
 		</main>
 	</div>
 
 	<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-	<script src="assets/js/sidebar.js?v=2025-11-17-unified"></script>
+	<script src="assets/js/app-role.js"></script>
+	<script src="assets/js/sidebar.js"></script>
+	<script src="assets/js/logout.js"></script>
 	<script>
-		async function getMe() {
-			const authUrl = '/api/check-auth';
+		// Sidebar toggle
+		document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+			if (typeof toggleSidebar === 'function') toggleSidebar();
+			else document.body.classList.toggle('sb-expanded');
+		});
+		
+		// Load user info
+		(async function() {
 			try {
-				const res = await fetch(authUrl, { credentials: 'include', headers: { 'Accept':'application/json' } });
-				if (res.status === 401) {
-					location.href = '/login';
-					return null;
+				const res = await fetch('/api/me', { credentials: 'include' });
+				const me = await res.json();
+				if (me && me.user) {
+					const fullName = [me.user.first_name, me.user.last_name].filter(Boolean).join(' ');
+					document.getElementById('whoChip').innerHTML = `<strong>${fullName || me.user.email}</strong><br><small>${me.user.role || ''}</small>`;
+					if (me.user.avatar) {
+						document.getElementById('adminAvatar').src = me.user.avatar;
+					}
 				}
-				if (!res.ok) return null;
-				const data = await res.json();
-				if (data && data.success === true && data.user) return data.user;
-				if (data && data.ok === true && data.user) return data.user;
-				location.href = '/login';
-				return null;
-			} catch (e) {
-				console.error('Auth check error:', e);
-				return null;
+			} catch (err) {
+				console.error('Load user error:', err);
+			}
+		})();
+		
+		let settings = {};
+		let smtpSettingsValid = false;
+		let isLoading = false;
+		let isSaving = false;
+		
+		function showAlert(message, type = 'success') {
+			const container = document.getElementById('alertContainer');
+			const alert = document.createElement('div');
+			alert.className = `alert alert-${type} alert-dismissible fade show`;
+			alert.innerHTML = `
+				${message}
+				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+			`;
+			container.innerHTML = '';
+			container.appendChild(alert);
+			if (type !== 'success') {
+				setTimeout(() => alert.remove(), 8000);
+			} else {
+				setTimeout(() => alert.remove(), 5000);
 			}
 		}
-
-		(async function(){
-			const me = await getMe();
-			if (!me) return;
-
-			const role = (me.role || '').toLowerCase();
-			renderSidebar('settings', role, false);
+		
+		// Validation Helpers
+		function setFieldError(inputEl, message) {
+			if (!inputEl) return;
+			inputEl.classList.add('is-invalid');
+			const errorEl = document.getElementById(inputEl.id + '_error');
+			if (errorEl) {
+				errorEl.textContent = message;
+				errorEl.style.display = 'block';
+			}
+		}
+		
+		function clearFieldError(inputEl) {
+			if (!inputEl) return;
+			inputEl.classList.remove('is-invalid');
+			const errorEl = document.getElementById(inputEl.id + '_error');
+			if (errorEl) {
+				errorEl.textContent = '';
+				errorEl.style.display = 'none';
+			}
+		}
+		
+		function validateEmail(str) {
+			if (!str || typeof str !== 'string') return false;
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			return emailRegex.test(str.trim());
+		}
+		
+		function validateHost(str) {
+			if (!str || typeof str !== 'string') return false;
+			const trimmed = str.trim();
+			if (trimmed.length === 0 || trimmed.includes(' ')) return false;
+			// Valid hostname or IP
+			const hostnameRegex = /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
+			const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+			return hostnameRegex.test(trimmed) || ipRegex.test(trimmed);
+		}
+		
+		// SMTP Field Validations
+		function validateSmtpHost(value) {
+			if (!value || value.trim() === '') {
+				return 'SMTP host is required.';
+			}
+			if (!validateHost(value)) {
+				return 'Enter a valid SMTP host (e.g., smtp.gmail.com).';
+			}
+			return null;
+		}
+		
+		function validateSmtpPort(value) {
+			if (!value || value === '') {
+				return 'SMTP port is required.';
+			}
+			const port = parseInt(value, 10);
+			if (isNaN(port) || port < 1 || port > 65535) {
+				return 'SMTP port must be a number between 1 and 65535.';
+			}
+			return null;
+		}
+		
+		function validateSmtpUser(value) {
+			if (!value || value.trim() === '') {
+				return 'SMTP username is required.';
+			}
+			if (!validateEmail(value)) {
+				return 'Enter a valid email address for SMTP username.';
+			}
+			return null;
+		}
+		
+		function validateSmtpPass(value) {
+			if (!value || value === '') {
+				return 'SMTP password is required.';
+			}
+			if (value.length < 6) {
+				return 'SMTP password must be at least 6 characters.';
+			}
+			return null;
+		}
+		
+		function validateSmtpFrom(value) {
+			if (!value || value.trim() === '') {
+				return 'From email is required.';
+			}
+			if (!validateEmail(value)) {
+				return 'Enter a valid From email address.';
+			}
+					return null;
+				}
+		
+		function validateSmtpFromName(value) {
+			if (!value || value.trim() === '') {
+				return 'From name is required.';
+			}
+			const trimmed = value.trim();
+			if (trimmed.length < 2 || trimmed.length > 60) {
+				return 'From name must be between 2 and 60 characters.';
+			}
+				return null;
+		}
+		
+		function validateSmtpSecure(value) {
+			if (!value || !['tls', 'ssl', 'none'].includes(value)) {
+				return 'Please select an encryption type.';
+			}
+				return null;
+		}
+		
+		// Validate all SMTP fields (with optional display parameter)
+		function validateAllSmtpFields(displayErrors = true) {
+			const fields = {
+				smtp_host: validateSmtpHost,
+				smtp_port: validateSmtpPort,
+				smtp_user: validateSmtpUser,
+				smtp_pass: validateSmtpPass,
+				smtp_from: validateSmtpFrom,
+				smtp_from_name: validateSmtpFromName,
+				smtp_secure: validateSmtpSecure
+			};
 			
-			// Cache role for sidebar
-			if (['admin', 'librarian', 'student'].includes(role)) {
-				localStorage.setItem('userRole', role);
-			}
-
-			// Load avatar in header if available
-			const headerAvatar = document.querySelector('#userBtn img.avatar-32');
-			if (headerAvatar && me.avatar && me.avatar.trim() !== '') {
-				headerAvatar.src = me.avatar;
-			}
-
-			document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-				if (typeof toggleSidebar === 'function') toggleSidebar();
-				else document.body.classList.toggle('sb-expanded');
-			});
-
-			const fullName = [me.first_name, me.last_name].filter(Boolean).join(' ');
-			document.getElementById('whoChip').innerHTML =
-				`<span class="badge role-chip ${role}">${role.toUpperCase()}</span> ${fullName || me.email}`;
-
-			document.getElementById('logoutLink')?.addEventListener('click', async e => {
-				e.preventDefault();
-				try { await fetch('/api/logout', { method:'POST', credentials:'include' }); } catch {}
-				location.href = '/login';
-			});
-
-			const form = document.getElementById('settingsForm');
-			const saveMsg = document.getElementById('saveMsg');
-			const smtpStatus = document.getElementById('smtpStatus');
-
-			function setForm(data){
-				for (const [k,v] of Object.entries(data || {})){
-					const el = form.querySelector(`[name="${k}"]`);
-					if (!el) continue;
-					if (el.type === 'checkbox') el.checked = !!Number(v || el.checked);
-					else el.value = v ?? '';
+			let hasErrors = false;
+			const errors = {};
+			
+			for (const [fieldId, validator] of Object.entries(fields)) {
+				const inputEl = document.getElementById(fieldId);
+				if (!inputEl) continue;
+				
+				const value = inputEl.value;
+				const error = validator(value);
+				
+				if (error) {
+					if (displayErrors) {
+						setFieldError(inputEl, error);
+					}
+					errors[fieldId] = error;
+					hasErrors = true;
+				} else {
+					if (displayErrors) {
+						clearFieldError(inputEl);
+					}
 				}
 			}
-
-			async function load(){
-				const res = await fetch('/api/settings').then(r=>r.json()).catch(()=>({}));
-				if (res?.success) setForm(res.settings || {});
+			
+			return { valid: !hasErrors, errors };
+		}
+		
+		// Cross-field validations (warnings only)
+		function checkCrossFieldWarnings() {
+			const port = parseInt(document.getElementById('smtp_port').value, 10);
+			const encryption = document.getElementById('smtp_secure').value;
+			const warnings = [];
+			
+			if (encryption === 'tls' && port !== 587) {
+				warnings.push('TLS typically uses port 587. Current port: ' + port);
 			}
-
-			form.addEventListener('submit', async (e)=>{
-				e.preventDefault();
-				const fd = new FormData(form);
-				const plain = {};
-				fd.forEach((v,k)=>{ plain[k] = v; });
-				plain.pwd_upper = form.pwd_upper.checked ? 1 : 0;
-				plain.pwd_special = form.pwd_special.checked ? 1 : 0;
-				const r = await fetch('/api/settings', { method:'POST', body: JSON.stringify(plain), headers:{'Content-Type':'application/json'} });
-				const data = await r.json().catch(()=>({success:false}));
-				saveMsg.textContent = data?.success ? 'Saved.' : (data?.error || 'Failed to save');
-				setTimeout(()=> saveMsg.textContent = '', 2500);
+			if (encryption === 'ssl' && port !== 465) {
+				warnings.push('SSL typically uses port 465. Current port: ' + port);
+			}
+			if (encryption === 'none') {
+				warnings.push('Unencrypted SMTP is not recommended.');
+			}
+			
+			return warnings;
+		}
+		
+		// Clear errors when user starts typing (after validation has been triggered)
+		function setupErrorClearing() {
+			const fields = ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from', 'smtp_from_name', 'smtp_secure'];
+			
+			fields.forEach(fieldId => {
+				const inputEl = document.getElementById(fieldId);
+				if (!inputEl) return;
+				
+				// Clear error when user starts typing (only if field has error)
+				inputEl.addEventListener('input', function() {
+					if (this.classList.contains('is-invalid')) {
+						clearFieldError(this);
+					}
+				});
+				
+				inputEl.addEventListener('change', function() {
+					if (this.classList.contains('is-invalid')) {
+						clearFieldError(this);
+					}
+				});
 			});
-
-			document.getElementById('btnTest').addEventListener('click', async ()=>{
-				smtpStatus.textContent = 'Testing...';
-				const fd = new FormData(form);
-				const plain = {};
-				fd.forEach((v,k)=>{ plain[k] = v; });
-				const r = await fetch('/api/settings/test-smtp', { method:'POST', body: JSON.stringify(plain), headers:{'Content-Type':'application/json'} });
-				const data = await r.json().catch(()=>({success:false}));
-				if (data?.success) smtpStatus.textContent = '✓ Configured';
-				else smtpStatus.textContent = '✗ Not Working: ' + (data?.error || 'Unknown error');
+		}
+		
+		// Track if validation has been triggered by button click
+		let validationTriggered = false;
+		
+		// Show skeleton loaders for form fields
+		function showSkeletonLoaders() {
+			const smtpFields = ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from', 'smtp_from_name', 'smtp_secure'];
+			const emailToggle = document.getElementById('email_optional_enabled');
+			
+			// Replace SMTP inputs with skeletons
+			smtpFields.forEach(fieldId => {
+				const inputEl = document.getElementById(fieldId);
+				if (!inputEl) return;
+				
+				const wrapper = inputEl.closest('.field-error-wrapper') || inputEl.parentElement;
+				const originalDisplay = inputEl.style.display;
+				inputEl.style.display = 'none';
+				inputEl.dataset.originalDisplay = originalDisplay || '';
+				
+				// Create skeleton if it doesn't exist
+				let skeleton = wrapper.querySelector('.skeleton-input, .skeleton-select');
+				if (!skeleton) {
+					skeleton = document.createElement('div');
+					skeleton.className = inputEl.tagName === 'SELECT' ? 'skeleton-select' : 'skeleton-input';
+					wrapper.insertBefore(skeleton, inputEl);
+				}
 			});
+			
+			// Replace toggle with skeleton
+			if (emailToggle) {
+				const toggleWrapper = emailToggle.closest('.form-check');
+				if (toggleWrapper) {
+					emailToggle.style.display = 'none';
+					let skeleton = toggleWrapper.querySelector('.skeleton-toggle');
+					if (!skeleton) {
+						skeleton = document.createElement('div');
+						skeleton.className = 'skeleton-toggle';
+						toggleWrapper.insertBefore(skeleton, emailToggle);
+					}
+				}
+			}
+			
+			// Disable all inputs
+			setFormLoadingState(true);
+		}
 
-			load();
-		})();
+		// Hide skeleton loaders and show real form fields
+		function hideSkeletonLoaders() {
+			const smtpFields = ['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from', 'smtp_from_name', 'smtp_secure'];
+			
+			// Show SMTP inputs and remove skeletons
+			smtpFields.forEach(fieldId => {
+				const inputEl = document.getElementById(fieldId);
+				if (!inputEl) return;
+				
+				const wrapper = inputEl.closest('.field-error-wrapper') || inputEl.parentElement;
+				const skeleton = wrapper.querySelector('.skeleton-input, .skeleton-select');
+				if (skeleton) {
+					skeleton.remove();
+				}
+				
+				inputEl.style.display = inputEl.dataset.originalDisplay || '';
+				delete inputEl.dataset.originalDisplay;
+			});
+			
+			// Show toggle and remove skeleton
+			const emailToggle = document.getElementById('email_optional_enabled');
+			if (emailToggle) {
+				const toggleWrapper = emailToggle.closest('.form-check');
+				if (toggleWrapper) {
+					const skeleton = toggleWrapper.querySelector('.skeleton-toggle');
+					if (skeleton) {
+						skeleton.remove();
+					}
+					emailToggle.style.display = '';
+				}
+			}
+			
+			// Re-enable inputs
+			setFormLoadingState(false);
+		}
+
+		// Set form loading state (disable/enable all inputs)
+		function setFormLoadingState(loading) {
+			isLoading = loading;
+			const allInputs = document.querySelectorAll('#smtpForm input, #smtpForm select, #email_optional_enabled, #saveEmailPrefsBtn');
+			allInputs.forEach(input => {
+				input.disabled = loading;
+			});
+		}
+
+		async function loadSettings() {
+			try {
+				const res = await fetch('/api/settings', {
+					credentials: 'include',
+					headers: { 'Accept': 'application/json' }
+				});
+				const data = await res.json();
+				if (data.success && data.settings) {
+					settings = data.settings;
+					
+					// Hide skeletons and show real fields
+					hideSkeletonLoaders();
+					
+					// Populate SMTP fields (without validation)
+					if (settings.smtp_host) document.getElementById('smtp_host').value = settings.smtp_host;
+					if (settings.smtp_port) document.getElementById('smtp_port').value = settings.smtp_port;
+					if (settings.smtp_user) document.getElementById('smtp_user').value = settings.smtp_user;
+					if (settings.smtp_pass) document.getElementById('smtp_pass').value = settings.smtp_pass;
+					if (settings.smtp_from) document.getElementById('smtp_from').value = settings.smtp_from;
+					if (settings.smtp_from_name) document.getElementById('smtp_from_name').value = settings.smtp_from_name;
+					if (settings.smtp_secure) document.getElementById('smtp_secure').value = settings.smtp_secure;
+					
+					// Silently check if SMTP settings are valid (for email preferences check, no UI display)
+					const validation = validateAllSmtpFields(false);
+					smtpSettingsValid = validation.valid;
+					
+					// Clear any errors that might have been set during validation
+					['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from', 'smtp_from_name', 'smtp_secure'].forEach(id => {
+						const el = document.getElementById(id);
+						if (el) clearFieldError(el);
+					});
+					
+					// Populate email preferences
+					if (settings.email_optional_enabled === '1' || settings.email_optional_enabled === 'true') {
+						document.getElementById('email_optional_enabled').checked = true;
+					}
+					
+					// Add fade-in effect
+					document.querySelectorAll('#smtpForm input, #smtpForm select, #email_optional_enabled').forEach(el => {
+						el.classList.add('fade-in');
+					});
+				} else {
+					// Hide skeletons even on error
+					hideSkeletonLoaders();
+				}
+			} catch (err) {
+				console.error('Load settings error:', err);
+				// Hide skeletons on error
+				hideSkeletonLoaders();
+			}
+		}
+		
+		// Handle backend validation errors
+		function displayBackendErrors(errors) {
+			if (!errors || typeof errors !== 'object') return;
+			
+			for (const [fieldName, errorMessage] of Object.entries(errors)) {
+				const inputEl = document.getElementById(fieldName);
+				if (inputEl) {
+					setFieldError(inputEl, errorMessage);
+				}
+			}
+		}
+		
+		document.getElementById('smtpForm').addEventListener('submit', async (e) => {
+			e.preventDefault();
+			
+			if (isSaving) return;
+			
+			validationTriggered = true;
+			
+			// Clear previous errors
+			['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from', 'smtp_from_name', 'smtp_secure'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) clearFieldError(el);
+			});
+			
+			// Validate all fields (display errors)
+			const validation = validateAllSmtpFields(true);
+			
+			if (!validation.valid) {
+				showAlert('Please fix the highlighted fields.', 'warning');
+				// Scroll to first error
+				const firstError = document.querySelector('.is-invalid');
+				if (firstError) {
+					firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					firstError.focus();
+				}
+				return;
+			}
+			
+			// Check cross-field warnings
+			const warnings = checkCrossFieldWarnings();
+			if (warnings.length > 0 && warnings.some(w => w.includes('Unencrypted'))) {
+				showAlert('Warning: ' + warnings.join(' '), 'warning');
+			}
+			
+			const formData = new FormData(e.target);
+			const data = Object.fromEntries(formData);
+			
+			// Show loading state
+			isSaving = true;
+			const submitBtn = e.target.querySelector('button[type="submit"]');
+			const originalBtnHtml = submitBtn.innerHTML;
+			submitBtn.disabled = true;
+			submitBtn.classList.add('btn-loading');
+			submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+			
+			// Disable all form inputs
+			const allInputs = e.target.querySelectorAll('input, select');
+			allInputs.forEach(input => input.disabled = true);
+			
+			try {
+				const res = await fetch('/api/settings', {
+					method: 'POST',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json'
+					},
+					body: JSON.stringify(data)
+				});
+				const result = await res.json();
+				if (result.success) {
+					smtpSettingsValid = true;
+					showAlert('SMTP settings saved successfully!', 'success');
+					// Reload settings to get latest values
+					await loadSettings();
+				} else {
+					if (result.errors) {
+						displayBackendErrors(result.errors);
+						showAlert('Please fix the highlighted fields.', 'warning');
+					} else {
+						showAlert('Failed to save settings: ' + (result.error || 'Unknown error'), 'danger');
+					}
+				}
+			} catch (err) {
+				showAlert('Error saving settings: ' + err.message, 'danger');
+			} finally {
+				// Restore button and inputs
+				submitBtn.disabled = false;
+				submitBtn.classList.remove('btn-loading');
+				submitBtn.innerHTML = originalBtnHtml;
+				allInputs.forEach(input => input.disabled = false);
+				isSaving = false;
+			}
+		});
+		
+		document.getElementById('testSmtpBtn').addEventListener('click', async () => {
+			if (isSaving || isLoading) return;
+			
+			validationTriggered = true;
+			
+			// Clear previous errors
+			['smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass', 'smtp_from', 'smtp_from_name', 'smtp_secure'].forEach(id => {
+				const el = document.getElementById(id);
+				if (el) clearFieldError(el);
+			});
+			
+			// Validate all fields (display errors)
+			const validation = validateAllSmtpFields(true);
+			
+			if (!validation.valid) {
+				showAlert('Please fill in all required SMTP fields first', 'warning');
+				// Scroll to first error
+				const firstError = document.querySelector('.is-invalid');
+				if (firstError) {
+					firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					firstError.focus();
+				}
+				return;
+			}
+			
+			const form = document.getElementById('smtpForm');
+			const formData = new FormData(form);
+			const data = Object.fromEntries(formData);
+			
+			const btn = document.getElementById('testSmtpBtn');
+			const originalBtnHtml = btn.innerHTML;
+			btn.disabled = true;
+			btn.classList.add('btn-loading');
+			btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Testing...';
+			
+			try {
+				const res = await fetch('/api/settings/test-smtp', {
+					method: 'POST',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json'
+					},
+					body: JSON.stringify(data)
+				});
+				const result = await res.json();
+				if (result.success) {
+					showAlert('SMTP connection test successful!', 'success');
+				} else {
+					if (result.errors) {
+						displayBackendErrors(result.errors);
+						showAlert('Please fix the highlighted fields.', 'warning');
+					} else {
+						showAlert('SMTP test failed: ' + (result.error || 'Unknown error'), 'danger');
+					}
+				}
+			} catch (err) {
+				showAlert('Error testing SMTP: ' + err.message, 'danger');
+			} finally {
+				btn.disabled = false;
+				btn.classList.remove('btn-loading');
+				btn.innerHTML = originalBtnHtml;
+			}
+		});
+		
+		document.getElementById('saveEmailPrefsBtn').addEventListener('click', async () => {
+			if (isSaving || isLoading) return;
+			
+			const enabled = document.getElementById('email_optional_enabled').checked;
+			
+			// If enabling optional emails, check if SMTP is configured
+			if (enabled) {
+				validationTriggered = true;
+				// Re-validate SMTP settings (display errors)
+				const validation = validateAllSmtpFields(true);
+				if (!validation.valid) {
+					showAlert('Configure and save SMTP settings before enabling optional email notifications.', 'warning');
+					// Scroll to SMTP section
+					document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+					// Highlight SMTP section
+					const smtpCard = document.querySelector('.card');
+					if (smtpCard) {
+						smtpCard.style.border = '2px solid #ffc107';
+						setTimeout(() => {
+							smtpCard.style.border = '';
+						}, 3000);
+					}
+					// Uncheck the toggle
+					document.getElementById('email_optional_enabled').checked = false;
+					return;
+				}
+				
+				// Check if SMTP settings are saved
+				if (!smtpSettingsValid) {
+					showAlert('Configure and save SMTP settings before enabling optional email notifications.', 'warning');
+					document.querySelector('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+					const smtpCard = document.querySelector('.card');
+					if (smtpCard) {
+						smtpCard.style.border = '2px solid #ffc107';
+						setTimeout(() => {
+							smtpCard.style.border = '';
+						}, 3000);
+					}
+					document.getElementById('email_optional_enabled').checked = false;
+					return;
+				}
+			}
+			
+			const enabledValue = enabled ? '1' : '0';
+			
+			// Show loading state
+			isSaving = true;
+			const btn = document.getElementById('saveEmailPrefsBtn');
+			const originalBtnHtml = btn.innerHTML;
+			btn.disabled = true;
+			btn.classList.add('btn-loading');
+			btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Saving...';
+			
+			// Disable toggle
+			document.getElementById('email_optional_enabled').disabled = true;
+			
+			try {
+				const res = await fetch('/api/settings', {
+					method: 'POST',
+					credentials: 'include',
+					headers: {
+						'Content-Type': 'application/json',
+						'Accept': 'application/json'
+					},
+					body: JSON.stringify({ email_optional_enabled: enabledValue })
+				});
+				const result = await res.json();
+				if (result.success) {
+					showAlert('Email preferences saved successfully!', 'success');
+					// Reload settings to get latest values
+					await loadSettings();
+				} else {
+					if (result.errors) {
+						displayBackendErrors(result.errors);
+						showAlert('Please fix the highlighted fields.', 'warning');
+					} else {
+						showAlert('Failed to save preferences: ' + (result.error || 'Unknown error'), 'danger');
+					}
+				}
+			} catch (err) {
+				showAlert('Error saving preferences: ' + err.message, 'danger');
+			} finally {
+				// Restore button and toggle
+				btn.disabled = false;
+				btn.classList.remove('btn-loading');
+				btn.innerHTML = originalBtnHtml;
+				document.getElementById('email_optional_enabled').disabled = false;
+				isSaving = false;
+			}
+		});
+		
+		// Initialize error clearing (clear errors when user types after validation)
+		setupErrorClearing();
+		
+		// Show skeleton loaders immediately on page load
+		showSkeletonLoaders();
+		
+		// Load settings on page load
+		loadSettings();
 	</script>
 </body>
 </html>

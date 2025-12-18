@@ -4,12 +4,90 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>LibraTrack – Overdue Books</title>
-  <link rel="icon" href="assets/img/LibraTrack-logo.png">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
   <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
   <link href="assets/css/student-pages.css" rel="stylesheet">
+  <style>
+    /* Skeleton Loaders */
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .skeleton-value {
+      display: inline-block;
+      width: 60px;
+      height: 24px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-row td {
+      padding: 16px;
+    }
+    .skeleton-table-cell {
+      height: 1rem;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    .skeleton-table-cell.short {
+      width: 60%;
+    }
+    .skeleton-table-cell.medium {
+      width: 80%;
+    }
+    .skeleton-table-cell.long {
+      width: 100%;
+    }
+    .skeleton-cover {
+      width: 50px;
+      height: 65px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 12px;
+    }
+    .skeleton-badge {
+      width: 50px;
+      height: 24px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    .skeleton-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s ease-in-out infinite;
+      display: inline-block;
+      margin: 0 4px;
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
 </head>
 <body class="sb-body sb-expanded">
   <div id="sidebar-root"></div>
@@ -96,6 +174,45 @@
     const kpiItems = document.getElementById('kpiItems');
     const kpiFine = document.getElementById('kpiFine');
     const FINE_PER_DAY = 5;
+    let isLoading = false;
+
+    // Render skeleton table rows
+    function renderSkeletonTableRows(count = 4) {
+      return Array.from({length: count}, () => `
+        <tr class="skeleton-table-row">
+          <td>
+            <div class="d-flex align-items-center">
+              <div class="skeleton-cover"></div>
+              <div class="flex-grow-1">
+                <div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div>
+                <div class="skeleton-table-cell short"></div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td>
+            <div class="skeleton-table-cell short"></div>
+          </td>
+          <td>
+            <div class="skeleton-badge"></div>
+          </td>
+          <td class="text-end">
+            <div class="d-inline-flex align-items-center">
+              <div class="skeleton-button"></div>
+              <div class="skeleton-button"></div>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Show skeleton KPI values
+    function showSkeletonKPIs() {
+      kpiItems.innerHTML = '<span class="skeleton-value"></span>';
+      kpiFine.innerHTML = '<span class="skeleton-value" style="width: 80px;"></span>';
+    }
 
     const fmtDate = (value) => {
       if (!value) return '—';
@@ -104,6 +221,9 @@
     };
 
     const renderRows = (items = []) => {
+      // Hide empty state during render
+      empty.classList.add('d-none');
+      
       if (!items.length) {
         tbody.innerHTML = '';
         empty.classList.remove('d-none');
@@ -111,16 +231,27 @@
         kpiFine.textContent = '₱0';
         return;
       }
-      empty.classList.add('d-none');
+      
+      // Update KPI values
       kpiItems.textContent = String(items.length);
       const totalFine = items.reduce((sum, item) => sum + (item.days_late || 0) * FINE_PER_DAY, 0);
       kpiFine.textContent = `₱${totalFine.toLocaleString()}`;
 
-      tbody.innerHTML = items.map(item => `
-        <tr>
+      // Render rows with fade-in
+      tbody.innerHTML = items.map(item => {
+        const cover = item.cover_url || item.book_cover || 'assets/img/default-book.png';
+        return `
+        <tr class="fade-in">
           <td>
-            <div class="fw-medium">${item.book_title || '—'}</div>
-            <div class="small text-muted">${item.isbn || ''}</div>
+            <div class="d-flex align-items-center">
+              <img src="${cover}" alt="${(item.book_title || 'Book').replace(/"/g, '&quot;')}" 
+                   style="width:50px; height:65px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-right:12px;"
+                   onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
+              <div class="flex-grow-1">
+                <div class="fw-medium">${item.book_title || '—'}</div>
+                <div class="small text-muted">${item.isbn || ''}</div>
+              </div>
+            </div>
           </td>
           <td>${fmtDate(item.borrowed_at)}</td>
           <td>${fmtDate(item.due_at)}</td>
@@ -132,11 +263,17 @@
             </div>
           </td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
     };
 
     async function loadOverdue() {
-      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Loading…</td></tr>';
+      // Show skeleton loading
+      tbody.innerHTML = renderSkeletonTableRows(4);
+      empty.classList.add('d-none');
+      showSkeletonKPIs();
+      isLoading = true;
+      
       try {
         const url = new URL('/api/student/my-loans', location.origin);
         url.searchParams.set('status', 'overdue');
@@ -147,6 +284,11 @@
         renderRows(data.items || []);
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center text-danger py-4">${err.message}</td></tr>`;
+        empty.classList.add('d-none');
+        kpiItems.textContent = '0';
+        kpiFine.textContent = '₱0';
+      } finally {
+        isLoading = false;
       }
     }
 

@@ -84,5 +84,32 @@ abstract class BaseController extends Controller
             return false;
         }
     }
+
+    /**
+     * Check if books table has school_id column
+     */
+    protected function booksHasSchoolId()
+    {
+        try {
+            $columns = DB::select("SHOW COLUMNS FROM books LIKE 'school_id'");
+            return count($columns) > 0;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if books table has added_by column
+     */
+    protected function booksHasAddedBy()
+    {
+        try {
+            $columns = DB::select("SHOW COLUMNS FROM books LIKE 'added_by'");
+            return count($columns) > 0;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
 }
+
 

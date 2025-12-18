@@ -13,6 +13,7 @@ use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,7 +37,7 @@ Route::get('/me', [AuthController::class, 'me'])->middleware('web');
 Route::get('/books', [BookController::class, 'list']);
 Route::get('/books/{id}', [BookController::class, 'show']); // Get single book
 Route::post('/books', [BookController::class, 'add'])->middleware('auth');
-Route::put('/books/{id}', [BookController::class, 'update'])->middleware('auth');
+Route::match(['put', 'post'], '/books/{id}', [BookController::class, 'update'])->middleware('auth');
 Route::delete('/books/{id}', [BookController::class, 'delete'])->middleware('auth');
 
 // Loan routes
@@ -73,9 +74,14 @@ Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->middlew
 
 // School routes
 Route::get('/schools', [SchoolController::class, 'list'])->middleware('auth');
+Route::get('/admin/schools', [SchoolController::class, 'adminList'])->middleware('auth');
+Route::post('/admin/schools', [SchoolController::class, 'create'])->middleware('auth');
+Route::put('/admin/schools/{id}', [SchoolController::class, 'update'])->middleware('auth');
+Route::put('/admin/schools/{id}/status', [SchoolController::class, 'setStatus'])->middleware('auth');
 
-// Log routes
+// Log routes - Admin only
 Route::get('/logs', [LogController::class, 'list'])->middleware('auth');
+Route::get('/api/system_logs_list', [LogController::class, 'list'])->middleware('auth');
 
 // Student routes
 Route::get('/student/my-loans', [StudentController::class, 'myLoans'])->middleware('web');
@@ -89,4 +95,13 @@ Route::post('/settings/test-smtp', [SettingsController::class, 'testSmtp'])->mid
 
 // Profile routes
 Route::post('/profile/avatar', [UserController::class, 'uploadAvatar'])->middleware('auth');
+
+// Notification routes
+Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->middleware('auth');
+Route::get('/notifications/list', [NotificationController::class, 'list'])->middleware('auth');
+Route::post('/notifications/mark-read', [NotificationController::class, 'markRead'])->middleware('auth');
+Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->middleware('auth');
+
+// Email queue processing (admin only)
+Route::post('/admin/process-email-queue', [NotificationController::class, 'processEmailQueue'])->middleware('auth');
 

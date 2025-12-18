@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AuditLog;
 
 class CategoryController extends BaseController
 {
@@ -66,6 +67,15 @@ class CategoryController extends BaseController
             'updated_at' => now(),
         ]);
         
+        // Log category creation
+        AuditLog::logAction(
+            $user,
+            'CATEGORY_CREATE',
+            'category',
+            $id,
+            "Created category: {$name}"
+        );
+        
         return response()->json([
             'success' => true,
             'id' => $id,
@@ -126,6 +136,15 @@ class CategoryController extends BaseController
                 ->update(['category' => $newName]);
         }
         
+        // Log category update
+        AuditLog::logAction(
+            $user,
+            'CATEGORY_UPDATE',
+            'category',
+            $id,
+            "Updated category: {$oldName} → {$newName}"
+        );
+        
         return response()->json([
             'success' => true,
             'message' => 'Category updated successfully'
@@ -168,6 +187,15 @@ class CategoryController extends BaseController
         
         // Safe to delete
         DB::table('categories')->where('id', $id)->delete();
+        
+        // Log category deletion
+        AuditLog::logAction(
+            $user,
+            'CATEGORY_DELETE',
+            'category',
+            $id,
+            "Deleted category: {$category->name}"
+        );
         
         return response()->json([
             'success' => true,

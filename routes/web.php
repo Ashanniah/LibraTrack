@@ -256,6 +256,11 @@ Route::middleware('auth')->group(function () {
         $html = injectBaseTag($html, '/');
         return response($html)->header('Content-Type', 'text/html');
     });
+    Route::get('/admin/schools', function () {
+        $html = file_get_contents(base_path('admin-schools.html'));
+        $html = injectBaseTag($html, '/');
+        return response($html)->header('Content-Type', 'text/html');
+    });
 
     Route::get('/admin/logs', function () {
         $html = file_get_contents(base_path('admin-logs.html'));
@@ -268,6 +273,9 @@ Route::middleware('auth')->group(function () {
         $html = injectBaseTag($html, '/');
         return response($html)->header('Content-Type', 'text/html');
     });
+    
+    // Utility scripts for book assignment
+    Route::match(['get', 'post'], '/assign-all-books-to-librarians', [App\Http\Controllers\BookAssignmentController::class, 'assignAllBooks']);
 });
 
 // Handle /libratrack/ prefix for all HTML files (backward compatibility)
