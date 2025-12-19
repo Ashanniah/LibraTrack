@@ -10,21 +10,31 @@ class NotificationHelper
 {
     /**
      * Notification type email policies
+     * Email-only notification system - only critical/time-sensitive events
      */
     private static function getEmailPolicy(string $type): string
     {
         $policies = [
+            // STUDENT notifications
+            'BORROW_REQUEST_APPROVED' => 'required',  // Critical
+            'BORROW_REQUEST_REJECTED' => 'required',  // Critical
+            'DUE_SOON' => 'required',                  // Time-sensitive
+            'OVERDUE' => 'required',                   // Critical
+            
+            // LIBRARIAN notifications
+            'LOW_STOCK' => 'required',                // Critical
+            'OVERDUE_CRITICAL' => 'required',         // Critical escalation
+            
+            // ADMIN notifications
+            'EMAIL_FAILURE' => 'required',            // System error
+            'SMTP_CONFIG_FAILURE' => 'required',      // System error
+            
+            // Disabled - not critical/time-sensitive
             'BORROW_REQUEST_SUBMITTED' => 'off',
-            'BORROW_REQUEST_APPROVED' => 'optional',
-            'BORROW_REQUEST_REJECTED' => 'optional',
-            'DUE_SOON' => 'optional',
-            'OVERDUE' => 'required',
             'NEW_BORROW_REQUEST' => 'off',
-            'LOW_STOCK' => 'required',
-            'OVERDUE_SUMMARY' => 'optional',
-            'EMAIL_FAILURE' => 'off',
-            'SETTINGS_CHANGED' => 'optional',
-            'SECURITY_ALERT' => 'optional',
+            'OVERDUE_SUMMARY' => 'off',
+            'SETTINGS_CHANGED' => 'off',
+            'SECURITY_ALERT' => 'off',
         ];
         
         return $policies[$type] ?? 'off';

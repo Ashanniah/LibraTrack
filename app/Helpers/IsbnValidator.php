@@ -26,17 +26,18 @@ class IsbnValidator
 
         // 2. Allowed Characters (only digits, hyphens, and spaces - no X allowed for ISBN-13)
         if (!preg_match('/^[0-9\s\-]+$/', $isbn)) {
-            return ['valid' => false, 'error' => 'ISBN can only contain numbers, hyphens, and spaces.', 'cleaned' => null];
+            return ['valid' => false, 'error' => 'ISBN must contain only digits.', 'cleaned' => null];
         }
 
         // 3. Clean Format: Remove hyphens and spaces
+        // Note: Hyphens and spaces are NOT counted - only digits matter for ISBN-13
         $cleaned = preg_replace('/[\s\-]/', '', $isbn);
 
         // 4. Check length (must be exactly 13 digits)
         $length = strlen($cleaned);
         
         if ($length !== 13) {
-            return ['valid' => false, 'error' => 'ISBN must contain exactly 13 digits.', 'cleaned' => null];
+            return ['valid' => false, 'error' => "ISBN must contain exactly 13 digits (you have {$length} digit" . ($length !== 1 ? 's' : '') . "). Hyphens are not counted.", 'cleaned' => null];
         }
         
         // 5. Validate ISBN-13 only

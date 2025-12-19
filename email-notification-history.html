@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LibraTrack – Email Notification History</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
+  <link rel="icon" href="assets/img/logo.png" type="image/png">
+
+  <style>
+    :root{
+      --card-pad:24px;
+      --cell-pad-y:14px;
+      --cell-pad-x:20px;
+      --ui-muted:#6b7280;
+      --ui-border:#eef0f3;
+      --ui-soft:#f6f7f9;
+      --brand-black:#111827;
+      --brand-gold:#a68604;
+      --sidebar-bg:#111;
+      --text-primary:#212529;
+      --text-secondary:#6b7280;
+      --border-radius:12px;
+      --border-radius-sm:8px;
+      --border-radius-lg:16px;
+      --shadow-sm:0 2px 4px rgba(0,0,0,.04);
+      --shadow-md:0 4px 12px rgba(0,0,0,.08);
+      --shadow-lg:0 6px 18px rgba(0,0,0,.12);
+      --header-bg:#fff;
+      --card-border:#e5e7eb;
+    }
+    html{font-size:14px;}
+    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
+    
+    main.container-fluid{padding:24px!important}
+    
+    .page-head{
+      background:#fff;
+      border-bottom:1px solid var(--card-border);
+      padding:12px 24px;
+    }
+    
+    .card{
+      border-radius:var(--border-radius-lg);
+      box-shadow:var(--shadow-sm);
+      border:1px solid var(--ui-border);
+      background:#fff;
+    }
+    .card-header{
+      background:var(--header-bg);
+      border-bottom:1px solid var(--ui-border);
+      padding:20px var(--card-pad);
+    }
+    
+    .table-modern{
+      margin:0;
+    }
+    .table-modern thead th{
+      background:var(--ui-soft);
+      color:var(--text-primary);
+      font-weight:600;
+      font-size:0.875rem;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      padding:16px var(--cell-pad-x);
+      border-bottom:2px solid var(--ui-border);
+      vertical-align:middle;
+    }
+    .table-modern tbody td{
+      padding:var(--cell-pad-y) var(--cell-pad-x);
+      vertical-align:middle;
+      border-bottom:1px solid var(--ui-border);
+      color:var(--text-primary);
+    }
+    .table-modern tbody tr:hover{
+      background:#f8f9fa;
+    }
+    
+    .badge-status-sent{
+      background:#d1fae5;
+      color:#059669;
+      padding:4px 12px;
+      border-radius:12px;
+      font-size:0.75rem;
+      font-weight:500;
+    }
+    .badge-status-failed{
+      background:#fee2e2;
+      color:#dc2626;
+      padding:4px 12px;
+      border-radius:12px;
+      font-size:0.75rem;
+      font-weight:500;
+    }
+    
+    .event-type-badge{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:6px;
+      font-size:0.75rem;
+      font-weight:500;
+      background:#f3f4f6;
+      color:#374151;
+    }
+    
+    .filter-section{
+      background:#f9fafb;
+      padding:16px var(--card-pad);
+      border-bottom:1px solid var(--ui-border);
+    }
+    
+    .skeleton{
+      background:linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size:200% 100%;
+      animation:skeleton-shimmer 1.5s ease-in-out infinite;
+      border-radius:4px;
+    }
+    @keyframes skeleton-shimmer{
+      0%{background-position:200% 0;}
+      100%{background-position:-200% 0;}
+    }
+    .skeleton-line{
+      height:1rem;
+      margin-bottom:8px;
+    }
+    .skeleton-line.short{width:60%;}
+    .skeleton-line.medium{width:80%;}
+    .skeleton-line.long{width:100%;}
+    
+    .fade-in{
+      animation:fadeIn 0.3s ease-in;
+    }
+    @keyframes fadeIn{
+      from{opacity:0;}
+      to{opacity:1;}
+    }
+  </style>
+</head>
+<body class="sb-body">
+  <div id="sidebar-root"></div>
+  <div class="sb-wrapper">
+    <div class="page-head">
+      <div class="container-fluid d-flex align-items-center justify-content-between py-3">
+        <div class="d-flex align-items-center gap-2">
+          <button id="sidebarToggle" class="btn btn-link text-dark p-0 me-2"><i class="bi bi-list fs-4"></i></button>
+          <div class="page-title">Email Notification History</div>
+        </div>
+        <div class="me-3">
+          <span class="text-muted small"><i class="bi bi-envelope me-1"></i>Read-only log</span>
+        </div>
+      </div>
+    </div>
+
+    <main class="container-fluid py-4">
+      <section class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="fw-semibold"><i class="bi bi-envelope-check me-2"></i>Email Notification History</span>
+          <button id="btnRefresh" class="btn btn-sm btn-light"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+        </div>
+        
+        <div class="filter-section">
+          <div class="row g-3">
+            <div class="col-12 col-md-3">
+              <label class="form-label small text-muted mb-1">Event Type</label>
+              <select id="filterEventType" class="form-select form-select-sm">
+                <option value="">All Types</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label small text-muted mb-1">Status</label>
+              <select id="filterStatus" class="form-select form-select-sm">
+                <option value="all">All Status</option>
+                <option value="sent">Sent</option>
+                <option value="failed">Failed</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label small text-muted mb-1">Date From</label>
+              <input type="date" id="filterDateFrom" class="form-control form-control-sm">
+            </div>
+            <div class="col-12 col-md-3">
+              <label class="form-label small text-muted mb-1">Date To</label>
+              <input type="date" id="filterDateTo" class="form-control form-control-sm">
+            </div>
+            <div class="col-12">
+              <label class="form-label small text-muted mb-1">Search Subject</label>
+              <input type="text" id="filterSearch" class="form-control form-control-sm" placeholder="Search by subject...">
+            </div>
+          </div>
+        </div>
+        
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-modern align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Date/Time</th>
+                  <th>Event Type</th>
+                  <th>Subject</th>
+                  <th>Recipient</th>
+                  <th>Status</th>
+                  <th class="text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="logsBody">
+                <tr>
+                  <td colspan="6" class="text-center text-muted py-4">
+                    <div class="skeleton skeleton-line long" style="margin:0 auto 8px; width:200px;"></div>
+                    <div class="skeleton skeleton-line medium" style="margin:0 auto;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center p-3 gap-2 flex-wrap">
+          <div class="text-muted small" id="pageInfo">Loading...</div>
+          <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+        </div>
+        
+        <div id="emptyState" class="text-center text-muted py-5 d-none">
+          <i class="bi bi-envelope-slash fs-2 d-block mb-2"></i>
+          <p class="mb-0">No email notifications found.</p>
+          <p class="text-muted small mt-2">Email notifications will appear here once they are sent.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- View Details Modal -->
+  <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Email Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label small text-muted">Event Type</label>
+            <div id="viewEventType" class="fw-semibold">—</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-muted">Subject</label>
+            <div id="viewSubject">—</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-muted">Recipient</label>
+            <div id="viewRecipient">—</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-muted">Status</label>
+            <div id="viewStatus">—</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-muted">Date/Time</label>
+            <div id="viewDateTime">—</div>
+          </div>
+          <div class="mb-3" id="viewErrorContainer" style="display:none;">
+            <label class="form-label small text-muted">Error Message</label>
+            <div id="viewError" class="text-danger">—</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-muted">Body Preview</label>
+            <div id="viewBodyPreview" class="text-muted small" style="white-space:pre-wrap;">—</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script>
+    (async () => {
+      let currentRole = 'student';
+      let currentPage = 1;
+      let currentLimit = 20;
+      let currentFilters = {
+        event_type: '',
+        status: 'all',
+        date_from: '',
+        date_to: '',
+        search: ''
+      };
+      
+      // Check auth and get role
+      try {
+        const res = await fetch('/api/check-auth', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+        const data = await res.ok ? await res.json() : null;
+        currentRole = (data?.user?.role || 'student').toLowerCase();
+        if (!['admin', 'librarian', 'student'].includes(currentRole)) {
+          window.location.href = 'login.html';
+          return;
+        }
+        renderSidebar('email-history', currentRole);
+      } catch {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        if (typeof toggleSidebar === 'function') toggleSidebar();
+        else document.body.classList.toggle('sb-collapsed');
+      });
+      
+      // Load event types
+      async function loadEventTypes() {
+        try {
+          const res = await fetch('/api/email-notifications/event-types', { credentials: 'include' });
+          const data = await res.json();
+          if (data.success && data.event_types) {
+            const select = document.getElementById('filterEventType');
+            data.event_types.forEach(type => {
+              const option = document.createElement('option');
+              option.value = type;
+              option.textContent = type.replace(/_/g, ' ');
+              select.appendChild(option);
+            });
+          }
+        } catch (err) {
+          console.error('Failed to load event types:', err);
+        }
+      }
+      
+      // Load email logs
+      async function loadLogs() {
+        const tbody = document.getElementById('logsBody');
+        const empty = document.getElementById('emptyState');
+        const pageInfo = document.getElementById('pageInfo');
+        
+        // Show loading
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+              <div class="skeleton skeleton-line long" style="margin:0 auto 8px; width:200px;"></div>
+              <div class="skeleton skeleton-line medium" style="margin:0 auto;"></div>
+            </td>
+          </tr>
+        `;
+        empty.classList.add('d-none');
+        
+        try {
+          const params = new URLSearchParams({
+            page: currentPage,
+            limit: currentLimit,
+            ...currentFilters
+          });
+          
+          const endpoint = currentRole === 'admin' && document.getElementById('viewAll')?.checked
+            ? `/api/email-notifications/all?${params}`
+            : `/api/email-notifications?${params}`;
+          
+          const res = await fetch(endpoint, { credentials: 'include' });
+          const data = await res.json();
+          
+          if (!data.success) {
+            throw new Error(data.error || 'Failed to load email logs');
+          }
+          
+          const logs = data.logs || [];
+          const pagination = data.pagination || {};
+          
+          if (logs.length === 0) {
+            tbody.innerHTML = '';
+            empty.classList.remove('d-none');
+          } else {
+            tbody.innerHTML = logs.map(log => {
+              const date = new Date(log.created_at);
+              const dateStr = date.toLocaleDateString();
+              const timeStr = date.toLocaleTimeString();
+              const statusBadge = log.status === 'sent' 
+                ? '<span class="badge-status-sent">Sent</span>'
+                : '<span class="badge-status-failed">Failed</span>';
+              
+              return `
+                <tr class="fade-in">
+                  <td>
+                    <div>${dateStr}</div>
+                    <div class="small text-muted">${timeStr}</div>
+                  </td>
+                  <td><span class="event-type-badge">${(log.event_type || '').replace(/_/g, ' ')}</span></td>
+                  <td>
+                    <div class="fw-medium">${escapeHtml(log.subject || '—')}</div>
+                    ${log.body_preview ? `<div class="small text-muted mt-1">${escapeHtml(log.body_preview).substring(0, 100)}...</div>` : ''}
+                  </td>
+                  <td class="small text-muted">${escapeHtml(log.recipient_email || '—')}</td>
+                  <td>${statusBadge}</td>
+                  <td class="text-end">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="viewLog(${log.id})" title="View Details">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+              `;
+            }).join('');
+            empty.classList.add('d-none');
+          }
+          
+          // Update pagination
+          pageInfo.textContent = `Showing ${((pagination.page - 1) * pagination.limit) + 1}–${Math.min(pagination.page * pagination.limit, pagination.total)} of ${pagination.total}`;
+          renderPagination(pagination);
+          
+        } catch (err) {
+          console.error('Failed to load logs:', err);
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" class="text-center text-danger py-4">
+                <i class="bi bi-exclamation-triangle me-2"></i>Failed to load email logs. Please try again.
+              </td>
+            </tr>
+          `;
+        }
+      }
+      
+      function renderPagination(pagination) {
+        const pager = document.getElementById('pager');
+        pager.innerHTML = '';
+        
+        if (pagination.pages <= 1) return;
+        
+        const addPage = (label, page, disabled = false) => {
+          const li = document.createElement('li');
+          li.className = `page-item ${disabled ? 'disabled' : ''} ${page === pagination.page ? 'active' : ''}`;
+          const a = document.createElement('a');
+          a.className = 'page-link';
+          a.href = '#';
+          a.textContent = label;
+          if (!disabled && page !== pagination.page) {
+            a.onclick = (e) => { e.preventDefault(); currentPage = page; loadLogs(); };
+          }
+          li.appendChild(a);
+          pager.appendChild(li);
+        };
+        
+        addPage('«', 1, currentPage === 1);
+        addPage('‹', currentPage - 1, currentPage === 1);
+        
+        for (let p = 1; p <= pagination.pages; p++) {
+          if (p === 1 || p === pagination.pages || (p >= currentPage - 2 && p <= currentPage + 2)) {
+            addPage(p, p);
+          } else if (p === currentPage - 3 || p === currentPage + 3) {
+            const li = document.createElement('li');
+            li.className = 'page-item disabled';
+            li.innerHTML = '<span class="page-link">...</span>';
+            pager.appendChild(li);
+          }
+        }
+        
+        addPage('›', currentPage + 1, currentPage === pagination.pages);
+        addPage('»', pagination.pages, currentPage === pagination.pages);
+      }
+      
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+      
+      window.viewLog = async function(logId) {
+        try {
+          const res = await fetch(`/api/email-notifications?page=1&limit=1000`, { credentials: 'include' });
+          const data = await res.json();
+          const log = data.logs?.find(l => l.id === logId);
+          
+          if (!log) {
+            alert('Email log not found');
+            return;
+          }
+          
+          document.getElementById('viewEventType').textContent = (log.event_type || '—').replace(/_/g, ' ');
+          document.getElementById('viewSubject').textContent = log.subject || '—';
+          document.getElementById('viewRecipient').textContent = log.recipient_email || '—';
+          document.getElementById('viewStatus').innerHTML = log.status === 'sent' 
+            ? '<span class="badge-status-sent">Sent</span>'
+            : '<span class="badge-status-failed">Failed</span>';
+          
+          const date = new Date(log.created_at);
+          document.getElementById('viewDateTime').textContent = date.toLocaleString();
+          
+          if (log.error_message) {
+            document.getElementById('viewErrorContainer').style.display = 'block';
+            document.getElementById('viewError').textContent = log.error_message;
+          } else {
+            document.getElementById('viewErrorContainer').style.display = 'none';
+          }
+          
+          document.getElementById('viewBodyPreview').textContent = log.body_preview || '—';
+          
+          const modal = new bootstrap.Modal('#viewModal');
+          modal.show();
+        } catch (err) {
+          alert('Failed to load email details: ' + err.message);
+        }
+      };
+      
+      // Filter handlers
+      document.getElementById('filterEventType').addEventListener('change', (e) => {
+        currentFilters.event_type = e.target.value;
+        currentPage = 1;
+        loadLogs();
+      });
+      
+      document.getElementById('filterStatus').addEventListener('change', (e) => {
+        currentFilters.status = e.target.value;
+        currentPage = 1;
+        loadLogs();
+      });
+      
+      document.getElementById('filterDateFrom').addEventListener('change', (e) => {
+        currentFilters.date_from = e.target.value;
+        currentPage = 1;
+        loadLogs();
+      });
+      
+      document.getElementById('filterDateTo').addEventListener('change', (e) => {
+        currentFilters.date_to = e.target.value;
+        currentPage = 1;
+        loadLogs();
+      });
+      
+      let searchTimeout;
+      document.getElementById('filterSearch').addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          currentFilters.search = e.target.value;
+          currentPage = 1;
+          loadLogs();
+        }, 500);
+      });
+      
+      document.getElementById('btnRefresh').addEventListener('click', () => {
+        loadLogs();
+      });
+      
+      // Initial load
+      await loadEventTypes();
+      await loadLogs();
+    })();
+  </script>
+</body>
+</html>
+
+

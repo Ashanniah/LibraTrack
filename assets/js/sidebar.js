@@ -11,6 +11,7 @@ console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
       categories: 'admin-categories.html',
       settings: 'admin-settings.html',
       logs: 'admin-logs.html',
+      emailHistory: 'email-notification-history.html',
       profile: 'admin-profile.html',
       logout: 'login.html',
     },
@@ -32,6 +33,7 @@ console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
       books: 'books.html',
       history: 'student-history.html',
       favorites: 'favorites.html',
+      emailHistory: 'email-notification-history.html',
       profile: 'student-profile.html',
       logout: 'login.html'
     }
@@ -54,6 +56,8 @@ console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
     'librarian-history.html': 'history',
     'librarian-profile.html': 'profile',
     'student-history.html': 'history',
+    'email-notification-history.html': 'email-history',
+    'student-notifications.html': 'email-history',
     'student-favorite.html': 'favorites',
     'student-favorites.html': 'favorites',
     'favorites.html': 'favorites',
@@ -87,6 +91,7 @@ console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
         <div class="sb-label mt-3">System</div>
         ${link(ROUTES.admin.settings,'bi-gear','System Settings',current==='settings')}
         ${link(ROUTES.admin.logs,'bi-card-checklist','Logs',current==='logs')}
+        ${link(ROUTES.admin.emailHistory,'bi-envelope-check','Email History',current==='email-history')}
 
         <div class="sb-label mt-3">Account</div>
         ${link(ROUTES.admin.profile,'bi-person-gear','Profile',current==='profile')}
@@ -101,6 +106,7 @@ console.log('Sidebar.js loaded - Version 2025-11-19-FINAL-LOANS-COMBINED-V4');
             ${link(ROUTES.student.books,'bi-journal-text','Books',current==='books')}
             ${link(ROUTES.student.history,'bi-clock-history','History',current==='history')}
             ${link(ROUTES.student.favorites,'bi-heart','Favorites',current==='favorites')}
+            ${link(ROUTES.student.emailHistory,'bi-envelope-check','Email History',current==='email-history')}
             <div class="sb-label mt-3">Account</div>
             ${link(ROUTES.student.profile,'bi-person','Profile',current==='profile')}
             ${link(ROUTES.student.logout,'bi-box-arrow-right','Logout',false)}
