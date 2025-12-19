@@ -88,10 +88,7 @@
           <div class="page-title">Notifications</div>
         </div>
         <div class="me-3">
-          <div class="form-check form-switch">
-            <input class="form-check-input" type="checkbox" id="emailSwitch" checked>
-            <label class="form-check-label" for="emailSwitch">Email alerts</label>
-          </div>
+          <span class="text-muted small"><i class="bi bi-envelope me-1"></i>Email History</span>
         </div>
       </div>
     </div>
@@ -99,15 +96,22 @@
     <main class="container-fluid py-4">
       <section class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-          <span class="fw-semibold"><i class="bi bi-bell me-2"></i>Recent</span>
+          <span class="fw-semibold"><i class="bi bi-envelope-check me-2"></i>Email Notification History</span>
           <button id="btnRefresh" class="btn btn-sm btn-light">Refresh</button>
+        </div>
+        <div class="card-body">
+          <p class="text-muted small mb-3">
+            <i class="bi bi-info-circle me-1"></i>
+            This page shows a read-only log of email notifications sent to you. All notifications are delivered via email.
+          </p>
         </div>
         <ul class="list-group list-group-flush" id="notifList">
           <li class="list-group-item text-center text-muted py-4">Loading…</li>
         </ul>
         <div id="notifEmpty" class="text-center text-muted py-5 d-none">
-          <i class="bi bi-bell-slash fs-2 d-block mb-2"></i>
-          <p class="mb-0">No notifications yet. You'll receive updates by email.</p>
+          <i class="bi bi-envelope-slash fs-2 d-block mb-2"></i>
+          <p class="mb-0">No email notifications yet.</p>
+          <p class="text-muted small mt-2">You'll receive email notifications for borrow request approvals, rejections, due date reminders, and overdue notices.</p>
         </div>
       </section>
     </main>
@@ -156,12 +160,10 @@
     }
 
     const TYPE_META = {
-      'overdue': { icon:'bi-exclamation-triangle text-danger', badge:'badge text-bg-danger-soft', label:'Overdue' },
-      'due-soon': { icon:'bi-calendar2-week text-primary', badge:'badge text-bg-primary-soft', label:'Due soon' },
-      'approved': { icon:'bi-check2-circle text-success', badge:'badge text-bg-success-soft', label:'Approved' },
-      'request-pending': { icon:'bi-hourglass-split text-secondary', badge:'badge text-bg-secondary-soft text-dark', label:'Pending' },
-      'rejected': { icon:'bi-x-circle text-danger', badge:'badge text-bg-danger-soft', label:'Rejected' },
-      'returned': { icon:'bi-arrow-counterclockwise text-success', badge:'badge text-bg-success-soft', label:'Returned' },
+      'BORROW_REQUEST_APPROVED': { icon:'bi-check2-circle text-success', badge:'badge text-bg-success-soft', label:'Approved' },
+      'BORROW_REQUEST_REJECTED': { icon:'bi-x-circle text-danger', badge:'badge text-bg-danger-soft', label:'Rejected' },
+      'DUE_SOON': { icon:'bi-calendar2-week text-warning', badge:'badge text-bg-warning-soft', label:'Due Soon' },
+      'OVERDUE': { icon:'bi-exclamation-triangle text-danger', badge:'badge text-bg-danger-soft', label:'Overdue' },
     };
 
     const fmtDateTime = (value) => {
@@ -178,10 +180,10 @@
       isLoading = true;
       
       try {
-        const res = await fetch('/api/student/notifications', { credentials: 'include' });
+        const res = await fetch('/api/notifications?limit=50', { credentials: 'include' });
         const data = await res.json();
-        if (!data.ok) throw new Error(data.error || 'Failed to load notifications');
-        renderNotifications(data.notifications || []);
+        if (!data.items) throw new Error(data.error || 'Failed to load notifications');
+        renderNotifications(data.items || []);
       } catch (err) {
         list.innerHTML = `<li class="list-group-item text-center text-danger py-4">${err.message}</li>`;
         empty.classList.add('d-none');
@@ -201,18 +203,18 @@
         return;
       }
       
-      // Render notifications with fade-in
+      // Render notifications with fade-in (read-only email history)
       list.innerHTML = items.map(item => {
-        const meta = TYPE_META[item.type] || { icon:'bi-bell text-primary', badge:'badge text-bg-light text-dark', label:item.type || 'Info' };
-        const timestamp = fmtDateTime(item.timestamp);
+        const meta = TYPE_META[item.type] || { icon:'bi-envelope text-primary', badge:'badge text-bg-light text-dark', label:item.type || 'Notification' };
+        const timestamp = fmtDateTime(item.created_at);
         return `
           <li class="list-group-item d-flex justify-content-between align-items-center gap-3 fade-in">
             <div class="d-flex align-items-center gap-3">
-              <i class="bi ${meta.icon}"></i>
+              <i class="bi ${meta.icon} fs-5"></i>
               <div>
                 <div class="fw-semibold">${item.title || meta.label}</div>
                 <div class="text-muted small">${item.message || ''}</div>
-                ${timestamp ? `<div class="text-muted small">${timestamp}</div>` : ''}
+                ${timestamp ? `<div class="text-muted small mt-1"><i class="bi bi-clock me-1"></i>${timestamp}</div>` : ''}
               </div>
             </div>
             <span class="${meta.badge}">${meta.label}</span>

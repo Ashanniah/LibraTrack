@@ -72,6 +72,11 @@ Route::delete('/categories', [CategoryController::class, 'delete'])->middleware(
 Route::get('/favorites', [FavoriteController::class, 'list'])->middleware('auth');
 Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->middleware('auth');
 
+// Email notification history routes
+Route::get('/email-notifications', [App\Http\Controllers\EmailLogController::class, 'index'])->middleware('auth');
+Route::get('/email-notifications/all', [App\Http\Controllers\EmailLogController::class, 'all'])->middleware('auth');
+Route::get('/email-notifications/event-types', [App\Http\Controllers\EmailLogController::class, 'eventTypes'])->middleware('auth');
+
 // School routes
 Route::get('/schools', [SchoolController::class, 'list'])->middleware('auth');
 Route::get('/admin/schools', [SchoolController::class, 'adminList'])->middleware('auth');

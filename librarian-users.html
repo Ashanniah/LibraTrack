@@ -1963,6 +1963,18 @@
         const method = isCreate ? 'POST' : 'PUT';
         await getJson(url, { method: method, headers:{'Content-Type':'application/json'}, body: JSON.stringify(model) });
         await loadStudents();
+        
+        // Update dashboard counts if dashboard is open
+        if (isCreate) {
+          // Dispatch event to update dashboard counts
+          window.dispatchEvent(new CustomEvent('studentCreated'));
+          
+          // Also try to call the refresh function directly if available
+          if (typeof window.refreshLibrarianStudentCounts === 'function') {
+            window.refreshLibrarianStudentCounts();
+          }
+        }
+        
         studentModalEl.addEventListener('hidden.bs.modal', () => {
           if (isCreate) showSuccess('Student Added','The student account has been created successfully.');
           else showSuccess('Student Updated','The student account has been updated successfully.');

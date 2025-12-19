@@ -105,6 +105,82 @@ function send_mail(PDO $pdo, string $toEmail, string $toName, string $subject, s
     }
 }
 
+/**
+ * Log email to email_logs table
+ * 
+ * @param PDO $pdo Database connection
+ * @param array $data Email log data
+ * @return int|false Log ID or false on failure
+ */
+function log_email(PDO $pdo, array $data): int|false {
+    try {
+        $stmt = $pdo->prepare("
+            INSERT INTO email_logs 
+            (user_id, role, recipient_email, event_type, subject, body_preview, status, error_message, related_entity_type, related_entity_id, created_at, sent_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)
+        ");
+        
+        $result = $stmt->execute([
+            $data['user_id'] ?? null,
+            $data['role'] ?? null,
+            $data['recipient_email'],
+            $data['event_type'] ?? null,
+            $data['subject'],
+            $data['body_preview'] ?? null,
+            $data['status'] ?? 'sent',
+            $data['error_message'] ?? null,
+            $data['related_entity_type'] ?? null,
+            $data['related_entity_id'] ?? null,
+            $data['status'] === 'sent' ? date('Y-m-d H:i:s') : null
+        ]);
+        
+        return $result ? (int)$pdo->lastInsertId() : false;
+    } catch (Exception $e) {
+        error_log("Failed to log email: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Enhanced send_mail with logging
+ * 
+ * @param PDO $pdo Database connection
+ * @param string $toEmail Recipient email
+ * @param string $toName Recipient name
+ * @param string $subject Email subject
+ * @param string $htmlBody HTML email body
+ * @param string|null $textBody Plain text body
+ * @param array $metadata Additional metadata for logging (user_id, role, event_type, related_entity_type, related_entity_id)
+ * @return array ['success' => bool, 'error' => string|null, 'log_id' => int|null]
+ */
+function send_mail_with_log(PDO $pdo, string $toEmail, string $toName, string $subject, string $htmlBody, ?string $textBody = null, array $metadata = []): array {
+    $result = send_mail($pdo, $toEmail, $toName, $subject, $htmlBody, $textBody);
+    
+    // Update log with metadata if provided
+    if (isset($metadata['log_id']) && $metadata['log_id']) {
+        try {
+            $updateStmt = $pdo->prepare("
+                UPDATE email_logs 
+                SET user_id = ?, role = ?, event_type = ?, related_entity_type = ?, related_entity_id = ?, sent_at = ?
+                WHERE id = ?
+            ");
+            $updateStmt->execute([
+                $metadata['user_id'] ?? null,
+                $metadata['role'] ?? null,
+                $metadata['event_type'] ?? null,
+                $metadata['related_entity_type'] ?? null,
+                $metadata['related_entity_id'] ?? null,
+                $result['success'] ? date('Y-m-d H:i:s') : null,
+                $metadata['log_id']
+            ]);
+        } catch (Exception $e) {
+            error_log("Failed to update email log: " . $e->getMessage());
+        }
+    }
+    
+    return $result;
+}
+
 
 
 

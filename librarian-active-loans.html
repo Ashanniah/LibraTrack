@@ -939,13 +939,31 @@
         <div class="modal-body py-4 px-5">
           <div class="return-confirm-icon mb-3">
             <i class="bi bi-check-circle-fill"></i>
-        </div>
+          </div>
           <h5 class="modal-title mb-2 fw-bold">Confirm Return</h5>
           <p class="text-muted mb-4" id="returnModalMessage">Are you sure you want to mark this book as returned?</p>
           <div class="d-flex gap-2 justify-content-center">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="min-width: 100px;">Cancel</button>
             <button type="button" class="btn btn-success" id="btnConfirmReturn" style="min-width: 100px;">Mark as Returned</button>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Modal -->
+  <div class="modal fade" id="returnSuccessModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content text-center">
+        <div class="modal-body py-4 px-5">
+          <div class="return-confirm-icon mb-3">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+          <h5 class="modal-title mb-2 fw-bold">Success</h5>
+          <p class="text-muted mb-4" id="returnSuccessMessage">Book marked as returned successfully!</p>
+          <div class="d-flex gap-2 justify-content-center">
+            <button type="button" class="btn btn-success" data-bs-dismiss="modal" style="min-width: 100px;">OK</button>
+          </div>
         </div>
       </div>
     </div>
@@ -1758,7 +1776,13 @@
           if (data?.ok) {
             modal.hide();
             bootstrap.Offcanvas.getInstance('#loanDrawer')?.hide();
-            alert('Book marked as returned successfully!');
+            
+            // Show success modal
+            const successModal = new bootstrap.Modal('#returnSuccessModal');
+            const bookTitle = loan.book_title || 'the book';
+            document.getElementById('returnSuccessMessage').textContent = `"${esc(bookTitle)}" marked as returned successfully!`;
+            successModal.show();
+            
             loadLoans();
           } else {
             alert(data?.error || 'Failed to mark book as returned');

@@ -141,9 +141,30 @@ class BorrowRequestController extends BaseController
             'requested_at' => now(),
         ]);
 
-        // BORROW_REQUEST_SUBMITTED and NEW_BORROW_REQUEST do not send emails
-        // Therefore, no in-app notifications are created for these events
-        // (Notifications are only created when emails are successfully sent)
+        // Queue email notification to librarians about new borrow request
+        try {
+            require_once __DIR__ . '/../../includes/email_notifications.php';
+            $pdo = DB::connection()->getPdo();
+            
+            // Get all active librarians in the student's school
+            $student = DB::table('users')->where('id', $user['id'])->first();
+            $studentSchoolId = (int)($student->school_id ?? 0);
+            
+            if ($studentSchoolId > 0) {
+                $librarians = DB::table('users')
+                    ->where('role', 'librarian')
+                    ->where('status', 'active')
+                    ->where('school_id', $studentSchoolId)
+                    ->get();
+                
+                foreach ($librarians as $librarian) {
+                    queue_email($pdo, $librarian->id, 'NEW_BORROW_REQUEST', 'borrow_request', $requestId);
+                }
+            }
+        } catch (\Exception $e) {
+            // Log but don't fail the request
+            error_log("Failed to queue NEW_BORROW_REQUEST email: " . $e->getMessage());
+        }
 
         return response()->json([
             'ok' => true,
