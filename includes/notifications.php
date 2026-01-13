@@ -474,3 +474,4 @@ function log_notification_action(PDO $pdo, string $action, int $notificationId, 
 
 
 
+
