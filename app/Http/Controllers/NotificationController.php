@@ -10,46 +10,13 @@ class NotificationController extends BaseController
 {
     /**
      * Get unread notification count
-     * Only counts notifications that correspond to successfully sent emails
+     * ALWAYS returns 0 - no notification counters/badges per requirements
+     * Notifications are read-only email history logs
      */
     public function unreadCount(Request $request)
     {
-        $user = $this->requireLogin();
-        $userRole = strtolower($user['role'] ?? '');
-        
-        // Define allowed notification types per role
-        $allowedTypes = [];
-        if ($userRole === 'student') {
-            $allowedTypes = [
-                'BORROW_REQUEST_APPROVED',
-                'BORROW_REQUEST_REJECTED',
-                'DUE_SOON',
-                'OVERDUE'
-            ];
-        } elseif ($userRole === 'librarian') {
-            $allowedTypes = [
-                'NEW_BORROW_REQUEST',
-                'LOW_STOCK',
-                'OVERDUE_SUMMARY'
-            ];
-        }
-        // Admin has no user-facing notifications
-        
-        $query = DB::table('notifications')
-            ->where('recipient_user_id', $user['id'])
-            ->where('recipient_role', $userRole)
-            ->where('is_read', false);
-        
-        if (!empty($allowedTypes)) {
-            $query->whereIn('type', $allowedTypes);
-        } else {
-            // Admin or invalid role - return 0
-            return response()->json(['unread' => 0]);
-        }
-        
-        $count = $query->count();
-        
-        return response()->json(['unread' => $count]);
+        // Email-only notification system - no counters
+        return response()->json(['unread' => 0]);
     }
     
     /**
@@ -78,9 +45,8 @@ class NotificationController extends BaseController
             ];
         } elseif ($userRole === 'librarian') {
             $allowedTypes = [
-                'NEW_BORROW_REQUEST',
                 'LOW_STOCK',
-                'OVERDUE_SUMMARY'
+                'OVERDUE_CRITICAL'
             ];
         } elseif ($userRole === 'admin') {
             // Admin has no user-facing notifications (relies on system logs)

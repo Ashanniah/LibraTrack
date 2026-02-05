@@ -4,11 +4,14 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>LibraTrack – Borrowing History</title>
+
   <link rel="icon" href="assets/img/logo.png" type="image/png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/css/sidebar.css" rel="stylesheet">`n  <link href="assets/css/responsive.css" rel="stylesheet">
+  <link href="assets/css/sidebar.css" rel="stylesheet">
+  <link href="assets/css/responsive.css" rel="stylesheet">
+
   <style>
     :root{
       --card-pad:24px;
@@ -33,15 +36,37 @@
       --table-header-bg:#fff;
       --card-border:#e5e7eb;
     }
+
     html{font-size:14px;}
-    body{font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans"}
-    main.container-fluid{padding:24px!important}
+    body{
+      font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+      margin:0;
+      padding:0;
+    }
+
+    /* ========= REMOVE GAP BEFORE TOPBAR (FIX) ========= */
+    html, body { margin: 0 !important; padding: 0 !important; }
+    .sb-wrapper { margin-top: 0 !important; padding-top: 0 !important; top: 0 !important; }
+    .sb-topbar { top: 0 !important; margin-top: 0 !important; padding-top: 0 !important; position: sticky !important; width: 100% !important; z-index: 1030 !important; left: 0 !important; }
+    .sb-topbar.navbar.sticky-top { top: 0 !important; margin-top: 0 !important; position: sticky !important; width: 100% !important; z-index: 1030 !important; left: 0 !important; }
+    body.sb-expanded .sb-wrapper { margin-top: 0 !important; padding-top: 0 !important; }
+    .sb-wrapper::before { content: none !important; display: none !important; }
+    .sb-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
+
+    /* ✅ EXTEND TOP HEIGHT OF THE HISTORY PAGE (adds more space above content) */
+    main.container-fluid{
+      padding: 40px 24px 24px !important; /* top right/left bottom */
+    }
+    /* ================================================= */
 
     /* Header Styling */
     .admin-header-gold{
       background:#fff!important;
       border-bottom:1px solid var(--card-border);
-      padding:12px 24px;
+      padding:16px 24px;
+      min-height:64px;
+      margin-top:0!important;
+      top:0!important;
     }
     .admin-header-gold .fw-bold,
     .admin-header-gold .h5,
@@ -111,9 +136,7 @@
     }
 
     /* Table Styling */
-    .table-modern{
-      margin-bottom:0;
-    }
+    .table-modern{ margin-bottom:0; }
     .table-modern thead th{
       background:#fff;
       color:var(--text-secondary);
@@ -129,10 +152,7 @@
       padding:var(--cell-pad-y) var(--cell-pad-x);
       vertical-align:middle;
     }
-    .table-modern tbody tr:hover{
-      background:#f8f9fa;
-    }
-    /* Book Cover in Table */
+    .table-modern tbody tr:hover{ background:#f8f9fa; }
     .table-modern tbody td img[alt*="Book"] {
       width: 50px;
       height: 65px;
@@ -153,9 +173,7 @@
       0% { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
-    .skeleton-table-row td {
-      padding: var(--cell-pad-y) var(--cell-pad-x);
-    }
+    .skeleton-table-row td { padding: var(--cell-pad-y) var(--cell-pad-x); }
     .skeleton-table-cell {
       height: 1rem;
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -163,15 +181,9 @@
       animation: skeleton-shimmer 1.5s ease-in-out infinite;
       border-radius: 4px;
     }
-    .skeleton-table-cell.short {
-      width: 60%;
-    }
-    .skeleton-table-cell.medium {
-      width: 80%;
-    }
-    .skeleton-table-cell.long {
-      width: 100%;
-    }
+    .skeleton-table-cell.short { width: 60%; }
+    .skeleton-table-cell.medium { width: 80%; }
+    .skeleton-table-cell.long { width: 100%; }
     .skeleton-cover {
       width: 50px;
       height: 65px;
@@ -198,13 +210,8 @@
       animation: skeleton-shimmer 1.5s ease-in-out infinite;
       display: inline-block;
     }
-    .fade-in {
-      animation: fadeIn 0.3s ease-in;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    .fade-in { animation: fadeIn 0.3s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     .btn:disabled,
     .form-control:disabled {
       opacity: 0.6;
@@ -219,6 +226,8 @@
       border-radius: var(--border-radius-lg);
       padding: 16px 20px;
       margin-bottom: 24px;
+      /* optional: increase visual top feel */
+      margin-top: 0;
     }
     .filter-section .btn {
       padding: 8px 20px;
@@ -271,11 +280,8 @@
       opacity: 0.5;
     }
 
-    /* Drawer Styling - Similar to Librarian */
-    .request-drawer { 
-      width: 520px; 
-      max-width: 90vw; 
-    }
+    /* Drawer Styling */
+    .request-drawer { width: 520px; max-width: 90vw; }
     .request-drawer .offcanvas-header {
       background: var(--sidebar-bg);
       color: #fff;
@@ -291,24 +297,17 @@
       filter: invert(1) grayscale(1);
       opacity: 0.8;
     }
-    .request-drawer .offcanvas-body { 
-      padding: 24px;
-      background: #fff;
-    }
-    .book-cover-small { 
-      width: 100px; 
-      height: 140px; 
-      object-fit: cover; 
+    .request-drawer .offcanvas-body { padding: 24px; background: #fff; }
+    .book-cover-small {
+      width: 100px;
+      height: 140px;
+      object-fit: cover;
       border-radius: var(--border-radius-sm);
       background: #f3f4f6;
       box-shadow: var(--shadow-sm);
     }
-    .request-section {
-      margin-bottom: 28px;
-    }
-    .request-section:last-child {
-      margin-bottom: 0;
-    }
+    .request-section { margin-bottom: 28px; }
+    .request-section:last-child { margin-bottom: 0; }
     .request-section-title {
       font-size: 0.875rem;
       font-weight: 700;
@@ -323,10 +322,7 @@
       padding: 8px 16px;
       border-radius: var(--border-radius-sm);
     }
-    .request-section-title i {
-      color: #fff;
-      font-size: 1rem;
-    }
+    .request-section-title i { color: #fff; font-size: 1rem; }
     .book-info-card {
       background: #f8f9fa;
       border-radius: var(--border-radius);
@@ -347,19 +343,13 @@
       align-items: center;
       gap: 6px;
     }
-    .book-meta i {
-      color: var(--text-secondary);
-      font-size: 0.875rem;
-      width: 16px;
-    }
+    .book-meta i { color: var(--text-secondary); font-size: 0.875rem; width: 16px; }
     .info-row {
       display: flex;
       padding: 12px 0;
       border-bottom: 1px solid var(--ui-border);
     }
-    .info-row:last-child {
-      border-bottom: none;
-    }
+    .info-row:last-child { border-bottom: none; }
     .info-label {
       font-weight: 600;
       color: var(--text-secondary);
@@ -369,18 +359,11 @@
       align-items: center;
       gap: 6px;
     }
-    .info-label i {
-      color: var(--text-secondary);
-      font-size: 0.875rem;
-      width: 16px;
-    }
-    .info-value {
-      color: var(--text-primary);
-      font-size: 0.9375rem;
-      font-weight: 500;
-    }
+    .info-label i { color: var(--text-secondary); font-size: 0.875rem; width: 16px; }
+    .info-value { color: var(--text-primary); font-size: 0.9375rem; font-weight: 500; }
   </style>
 </head>
+
 <body class="sb-body">
   <div id="sidebar-root"></div>
 
@@ -388,8 +371,9 @@
     <nav class="sb-topbar navbar navbar-expand sticky-top admin-header-gold">
       <div class="container-fluid">
         <button id="sidebarToggle" class="btn btn-link text-dark me-2" aria-label="Toggle sidebar">
-            <i class="bi bi-list fs-4"></i>
-          </button>
+          <i class="bi bi-list fs-4"></i>
+        </button>
+
         <div class="fw-bold h5 mb-0" id="pageTitle">Borrowing History</div>
 
         <div class="ms-auto d-flex align-items-center gap-2">
@@ -400,7 +384,6 @@
             </div>
           </form>
 
-          <div class="dropdown position-relative">
           <div class="dropdown">
             <button id="userBtn" class="btn admin-btn-custom" data-bs-toggle="dropdown" aria-expanded="false">
               <img src="assets/img/default-avatar.png" alt="User" class="avatar-32">
@@ -411,11 +394,12 @@
               <li><a class="dropdown-item text-danger" href="#" id="logoutLink"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
             </ul>
           </div>
+
         </div>
       </div>
     </nav>
 
-    <main class="container-fluid py-4">
+    <main class="container-fluid">
       <div class="filter-section">
         <div class="d-flex flex-wrap gap-2">
           <button class="btn active" data-status="">All</button>
@@ -455,145 +439,94 @@
     <div class="offcanvas-header">
       <h5 class="offcanvas-title" id="loanDrawerLabel">Loan Details</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
-        </div>
-    <div class="offcanvas-body" id="loanDrawerBody">
-      <!-- Content populated by JS -->
     </div>
+    <div class="offcanvas-body" id="loanDrawerBody"></div>
   </div>
 
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/sidebar.js?v=2025-11-19-FINAL-NO-SEARCH-NO-NOTIFICATIONS-V2"></script>
   <script src="assets/js/logout.js"></script>
+
   <script>
-    // Logout - handled by logout.js (confirmation dialog)
-
-    (async () => {
-      try {
-        const res = await fetch('/api/check-auth', { credentials: 'include', headers: { 'Accept': 'application/json' } });
-        const data = await res.ok ? await res.json() : null;
-        const role = (data?.user?.role || 'student').toLowerCase();
-        if (['admin', 'librarian', 'student'].includes(role)) {
-          renderSidebar('history', role);
-          
-          // Load avatar if available
-          const headerAvatar = document.querySelector('#userBtn img.avatar-32');
-          if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') {
-            headerAvatar.src = data.user.avatar;
-          }
-        }
-      } catch {
-        renderSidebar('history', 'student');
-      }
-      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
-        if (typeof toggleSidebar === 'function') toggleSidebar();
-        else document.body.classList.toggle('sb-expanded');
-      });
-
-      // Search functionality
-      if (searchInput) {
-        let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
-          if (isLoading) return;
-          
-          clearTimeout(searchTimeout);
-          const query = e.target.value.trim();
-          searchTimeout = setTimeout(() => {
-            filterBySearch(query);
-          }, 300);
-        });
-      }
-    })();
-
-    function filterBySearch(query) {
-      // If search is cleared and we have loans, just show all rows
-      if (!query.trim()) {
-        const rows = document.querySelectorAll('#historyBody tr:not(.skeleton-table-row)');
-        rows.forEach(row => {
-          row.style.display = '';
-        });
-        return;
-      }
-      
-      // Filter existing rows (not skeletons)
-      const rows = document.querySelectorAll('#historyBody tr:not(.skeleton-table-row)');
-      rows.forEach(row => {
-        const text = row.textContent.toLowerCase();
-        row.style.display = text.includes(query.toLowerCase()) ? '' : 'none';
-      });
-    }
-
     const filters = document.querySelectorAll('[data-status]');
     const tbody = document.getElementById('historyBody');
     const empty = document.getElementById('historyEmpty');
     const searchInput = document.getElementById('historySearch');
 
-    let currentStatus = '';
     let loans = [];
     let isLoading = false;
 
-    // Render skeleton table rows
+    (async () => {
+      try {
+        const res = await fetch('/api/check-auth', { credentials: 'include', headers: { 'Accept': 'application/json' } });
+        const data = await (res.ok ? res.json() : Promise.resolve(null));
+        const role = (data?.user?.role || 'student').toLowerCase();
+        renderSidebar('history', ['admin','librarian','student'].includes(role) ? role : 'student');
+
+        const headerAvatar = document.querySelector('#userBtn img.avatar-32');
+        if (headerAvatar && data?.user?.avatar && data.user.avatar.trim() !== '') headerAvatar.src = data.user.avatar;
+      } catch {
+        renderSidebar('history', 'student');
+      }
+
+      document.getElementById('sidebarToggle')?.addEventListener('click', () => {
+        if (typeof toggleSidebar === 'function') toggleSidebar();
+        else document.body.classList.toggle('sb-expanded');
+      });
+
+      if (searchInput) {
+        let t;
+        searchInput.addEventListener('input', (e) => {
+          if (isLoading) return;
+          clearTimeout(t);
+          const q = e.target.value.trim();
+          t = setTimeout(() => filterBySearch(q), 300);
+        });
+      }
+    })();
+
+    function filterBySearch(query) {
+      const rows = document.querySelectorAll('#historyBody tr:not(.skeleton-table-row)');
+      if (!query.trim()) { rows.forEach(r => r.style.display = ''); return; }
+      rows.forEach(r => r.style.display = r.textContent.toLowerCase().includes(query.toLowerCase()) ? '' : 'none');
+    }
+
     function renderSkeletonTableRows(count = 5) {
       return Array.from({length: count}, () => `
         <tr class="skeleton-table-row">
-          <td>
-            <div class="skeleton-cover"></div>
-          </td>
+          <td><div class="skeleton-cover"></div></td>
           <td>
             <div class="skeleton-table-cell medium" style="margin-bottom: 4px;"></div>
             <div class="skeleton-table-cell short"></div>
           </td>
-          <td>
-            <div class="skeleton-badge"></div>
-          </td>
-          <td>
-            <div class="skeleton-table-cell short"></div>
-          </td>
-          <td>
-            <div class="skeleton-table-cell short"></div>
-          </td>
-          <td>
-            <div class="skeleton-table-cell short" style="width: 30px;"></div>
-          </td>
-          <td class="text-end">
-            <div class="skeleton-button"></div>
-          </td>
+          <td><div class="skeleton-badge"></div></td>
+          <td><div class="skeleton-table-cell short"></div></td>
+          <td><div class="skeleton-table-cell short"></div></td>
+          <td><div class="skeleton-table-cell short" style="width: 30px;"></div></td>
+          <td class="text-end"><div class="skeleton-button"></div></td>
         </tr>
       `).join('');
     }
 
-    // Disable/enable interactions during loading
     function setLoadingState(loading) {
       isLoading = loading;
-      
-      // Disable filter buttons
-      filters.forEach(btn => {
-        btn.disabled = loading;
-      });
-      
-      // Disable search input
-      if (searchInput) {
-        searchInput.disabled = loading;
-      }
+      filters.forEach(btn => btn.disabled = loading);
+      if (searchInput) searchInput.disabled = loading;
     }
 
     filters.forEach(btn => {
       btn.addEventListener('click', () => {
         if (isLoading) return;
-        
         filters.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        currentStatus = btn.dataset.status || '';
-        loadLoans(currentStatus);
+        loadLoans(btn.dataset.status || '');
       });
     });
 
     function statusPill(status) {
-      const map = {
-        borrowed: 'pill-info',
-        returned: 'pill-success',
-        overdue: 'pill-danger'
-      };
-      return `<span class="pill ${map[status] || 'pill-neutral'}">${status.charAt(0).toUpperCase()+status.slice(1)}</span>`;
+      const map = { borrowed: 'pill-info', returned: 'pill-success', overdue: 'pill-danger' };
+      const s = (status || 'unknown');
+      return `<span class="pill ${map[s] || 'pill-neutral'}">${s.charAt(0).toUpperCase()+s.slice(1)}</span>`;
     }
 
     function fmtDate(value) {
@@ -604,20 +537,24 @@
     }
 
     async function loadLoans(status='') {
-      // Show skeleton loading
       tbody.innerHTML = renderSkeletonTableRows(5);
       empty.classList.add('d-none');
       setLoadingState(true);
-      
+
       try {
         const url = new URL('/api/student/my-loans', location.origin);
         url.searchParams.set('pagesize', '200');
         if (status) url.searchParams.set('status', status);
+
         const res = await fetch(url, { credentials: 'include' });
         const data = await res.json();
         if (!data.ok) throw new Error(data.error || 'Failed to load');
+
         loans = data.items || [];
         renderRows();
+
+        const q = (searchInput?.value || '').trim();
+        if (q) filterBySearch(q);
       } catch (err) {
         tbody.innerHTML = `<tr><td colspan="7" class="text-center text-danger py-4">${err.message}</td></tr>`;
         empty.classList.add('d-none');
@@ -627,126 +564,104 @@
     }
 
     function renderRows() {
-      // Remove skeletons and render actual data with fade-in
-      if (!loans.length) {
-        tbody.innerHTML = '';
-        empty.classList.remove('d-none');
-        return;
-      }
+      if (!loans.length) { tbody.innerHTML = ''; empty.classList.remove('d-none'); return; }
       empty.classList.add('d-none');
-      
+
       tbody.innerHTML = loans.map(loan => {
         const cover = loan.cover_url || loan.book_cover || 'assets/img/default-book.png';
+        const title = (loan.book_title || '—').replace(/"/g, '&quot;');
         return `
-        <tr class="fade-in">
-          <td>
-            <img src="${cover}" alt="${(loan.book_title || 'Book').replace(/"/g, '&quot;')}" 
-                 style="width:50px; height:65px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"
-                 onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
-          </td>
-          <td>
-            <div class="fw-medium">${loan.book_title || '—'}</div>
-            <div class="small text-muted">${loan.isbn || ''}</div>
-          </td>
-          <td>${statusPill(loan.loan_status)}</td>
-          <td>${fmtDate(loan.borrowed_at)}</td>
-          <td>${fmtDate(loan.due_at)}</td>
-          <td>${loan.returned_at ? fmtDate(loan.returned_at) : '—'}</td>
-          <td class="text-end">
-            <i class="bi bi-eye" style="cursor:pointer; font-size:1.125rem; color:var(--text-primary);" data-id="${loan.id}" title="View Details"></i>
-          </td>
-        </tr>
-      `;
+          <tr class="fade-in">
+            <td>
+              <img src="${cover}" alt="${title}"
+                   style="width:50px; height:65px; object-fit:cover; border-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,0.1);"
+                   onerror="this.src='assets/img/default-book.png'; this.onerror=null;">
+            </td>
+            <td>
+              <div class="fw-medium">${loan.book_title || '—'}</div>
+              <div class="small text-muted">${loan.isbn || ''}</div>
+            </td>
+            <td>${statusPill(loan.loan_status)}</td>
+            <td>${fmtDate(loan.borrowed_at)}</td>
+            <td>${fmtDate(loan.due_at)}</td>
+            <td>${loan.returned_at ? fmtDate(loan.returned_at) : '—'}</td>
+            <td class="text-end">
+              <i class="bi bi-eye"
+                 style="cursor:pointer; font-size:1.125rem; color:var(--text-primary);"
+                 data-id="${loan.id}" title="View Details"></i>
+            </td>
+          </tr>
+        `;
       }).join('');
 
       tbody.querySelectorAll('i[data-id]').forEach(icon => {
         icon.addEventListener('click', () => openDetails(icon.dataset.id));
-        icon.addEventListener('mouseenter', function() {
-          this.style.color = 'var(--brand-gold)';
-        });
-        icon.addEventListener('mouseleave', function() {
-          this.style.color = 'var(--text-primary)';
-        });
+        icon.addEventListener('mouseenter', function() { this.style.color = 'var(--brand-gold)'; });
+        icon.addEventListener('mouseleave', function() { this.style.color = 'var(--text-primary)'; });
       });
     }
 
     function openDetails(id) {
       const loan = loans.find(l => String(l.id) === String(id));
       if (!loan) return;
-      
-      const esc = (s='') => s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-      const cover = loan.cover_url || 'assets/img/no-cover.png';
-      const statusBadge = loan.loan_status === 'borrowed' ? '<span class="badge" style="background:#dbeafe; color:#1e40af; font-weight:600; padding:6px 12px;">BORROWED</span>'
-                         : loan.loan_status === 'returned' ? '<span class="badge" style="background:#d1fae5; color:#065f46; font-weight:600; padding:6px 12px;">RETURNED</span>'
-                         : loan.loan_status === 'overdue' ? '<span class="badge" style="background:#fee2e2; color:#991b1b; font-weight:600; padding:6px 12px;">OVERDUE</span>'
-                         : '<span class="badge text-bg-secondary">UNKNOWN</span>';
-      
+
+      const esc = (s='') => String(s).replace(/[&<>"']/g, m => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[m]));
+
+      const cover = loan.cover_url || loan.book_cover || 'assets/img/no-cover.png';
+
+      const statusBadge =
+        loan.loan_status === 'borrowed' ? '<span class="badge" style="background:#dbeafe; color:#1e40af; font-weight:600; padding:6px 12px;">BORROWED</span>' :
+        loan.loan_status === 'returned' ? '<span class="badge" style="background:#d1fae5; color:#065f46; font-weight:600; padding:6px 12px;">RETURNED</span>' :
+        loan.loan_status === 'overdue'  ? '<span class="badge" style="background:#fee2e2; color:#991b1b; font-weight:600; padding:6px 12px;">OVERDUE</span>' :
+                                          '<span class="badge text-bg-secondary">UNKNOWN</span>';
+
       const body = `
-        <!-- Status Badge -->
-        <div class="mb-4 text-center">
-          ${statusBadge}
-        </div>
-        
-        <!-- Book Information -->
+        <div class="mb-4 text-center">${statusBadge}</div>
+
         <div class="request-section">
-          <div class="request-section-title">
-            <i class="bi bi-journal-text"></i> Book Information
-          </div>
+          <div class="request-section-title"><i class="bi bi-journal-text"></i> Book Information</div>
           <div class="book-info-card">
             <div class="d-flex gap-3">
-              <img src="${cover}" alt="${esc(loan.book_title)}" class="book-cover-small" onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
+              <img src="${cover}" alt="${esc(loan.book_title)}" class="book-cover-small"
+                   onerror="this.src='assets/img/no-cover.png'; this.onerror=null;">
               <div class="flex-grow-1">
                 <div class="book-title">${esc(loan.book_title || '—')}</div>
-                ${loan.author ? `<div class="book-meta">
-                  <i class="bi bi-person"></i>
-                  <span>${esc(loan.author)}</span>
-                </div>` : ''}
-                ${loan.category ? `<div class="book-meta">
-                  <i class="bi bi-tag"></i>
-                  <span>${esc(loan.category)}</span>
-                </div>` : ''}
-                ${loan.isbn ? `<div class="book-meta">
-                  <i class="bi bi-upc-scan"></i>
-                  <span>ISBN: ${esc(loan.isbn)}</span>
-                </div>` : ''}
+                ${loan.author ? `<div class="book-meta"><i class="bi bi-person"></i><span>${esc(loan.author)}</span></div>` : ''}
+                ${loan.category ? `<div class="book-meta"><i class="bi bi-tag"></i><span>${esc(loan.category)}</span></div>` : ''}
+                ${loan.isbn ? `<div class="book-meta"><i class="bi bi-upc-scan"></i><span>ISBN: ${esc(loan.isbn)}</span></div>` : ''}
               </div>
             </div>
           </div>
         </div>
-        
-        <!-- Loan Information -->
+
         <div class="request-section">
-          <div class="request-section-title">
-            <i class="bi bi-calendar-event"></i> Loan Information
-          </div>
+          <div class="request-section-title"><i class="bi bi-calendar-event"></i> Loan Information</div>
           <div class="info-row">
-            <div class="info-label">
-              <i class="bi bi-calendar-check"></i> Borrowed
-            </div>
+            <div class="info-label"><i class="bi bi-calendar-check"></i> Borrowed</div>
             <div class="info-value">${fmtDate(loan.borrowed_at)}</div>
           </div>
           <div class="info-row">
-            <div class="info-label">
-              <i class="bi bi-calendar-x"></i> Due Date
-            </div>
+            <div class="info-label"><i class="bi bi-calendar-x"></i> Due Date</div>
             <div class="info-value">${fmtDate(loan.due_at)}</div>
           </div>
-          ${loan.returned_at ? `<div class="info-row">
-            <div class="info-label">
-              <i class="bi bi-box-arrow-in-left"></i> Returned
-            </div>
-            <div class="info-value">${fmtDate(loan.returned_at)}</div>
-          </div>` : ''}
-          ${loan.extended_due_at ? `<div class="info-row">
-            <div class="info-label">
-              <i class="bi bi-calendar-plus"></i> Extended To
-            </div>
-            <div class="info-value">${fmtDate(loan.extended_due_at)}</div>
-          </div>` : ''}
+          ${loan.returned_at ? `
+            <div class="info-row">
+              <div class="info-label"><i class="bi bi-box-arrow-in-left"></i> Returned</div>
+              <div class="info-value">${fmtDate(loan.returned_at)}</div>
+            </div>` : ''
+          }
+          ${loan.extended_due_at ? `
+            <div class="info-row">
+              <div class="info-label"><i class="bi bi-calendar-plus"></i> Extended To</div>
+              <div class="info-value">${fmtDate(loan.extended_due_at)}</div>
+            </div>` : ''
+          }
         </div>
       `;
-      
-      document.getElementById('loanDrawerLabel').textContent = `Loan Details – ${esc(loan.book_title || 'Book')}`;
+
+      document.getElementById('loanDrawerLabel').textContent = `Loan Details – ${loan.book_title || 'Book'}`;
       document.getElementById('loanDrawerBody').innerHTML = body;
       bootstrap.Offcanvas.getOrCreateInstance('#loanDrawer').show();
     }

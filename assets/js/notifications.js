@@ -10,24 +10,12 @@
 
   /**
    * Update unread notification count badge
+   * DISABLED: Email-only notification system - no badges/counters per requirements
    */
   async function updateNotificationBadge() {
+    // Email-only notification system - no badges/counters
     const badge = document.getElementById('notificationBadge');
-    if (!badge) return;
-
-    try {
-      const res = await fetch('/api/notifications/unread-count', {credentials: 'include'});
-      const data = await res.json().catch(() => ({unread: 0}));
-      
-      const count = data.unread || 0;
-      if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.classList.remove('d-none');
-      } else {
-        badge.classList.add('d-none');
-      }
-    } catch (err) {
-      console.error('Error updating notification badge:', err);
+    if (badge) {
       badge.classList.add('d-none');
     }
   }

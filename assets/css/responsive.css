@@ -535,6 +535,520 @@
 }
 
 /* ============================================
+   HISTORY PAGES RESPONSIVE
+   ============================================ */
+
+@media (max-width: 991.98px) {
+  /* Filter sections stack on tablet */
+  .filter-section .row > [class*="col-"] {
+    margin-bottom: 12px;
+  }
+  
+  /* History table adjustments */
+  .history-table {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* Filter section full width on mobile */
+  .filter-section {
+    padding: 12px 16px !important;
+  }
+  
+  .filter-section .row {
+    margin: 0;
+  }
+  
+  .filter-section .row > [class*="col-"] {
+    padding: 0;
+    margin-bottom: 12px;
+  }
+  
+  /* Status badges smaller on mobile */
+  .pill,
+  .badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  /* Compact filter layout */
+  .filter-section .form-label {
+    font-size: 0.8125rem;
+    margin-bottom: 4px;
+  }
+  
+  .filter-section .form-control,
+  .filter-section .form-select {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  
+  /* Hide less important info on mobile */
+  .text-muted.small {
+    font-size: 0.75rem;
+  }
+}
+
+/* ============================================
+   BOOKS PAGE RESPONSIVE
+   ============================================ */
+
+@media (max-width: 991.98px) {
+  /* Book cards adjust */
+  .book-card {
+    min-width: 200px;
+  }
+  
+  /* Search and filter bar */
+  .search-filter-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* Category chips horizontal scroll */
+  .category-chips {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+  }
+  
+  .category-chip {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  /* Book grid single column */
+  .book-grid .grid-item {
+    width: 100% !important;
+  }
+  
+  /* Search bar full width */
+  .search-bar-custom {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* ============================================
+   LIBRARIAN PAGES RESPONSIVE
+   ============================================ */
+
+@media (max-width: 991.98px) {
+  /* Borrow requests table */
+  .borrow-requests-table th:nth-child(n+4),
+  .borrow-requests-table td:nth-child(n+4) {
+    display: none;
+  }
+  
+  /* Active loans adjustments */
+  .loan-card {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  /* Action buttons stack */
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .action-buttons .btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  /* User cards in librarian pages */
+  .user-card {
+    margin-bottom: 12px;
+  }
+}
+
+/* ============================================
+   ADMIN PAGES RESPONSIVE
+   ============================================ */
+
+@media (max-width: 991.98px) {
+  /* Admin dashboard cards */
+  .admin-card {
+    margin-bottom: 16px;
+  }
+  
+  /* Settings form */
+  .settings-form .row > [class*="col-"] {
+    margin-bottom: 16px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  /* Admin tables compact */
+  .admin-table {
+    font-size: 0.8125rem;
+  }
+  
+  /* Settings sections */
+  .settings-section {
+    padding: 16px 12px;
+  }
+}
+
+/* ============================================
+   PROFILE PAGES RESPONSIVE
+   ============================================ */
+
+@media (max-width: 991.98px) {
+  .profile-container {
+    flex-direction: column;
+  }
+  
+  .profile-sidebar {
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  
+  .profile-content {
+    width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .profile-avatar {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .profile-info {
+    padding: 16px;
+  }
+}
+
+/* ============================================
+   NOTIFICATION PAGES RESPONSIVE
+   ============================================ */
+
+@media (max-width: 767.98px) {
+  .notification-item {
+    padding: 12px !important;
+  }
+  
+  .notification-item .badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+}
+
+/* ============================================
+   FORM PAGES RESPONSIVE ENHANCEMENTS
+   ============================================ */
+
+@media (max-width: 991.98px) {
+  /* Form groups stack */
+  .form-group,
+  .mb-3,
+  .mb-4 {
+    margin-bottom: 16px !important;
+  }
+  
+  /* Input groups */
+  .input-group {
+    flex-wrap: wrap;
+  }
+  
+  .input-group > .form-control {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+@media (max-width: 575.98px) {
+  /* Form sections */
+  .form-section {
+    padding: 16px 12px;
+  }
+  
+  /* File upload areas */
+  .file-upload-area {
+    padding: 24px 16px;
+  }
+  
+  /* Image preview */
+  .image-preview {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* ============================================
+   DROPDOWN MENUS RESPONSIVE
+   ============================================ */
+
+@media (max-width: 575.98px) {
+  .dropdown-menu {
+    max-width: calc(100vw - 32px);
+    left: 16px !important;
+    right: 16px !important;
+    width: auto !important;
+  }
+  
+  .dropdown-menu-end {
+    left: 16px !important;
+    right: 16px !important;
+  }
+}
+
+/* ============================================
+   ALERTS & BANNERS RESPONSIVE
+   ============================================ */
+
+@media (max-width: 575.98px) {
+  .alert {
+    padding: 12px 16px;
+    font-size: 0.875rem;
+  }
+  
+  .alert-dismissible .btn-close {
+    padding: 0.5rem 0.5rem;
+  }
+}
+
+/* ============================================
+   LOADING STATES RESPONSIVE
+   ============================================ */
+
+@media (max-width: 575.98px) {
+  .skeleton {
+    height: 16px;
+  }
+  
+  .skeleton-table-cell {
+    height: 40px;
+  }
+}
+
+/* ============================================
+   UTILITY ENHANCEMENTS
+   ============================================ */
+
+/* Smooth scrolling on mobile */
+@media (max-width: 991.98px) {
+  html {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Prevent text size adjustment on iOS */
+@media (max-width: 991.98px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ============================================
+   ADDITIONAL RESPONSIVE FIXES
+   ============================================ */
+
+/* Fix for history pages topbar spacing */
+@media (max-width: 991.98px) {
+  .sb-topbar.sticky-top {
+    position: sticky !important;
+    top: 0 !important;
+  }
+  
+  main.container-fluid {
+    padding-top: 16px !important;
+  }
+}
+
+/* Fix for filter sections on mobile */
+@media (max-width: 575.98px) {
+  .filter-section .row.g-3 > [class*="col-"],
+  .filter-section .row.g-4 > [class*="col-"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 12px;
+  }
+  
+  /* Date picker inputs full width */
+  .filter-section input[type="date"],
+  .filter-section input[type="text"] {
+    width: 100%;
+  }
+}
+
+/* Fix for action button groups */
+@media (max-width: 767.98px) {
+  .btn-group-vertical,
+  .d-flex.gap-2 {
+    width: 100%;
+  }
+  
+  .btn-group-vertical .btn,
+  .d-flex.gap-2 .btn {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+}
+
+/* Fix for card headers on mobile */
+@media (max-width: 575.98px) {
+  .card-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .card-header .btn {
+    width: 100%;
+  }
+}
+
+/* Fix for search bars */
+@media (max-width: 767.98px) {
+  .search-bar-custom {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .search-bar-custom .form-control {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}
+
+/* Fix for notification lists */
+@media (max-width: 575.98px) {
+  .list-group-item {
+    padding: 12px 16px !important;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .list-group-item .badge {
+    margin-top: 8px;
+    align-self: flex-start;
+  }
+}
+
+/* Fix for empty states */
+@media (max-width: 575.98px) {
+  .empty-state {
+    padding: 32px 16px;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+  }
+  
+  .empty-state h5 {
+    font-size: 1.1rem;
+  }
+}
+
+/* Fix for pagination on mobile */
+@media (max-width: 575.98px) {
+  .pagination-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .pagination {
+    min-width: max-content;
+  }
+}
+
+/* Fix for modals on very small screens */
+@media (max-width: 400px) {
+  .modal-dialog {
+    margin: 0;
+    max-width: 100%;
+    height: 100vh;
+  }
+  
+  .modal-content {
+    border-radius: 0;
+    min-height: 100vh;
+  }
+}
+
+/* Fix for image upload areas */
+@media (max-width: 575.98px) {
+  .img-drop,
+  .image-upload-area {
+    min-height: 200px;
+    padding: 24px 16px;
+  }
+  
+  .img-preview {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Fix for stat cards grid */
+@media (max-width: 991.98px) {
+  .row.g-3 > [class*="col-6"],
+  .row.g-3 > [class*="col-md-3"],
+  .row.g-3 > [class*="col-md-4"] {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .row.g-3 > [class*="col-6"],
+  .row.g-3 > [class*="col-md-3"],
+  .row.g-3 > [class*="col-md-4"] {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+/* Fix for horizontal scroll containers */
+@media (max-width: 991.98px) {
+  .h-scroll,
+  .horizontal-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 8px;
+  }
+  
+  .h-scroll::-webkit-scrollbar,
+  .horizontal-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .h-scroll::-webkit-scrollbar-thumb,
+  .horizontal-scroll::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
+}
+
+/* Fix for tooltips and popovers on mobile */
+@media (max-width: 575.98px) {
+  .tooltip,
+  .popover {
+    max-width: calc(100vw - 32px);
+    font-size: 0.875rem;
+  }
+}
+
+/* ============================================
    PRINT STYLES
    ============================================ */
 

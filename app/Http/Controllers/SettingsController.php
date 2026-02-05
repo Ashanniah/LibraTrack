@@ -266,14 +266,44 @@ class SettingsController extends BaseController
             // Set timeout
             $mail->Timeout = 10;
             
-            // Test connection by connecting to SMTP server
+            // Test connection and send a test email
             $mail->smtpConnect();
             
             if ($mail->smtpConnected()) {
+                // Send a test email to the user's email address
+                $fromName = $request->input('smtp_from_name', 'LibraTrack');
+                $mail->setFrom($fromEmail, $fromName);
+                $mail->addAddress($username, 'Test Recipient'); // Send to self
+                
+                $mail->isHTML(true);
+                $mail->Subject = 'LibraTrack SMTP Test - Connection Successful';
+                $mail->Body = '
+                    <html>
+                    <body style="font-family: Arial, sans-serif; padding: 20px;">
+                        <h2 style="color: #28a745;">✅ SMTP Connection Test Successful!</h2>
+                        <p>This is a test email from LibraTrack to verify your SMTP configuration is working correctly.</p>
+                        <p><strong>Test Details:</strong></p>
+                        <ul>
+                            <li>SMTP Host: ' . htmlspecialchars($host) . '</li>
+                            <li>SMTP Port: ' . htmlspecialchars($port) . '</li>
+                            <li>Encryption: ' . htmlspecialchars(strtoupper($encryption)) . '</li>
+                            <li>From: ' . htmlspecialchars($fromEmail) . '</li>
+                            <li>Test Time: ' . date('Y-m-d H:i:s') . '</li>
+                        </ul>
+                        <p style="color: #6c757d; font-size: 12px; margin-top: 30px;">
+                            If you received this email, your SMTP settings are configured correctly and ready to send notifications.
+                        </p>
+                    </body>
+                    </html>
+                ';
+                $mail->AltBody = 'SMTP Connection Test Successful! This is a test email from LibraTrack.';
+                
+                $mail->send();
                 $mail->smtpClose();
+                
                 return response()->json([
                     'success' => true,
-                    'message' => 'SMTP connection successful'
+                    'message' => 'SMTP connection successful! A test email has been sent to ' . $username . '. Please check your inbox (and spam folder).'
                 ]);
             } else {
                 return response()->json([
@@ -282,6 +312,16 @@ class SettingsController extends BaseController
                 ], 500);
             }
         } catch (Exception $e) {
+            // Queue SMTP_CONFIG_FAILURE notification for admin
+            try {
+                require_once __DIR__ . '/../../includes/email_notifications.php';
+                $pdo = DB::connection()->getPdo();
+                $errorMsg = substr($e->getMessage(), 0, 200);
+                queue_email($pdo, $user['id'], 'SMTP_CONFIG_FAILURE', 'error', null);
+            } catch (\Exception $notifError) {
+                // Ignore notification errors
+            }
+            
             return response()->json([
                 'success' => false,
                 'error' => $e->getMessage()

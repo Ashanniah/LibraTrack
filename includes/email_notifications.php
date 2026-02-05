@@ -12,25 +12,54 @@ require_once __DIR__ . '/email_templates.php';
  * Check if email should be sent for a notification type
  */
 function should_send_email_type(string $type, PDO $pdo): bool {
-    // REQUIRED types - always send
-    $required = ['OVERDUE', 'LOW_STOCK'];
-    if (in_array($type, $required, true)) {
+    // Email-only notification system - all role-based events
+    
+    // STUDENT notifications - all required
+    $studentRequired = [
+        'BORROW_REQUEST_APPROVED',
+        'BORROW_REQUEST_REJECTED',
+        'DUE_SOON',
+        'OVERDUE',
+        'ACCOUNT_STATUS_CHANGE',
+        'PASSWORD_RESET'
+    ];
+    if (in_array($type, $studentRequired, true)) {
         return true;
     }
     
-    // OPTIONAL types - check config flag
-    $optional = ['BORROW_REQUEST_APPROVED', 'BORROW_REQUEST_REJECTED', 'DUE_SOON'];
-    if (in_array($type, $optional, true)) {
-        $enabled = get_setting($pdo, 'email_optional_enabled', '0');
-        return $enabled === '1';
+    // LIBRARIAN notifications - all required
+    $librarianRequired = [
+        'NEW_BORROW_REQUEST',
+        'LOW_STOCK',
+        'OVERDUE_SUMMARY',
+        'ACCOUNT_STATUS_CHANGE',
+        'PASSWORD_RESET'
+    ];
+    if (in_array($type, $librarianRequired, true)) {
+        return true;
     }
     
-    // EMAIL_FAILURE - check if enabled
-    if ($type === 'EMAIL_FAILURE') {
-        $enabled = get_setting($pdo, 'email_failure_notifications', '1');
-        return $enabled === '1';
+    // ADMIN notifications - all required
+    $adminRequired = [
+        'EMAIL_FAILURE',
+        'SMTP_CONFIG_FAILURE',
+        'SMTP_MISCONFIGURATION',
+        'CRITICAL_SYSTEM_ERROR',
+        'ACCOUNT_ROLE_CHANGE',
+        'SECURITY_EVENT',
+        'BACKUP_ALERT',
+        'MAINTENANCE_ALERT'
+    ];
+    if (in_array($type, $adminRequired, true)) {
+        return true;
     }
     
+    // Legacy support for existing types
+    if (in_array($type, ['OVERDUE_CRITICAL'], true)) {
+        return true; // Map to librarian
+    }
+    
+    // All other types - disabled
     return false;
 }
 
@@ -166,6 +195,11 @@ function process_email_queue(PDO $pdo, int $limit = 25): array {
                     throw new Exception("Could not build email template for type: {$type}");
                 }
                 
+                // Get recipient role
+                $stmtRole = $pdo->prepare("SELECT role FROM users WHERE id = ?");
+                $stmtRole->execute([$recipientUserId]);
+                $recipientRole = $stmtRole->fetchColumn() ?: null;
+                
                 // Send email
                 $result = send_mail(
                     $pdo,
@@ -174,6 +208,20 @@ function process_email_queue(PDO $pdo, int $limit = 25): array {
                     $template['subject'],
                     $template['html']
                 );
+                
+                // Log to email_logs table
+                $logId = log_email($pdo, [
+                    'user_id' => $recipientUserId,
+                    'role' => $recipientRole,
+                    'recipient_email' => $recipient['email'],
+                    'event_type' => $type,
+                    'subject' => $template['subject'],
+                    'body_preview' => substr(strip_tags($template['html']), 0, 500),
+                    'status' => $result['success'] ? 'sent' : 'failed',
+                    'error_message' => $result['success'] ? null : ($result['error'] ?? 'Unknown error'),
+                    'related_entity_type' => $entityType,
+                    'related_entity_id' => $entityId,
+                ]);
                 
                 // Update delivery status
                 if ($result['success']) {
@@ -354,6 +402,30 @@ function build_email_template(PDO $pdo, string $type, ?string $entityType, ?int 
                 }
                 break;
                 
+            case 'NEW_BORROW_REQUEST':
+                if ($entityType === 'borrow_request' && $entityId) {
+                    $stmt = $pdo->prepare("
+                        SELECT br.duration_days, b.title, u.first_name, u.last_name, u.student_no
+                        FROM borrow_requests br
+                        INNER JOIN books b ON b.id = br.book_id
+                        INNER JOIN users u ON u.id = br.student_id
+                        WHERE br.id = ?
+                    ");
+                    $stmt->execute([$entityId]);
+                    $request = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($request) {
+                        $studentName = trim(($request['first_name'] ?? '') . ' ' . ($request['last_name'] ?? ''));
+                        return tpl_new_borrow_request(
+                            trim(($recipient['first_name'] ?? '') . ' ' . ($recipient['last_name'] ?? '')),
+                            $studentName,
+                            $request['title'],
+                            $request['student_no'] ?? '',
+                            (int)$request['duration_days']
+                        );
+                    }
+                }
+                break;
+                
             case 'BORROW_REQUEST_APPROVED':
                 if ($entityType === 'loan' && $entityId) {
                     $stmt = $pdo->prepare("
@@ -394,10 +466,42 @@ function build_email_template(PDO $pdo, string $type, ?string $entityType, ?int 
                 }
                 break;
                 
+            case 'OVERDUE_CRITICAL':
+                if ($entityType === 'loan' && $entityId) {
+                    $stmt = $pdo->prepare("
+                        SELECT b.title, l.due_at, u.first_name, u.last_name
+                        FROM loans l 
+                        INNER JOIN books b ON b.id = l.book_id 
+                        INNER JOIN users u ON u.id = l.student_id
+                        WHERE l.id = ?
+                    ");
+                    $stmt->execute([$entityId]);
+                    $loan = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if ($loan) {
+                        $today = date('Y-m-d');
+                        $daysOverdue = (int)((strtotime($today) - strtotime($loan['due_at'])) / 86400);
+                        $studentName = trim(($loan['first_name'] ?? '') . ' ' . ($loan['last_name'] ?? ''));
+                        return tpl_overdue_critical(
+                            trim(($recipient['first_name'] ?? '') . ' ' . ($recipient['last_name'] ?? '')),
+                            $loan['title'],
+                            $studentName,
+                            $daysOverdue
+                        );
+                    }
+                }
+                break;
+                
             case 'EMAIL_FAILURE':
                 return tpl_email_failure(
                     trim(($recipient['first_name'] ?? '') . ' ' . ($recipient['last_name'] ?? '')),
                     'Email delivery failures detected. Please check SMTP settings.'
+                );
+                
+            case 'SMTP_CONFIG_FAILURE':
+                $error = $entityType === 'error' ? $entityId : 'SMTP configuration test failed';
+                return tpl_smtp_config_failure(
+                    trim(($recipient['first_name'] ?? '') . ' ' . ($recipient['last_name'] ?? '')),
+                    $error
                 );
         }
     } catch (Exception $e) {
@@ -405,6 +509,58 @@ function build_email_template(PDO $pdo, string $type, ?string $entityType, ?int 
     }
     
     return null;
+}
+
+/**
+ * Build notification data from email template
+ * Creates in-app notification record from email template data
+ */
+function build_notification_from_email(PDO $pdo, string $type, ?string $entityType, ?int $entityId, array $recipient, array $template): ?array {
+    try {
+        $title = $template['subject'] ?? '';
+        $message = strip_tags($template['html'] ?? '');
+        $deepLink = null;
+        
+        // Build deep links based on type
+        switch ($type) {
+            case 'BORROW_REQUEST_APPROVED':
+            case 'BORROW_REQUEST_REJECTED':
+            case 'DUE_SOON':
+            case 'OVERDUE':
+                if ($entityType === 'loan' && $entityId) {
+                    $deepLink = "/student-history.html";
+                } elseif ($entityType === 'borrow_request' && $entityId) {
+                    $deepLink = "/books.html";
+                }
+                break;
+                
+            case 'LOW_STOCK':
+                if ($entityType === 'book' && $entityId) {
+                    $deepLink = "/librarian-lowstock.html";
+                }
+                break;
+                
+            case 'OVERDUE_CRITICAL':
+                if ($entityType === 'loan' && $entityId) {
+                    $deepLink = "/librarian-active-loans.html";
+                }
+                break;
+                
+            case 'EMAIL_FAILURE':
+            case 'SMTP_CONFIG_FAILURE':
+                $deepLink = "/admin-settings.html";
+                break;
+        }
+        
+        return [
+            'title' => $title,
+            'message' => $message,
+            'deep_link' => $deepLink
+        ];
+    } catch (Exception $e) {
+        error_log("Error building notification from email: " . $e->getMessage());
+        return null;
+    }
 }
 
 /**

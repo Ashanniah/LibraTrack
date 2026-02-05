@@ -711,6 +711,9 @@
       const role = (me.role || '').toLowerCase();
       console.log('Dashboard: Detected role:', role);
       
+      // Store role globally for refresh functions
+      window.currentRole = role;
+      
       // Cache role for sidebar (so it renders immediately on next page)
       if (['admin', 'librarian', 'student'].includes(role)) {
         localStorage.setItem('userRole', role);
@@ -878,7 +881,6 @@
         <div class="row g-3 mb-3">
           <!-- Members -->
           <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-success"><div class="sb-card-title"><i class="bi bi-people"></i>Total Students</div><div class="sb-card-value" id="lbStudents"><div class="skeleton skeleton-value"></div></div></div></div>
-          <div class="col-6 col-md-3"><div class="sb-card elevated text-center card-success"><div class="sb-card-title"><i class="bi bi-person-plus"></i>Registered Today</div><div class="sb-card-value" id="lbStudentsToday"><div class="skeleton skeleton-value"></div></div></div></div>
         </div>
         <div class="qa-bar mb-3">
           <h5 class="fw-semibold">Quick Actions</h5>
@@ -1026,17 +1028,84 @@
       // Students
       let students=[];
       try{
-        const res=await fetch('/api/users/search?q=&role=student&limit=500',{credentials:'include'});
+        const res=await fetch('/api/users?role=student&limit=500',{credentials:'include'});
         const data=await res.json().catch(()=>({success:false}));
-        if (data && (data.success===true)) students=data.students||[];
-        else if (data.users) students=data.users||[];
-      }catch{}
-      const registeredToday = students.filter(s => (s.created_at||'').slice(0,10)===today).length;
+        if (data && (data.success===true)) {
+          students=data.students||[];
+        } else if (data.users) {
+          students=data.users||[];
+        }
+        console.log('Dashboard: Loaded students:', students.length);
+      }catch(err){
+        console.error('Dashboard: Error loading students:', err);
+      }
       updateCard('lbStudents', students.length||0);
-      updateCard('lbStudentsToday', registeredToday||0);
 
       // Notifications are handled by centralized notifications.js
     }
+    
+    // Export function to refresh student counts (can be called from other pages)
+    window.refreshLibrarianStudentCounts = async function() {
+      // Check if we're on librarian dashboard
+      const role = (window.currentRole || localStorage.getItem('userRole') || '').toLowerCase();
+      if (role !== 'librarian') return;
+      
+      // Helper function to update card
+      const updateCard = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.innerHTML = '';
+          el.textContent = value;
+          el.classList.add('fade-in');
+        }
+      };
+      
+      // Reload only student counts, not entire dashboard
+      let students=[];
+      try{
+        const res=await fetch('/api/users?role=student&limit=500',{credentials:'include'});
+        const data=await res.json().catch(()=>({success:false}));
+        if (data && (data.success===true)) {
+          students=data.students||[];
+        } else if (data.users) {
+          students=data.users||[];
+        }
+        console.log('Dashboard: Refreshed student counts:', students.length);
+      }catch(err){
+        console.warn('Failed to refresh student counts:', err);
+        return;
+      }
+      
+      updateCard('lbStudents', students.length||0);
+    };
+    
+    // Listen for student creation events
+    window.addEventListener('studentCreated', () => {
+      if (typeof refreshLibrarianStudentCounts === 'function') {
+        refreshLibrarianStudentCounts();
+      }
+    });
+    
+    // Also refresh when page becomes visible (in case student was added in another tab)
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        // Refresh student counts when page becomes visible
+        const role = (window.currentRole || '').toLowerCase();
+        if (role === 'librarian' && typeof refreshLibrarianStudentCounts === 'function') {
+          setTimeout(() => {
+            refreshLibrarianStudentCounts();
+          }, 500);
+        }
+      }
+    });
+    
+    // Refresh on window focus (when switching back to dashboard tab)
+    window.addEventListener('focus', () => {
+      const role = (window.currentRole || '').toLowerCase();
+      if (role === 'librarian' && typeof refreshLibrarianStudentCounts === 'function') {
+        refreshLibrarianStudentCounts();
+      }
+    });
 
     function initAdminDashboard(section){
       section.innerHTML = `
@@ -1158,17 +1227,62 @@
         updateCard('adCategories', '—');
       }
       updateCard('adThreshold', '3');
+      
+      // Check SMTP Status
       const smtpEl = document.getElementById('adSmtp');
       if (smtpEl) {
-        smtpEl.innerHTML = '';
-        smtpEl.textContent = 'Configured';
-        smtpEl.classList.add('fade-in');
+        try {
+          const res = await fetch('/api/settings', {credentials: 'include'});
+          const data = await res.json().catch(() => ({success: false}));
+          if (data.success && data.settings) {
+            const smtpHost = (data.settings.smtp_host || '').trim();
+            const smtpUser = (data.settings.smtp_user || '').trim();
+            const smtpPass = (data.settings.smtp_pass || '').trim();
+            const isConfigured = smtpHost && smtpUser && smtpPass;
+            
+            smtpEl.innerHTML = '';
+            smtpEl.textContent = isConfigured ? 'Configured' : 'Not Configured';
+            smtpEl.parentElement.className = isConfigured ? 'sb-card elevated text-center card-success' : 'sb-card elevated text-center card-danger';
+            smtpEl.classList.add('fade-in');
+            
+            // Add click handler to navigate to settings if not configured
+            if (!isConfigured) {
+              smtpEl.style.cursor = 'pointer';
+              smtpEl.title = 'Click to configure SMTP settings';
+              smtpEl.onclick = () => {
+                window.location.href = 'admin-settings.html';
+              };
+            }
+          } else {
+            smtpEl.innerHTML = '';
+            smtpEl.textContent = 'Not Configured';
+            smtpEl.parentElement.className = 'sb-card elevated text-center card-danger';
+            smtpEl.classList.add('fade-in');
+            smtpEl.style.cursor = 'pointer';
+            smtpEl.title = 'Click to configure SMTP settings';
+            smtpEl.onclick = () => {
+              window.location.href = 'admin-settings.html';
+            };
+          }
+        } catch (e) {
+          console.error('Error loading SMTP settings:', e);
+          smtpEl.innerHTML = '';
+          smtpEl.textContent = 'Not Configured';
+          smtpEl.parentElement.className = 'sb-card elevated text-center card-danger';
+          smtpEl.classList.add('fade-in');
+          smtpEl.style.cursor = 'pointer';
+          smtpEl.title = 'Click to configure SMTP settings';
+          smtpEl.onclick = () => {
+            window.location.href = 'admin-settings.html';
+          };
+        }
       }
-      // Notification Channel: Shows email channel status
+      
+      // Notification Channel: Shows email channel status (always enabled for email-only system)
       const notifChannelEl = document.getElementById('adNotifChannel');
       if (notifChannelEl) {
         notifChannelEl.innerHTML = '';
-        notifChannelEl.textContent = 'Email (enabled)';
+        notifChannelEl.textContent = 'Email (Enabled)';
         notifChannelEl.classList.add('fade-in');
       }
 

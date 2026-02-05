@@ -217,22 +217,29 @@ class BookController extends BaseController
         // Use normalized ISBN for uniqueness check and storage
         $normalizedIsbn = $isbnValidation['cleaned'];
         
-        // Check unique ISBN (using normalized ISBN)
-        // For librarians: check uniqueness within books they added only
-        // For admins: check global uniqueness
-        $isbnQuery = DB::table('books')->whereRaw('TRIM(REPLACE(REPLACE(isbn, "-", ""), " ", "")) = ?', [$normalizedIsbn]);
-        
-        if (strtolower($user['role'] ?? '') === 'librarian') {
+        // Check unique ISBN only for books added by the current user
+        // Only show error if the user themselves added a book with the exact same 13-digit ISBN
+        try {
             $userId = (int)($user['id'] ?? 0);
-            if ($userId > 0 && $this->booksHasAddedBy()) {
-                // Check ISBN uniqueness within books added by this librarian only
-                $isbnQuery->where('added_by', $userId);
+            $userRole = strtolower($user['role'] ?? '');
+            
+            $isbnQuery = DB::table('books')->whereRaw('TRIM(REPLACE(REPLACE(isbn, "-", ""), " ", "")) = ?', [$normalizedIsbn]);
+            
+            // Only check against books added by the current user (for librarians)
+            // Admin can have duplicates from different librarians, but not from themselves
+            if ($userRole === 'librarian' || $userRole === 'admin') {
+                if ($this->booksHasAddedBy() && $userId > 0) {
+                    $isbnQuery->where('added_by', $userId);
+                }
             }
-        }
-        // Admin checks global ISBN uniqueness (no filter)
-        
-        if ($isbnQuery->exists()) {
-            return response()->json(['ok' => false, 'error' => 'ISBN already exists'], 409);
+            // If added_by column doesn't exist or user is not librarian/admin, check globally (fallback)
+            
+            if ($isbnQuery->exists()) {
+                return response()->json(['ok' => false, 'error' => 'A book with this ISBN already exists.'], 409);
+            }
+        } catch (\Exception $e) {
+            // If ISBN check fails, log but don't block - allow the insert to proceed
+            error_log("ISBN duplicate check error: " . $e->getMessage());
         }
 
         $coverFile = null;
@@ -291,7 +298,49 @@ class BookController extends BaseController
             }
             // Admin can leave added_by and school_id null for global books
 
-            $bookId = DB::table('books')->insertGetId($insertData);
+            try {
+                $bookId = DB::table('books')->insertGetId($insertData);
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Handle database constraint violations (like unique ISBN)
+                $errorCode = $e->getCode();
+                $errorMessage = $e->getMessage();
+                
+                // MySQL error code 1062 is "Duplicate entry", 23000 is SQL standard
+                if ($errorCode == 23000 || $errorCode == 1062 || 
+                    strpos($errorMessage, 'Duplicate entry') !== false || 
+                    strpos($errorMessage, 'UNIQUE constraint') !== false ||
+                    stripos($errorMessage, 'unique constraint') !== false) {
+                    
+                    // Check if this is an ISBN duplicate
+                    if (stripos($errorMessage, 'isbn') !== false) {
+                        // Check if the duplicate is from the same user
+                        $duplicateBook = DB::table('books')
+                            ->whereRaw('TRIM(REPLACE(REPLACE(isbn, "-", ""), " ", "")) = ?', [$normalizedIsbn])
+                            ->first();
+                        
+                        if ($duplicateBook) {
+                            $duplicateAddedBy = (int)($duplicateBook->added_by ?? 0);
+                            $currentUserId = (int)($user['id'] ?? 0);
+                            
+                            // Only show error if the duplicate is from the same user
+                            if ($duplicateAddedBy === $currentUserId && $currentUserId > 0 && $this->booksHasAddedBy()) {
+                                return response()->json(['ok' => false, 'error' => 'A book with this ISBN already exists.'], 409);
+                            } else {
+                                // Different user has this ISBN - database unique constraint prevents this
+                                // This means the database has a global unique constraint on ISBN
+                                // We need to inform the user that ISBN must be globally unique
+                                return response()->json([
+                                    'ok' => false, 
+                                    'error' => 'A book with this ISBN already exists in the system.'
+                                ], 409);
+                            }
+                        }
+                        return response()->json(['ok' => false, 'error' => 'A book with this ISBN already exists.'], 409);
+                    }
+                }
+                // Re-throw if it's not a constraint violation we can handle
+                throw $e;
+            }
             
             // Log book creation
             AuditLog::logAction(
@@ -358,7 +407,13 @@ class BookController extends BaseController
             if ($coverFile && file_exists(public_path("uploads/covers/{$coverFile}"))) {
                 @unlink(public_path("uploads/covers/{$coverFile}"));
             }
-            return response()->json(['ok' => false, 'error' => 'Insert failed'], 500);
+            // Log the actual error for debugging
+            error_log("Book insert error: " . $e->getMessage());
+            error_log("Book insert error trace: " . $e->getTraceAsString());
+            return response()->json([
+                'ok' => false, 
+                'error' => 'Failed to add book: ' . $e->getMessage()
+            ], 500);
         }
     }
 
